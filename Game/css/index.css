@@ -35,7 +35,8 @@
     float: right;
 }
 
-.element-off {
+/* Styles for hiding an element and making it invisible */
+.element-hidden {
     visibility: hidden;
     display: none;
 }
