@@ -22,7 +22,6 @@
     margin: 0;
     padding-left: 10px;
     padding-top: 5px;
-    padding-bottom: 5px;
     float: left;
 }
 
@@ -31,6 +30,12 @@
     margin: 0;
     padding-right: 10px;
     padding-top: 5px;
-    padding-bottom: 5px;
     float: right;
+}
+
+/* Styles for the pause / resume button */
+#pause-resume-button img {
+    margin: 0;
+    padding-top: 5px;
+    padding-bottom: 5px;
 }

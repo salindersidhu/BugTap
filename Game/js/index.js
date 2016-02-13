@@ -1,9 +1,18 @@
 var setup = (function() {
-    // Game variables
-    var FPS = 60;               // Frames per second (Default: 60)
-    var CANVAS_WIDTH = 400;     // Canvas width (Default: 400)
-    var CANVAS_HEIGHT = 600;    // Canvas height (Default: 600)
-    var isGameRunning = false;  // If game is running (Default: false)
+    // Frames per second (Default: 60)
+    var FPS = 60;
+    // Canvas width (Default: 400)
+    var CANVAS_WIDTH = 400;
+    // Canvas height (Default: 600)
+    var CANVAS_HEIGHT = 600;
+    // Play button image
+    var PLAY_BUTTON_IMAGE = "assets/button_play.png";
+    // Pause button image
+    var PAUSE_BUTTON_IMAGE = "assets/button_pause.png";
+    // If game has started (Default: false)
+    var isGameStarted = false;
+    // If game is paused (Default: false)
+    var isGamePaused = false;
 
     // Function that sets up the HTML element events and game canvas
     this.init = function() {
@@ -13,6 +22,18 @@ var setup = (function() {
         $("#back-button").click(function(){homeLinkEvent();});
         $("#clear-button").click(function(){scoreClearEvent();});
         $("#play-button").click(function(){playLinkEvent();});
+        $("#pause-resume-button").click(function(){pauseResumeEvent();});
+    }
+    //
+    this.pauseResumeEvent = function() {
+        // Pause the game is game is running and resume the game if paused
+        isGamePaused = !isGamePaused;
+        // Change the image of the button depending on the state of the game
+        if (isGamePaused) {
+            $("#pause-resume-button img").attr("src", PLAY_BUTTON_IMAGE);
+        } else {
+            $("#pause-resume-button img").attr("src", PAUSE_BUTTON_IMAGE);
+        }
     }
     // Function that handles loading the high score value from local storage
     this.refreshScoreEvent = function() {
@@ -29,7 +50,7 @@ var setup = (function() {
     // Function that handles the event for the score naviation link
     this.scoreLinkEvent = function() {
         // If game is not running
-        if (!isGameRunning) {
+        if (!isGameStarted) {
             // Set score link item to active and home link to inactive
             $("#score-link").addClass("active");
             $("#home-link").removeClass("active");
@@ -42,7 +63,7 @@ var setup = (function() {
     // Function that handles the event for the home navigation link
     this.homeLinkEvent = function() {
         // If game is not running
-        if (!isGameRunning) {
+        if (!isGameStarted) {
             // Set home link to active and score link to inactive
             $("#home-link").addClass("active");
             $("#score-link").removeClass("active");
@@ -56,7 +77,7 @@ var setup = (function() {
         // Hide the welcome section and show the game section
         $("#welcome-section").hide();
         $("#game-section").show();
-        isGameRunning = true; // Game has now started
+        isGameStarted = true; // Game has now started
     }
     // Functions that are returned
     return {
