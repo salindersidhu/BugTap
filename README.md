@@ -6,7 +6,12 @@ A single player game adapted from Assignment 2 of CSC309 at the University of To
 In this game, there are 5 pieces of food positioned randomly at the center of the table. Bugs will randomly appear from all corners of the table and will move towards the closest piece of food. The first bug that reaches a piece of food immediately eats it, the bugs then move to the next closest piece of food. The player's objective is to kill all the bugs before they eat all the food. The game ends when either the 60 second timer is up or when the bugs have eaten all the food on the table.
 
 ## Credits
-- University of Toronto: CSC309 Programming on the Web, Summer 2015, Assignment 2
+- Original Assignment:
+    - University of Toronto: CSC309 Programming on the Web, Summer 2015
+- Original Graphics:
+    - Bug sprite from [E-String](http://e-string.com/articles/create-simple-game-using-sprite-kit/)
+    - Food sprites from [Free vector](http://all-free-download.com/free-vector/download/vivid_food_icon_design_vector_535039.html)
+    - Table cloth texture purchased from [Turbo Squid](http://www.turbosquid.com/FullPreview/Index.cfm/ID/680798)
 
 ## License:
 Copyright (c) 2016 Salinder Sidhu
