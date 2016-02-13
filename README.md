@@ -11,7 +11,6 @@ In this game, there are 5 pieces of food positioned randomly at the center of th
 - Original Graphics:
     - Bug sprite from [E-String](http://e-string.com/articles/create-simple-game-using-sprite-kit/)
     - Food sprites from [Free vector](http://all-free-download.com/free-vector/download/vivid_food_icon_design_vector_535039.html)
-    - Table cloth texture purchased from [Turbo Squid](http://www.turbosquid.com/FullPreview/Index.cfm/ID/680798)
 
 ## License:
 Copyright (c) 2016 Salinder Sidhu
