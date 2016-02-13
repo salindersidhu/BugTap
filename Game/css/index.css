@@ -9,9 +9,9 @@
 /* Styles for the infobar */
 #infobar {
     margin: 0 auto;
-    border-top: 2px solid #000000;
-    border-left: 2px solid #000000;
-    border-right: 2px solid #000000;
+    border-top: 2px solid black;
+    border-left: 2px solid black;
+    border-right: 2px solid black;
     width: 404px;
     height: auto;
     overflow: hidden;
