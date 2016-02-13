@@ -1,11 +1,11 @@
 function TapTapBug(FPS, timeTextID) {
-    var _this = this;           // Store a reference to the module
-    this.timer = 61;            // Game's timer
-    this.isGamePaused = true;   // If game is paused
-    this.ctx = null;            // Game's drawing canvas
-    this.FPS = FPS              // Frames per second
+    var _this = this;               // Store a reference to the module
+    this.timer = 61;                // Game's timer
+    this.isGamePaused = true;       // If game is paused
+    this.ctx = null;                // Game's drawing canvas
+    this.FPS = FPS                  // Frames per second
     this.timeTextID = timeTextID;   // The ID of the time text element
-    init();                     // Initialize game
+    init();                         // Initialize game
 
     // Function that handles initialization of game
     function init() {
