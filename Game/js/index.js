@@ -1,48 +1,51 @@
-function TapTapBug(FPS) {
-    // Store a reference to the module
-    var _this = this;
-    // Game's timer (Default: 60)
-    this.timer = 60;
-    // If game is paused (Default: true)
-    this.isGamePaused = true;
-    // Obtain the canvas from the DOM and configure the context
-    canvas = $("#game-canvas").get(0);
-    var ctx = canvas.getContext("2d");
-    // Execute the game loop indefinitely
-    setInterval(gameLoop, 1000 / FPS);
+function TapTapBug(FPS, timeTextID) {
+    var _this = this;           // Store a reference to the module
+    this.timer = 61;            // Game's timer
+    this.isGamePaused = true;   // If game is paused
+    this.ctx = null;            // Game's drawing canvas
+    this.FPS = FPS              // Frames per second
+    this.timeTextID = timeTextID;   // The ID of the time text element
+    init();                     // Initialize game
 
+    // Function that handles initialization of game
+    function init() {
+        // Obtain the canvas from the DOM and configure the context
+        canvas = $("#game-canvas").get(0);
+        _this.ctx = canvas.getContext("2d");
+        // Execute the game loop indefinitely
+        setInterval(gameLoop, 1000 / _this.FPS);
+    }
     // Function that updates the game and renders the game content
     function gameLoop() {
         if (!_this.isGamePaused) {
+            // Update game
+            update();
         }
     }
+    function update() {
+        // Update countdown timer and corresponding time text element
+        _this.timer -= 1 / _this.FPS;
+        $(_this.timeTextID).text("Time: " + Math.floor(_this.timer));
+    }
     // Function that sets the value of the instance varaible isGamePaused
-    function setGamePaused(isGamePaused) {
+    function setPaused(isGamePaused) {
         _this.isGamePaused = isGamePaused;
     }
     // Functions that are returned
     return {
-        setGamePaused : setGamePaused
+        setPaused : setPaused
     }
 }
 
 var setup = (function() {
-    // Frames per second (Default: 60)
-    var FPS = 60;
-    // Canvas width (Default: 400)
-    var CANVAS_WIDTH = 400;
-    // Canvas height (Default: 600)
-    var CANVAS_HEIGHT = 600;
-    // Play button image
-    var PLAY_BUTTON_IMAGE = "assets/button_play.png";
-    // Pause button image
-    var PAUSE_BUTTON_IMAGE = "assets/button_pause.png";
-    // If game has started (Default: false)
-    var isGameStarted = false;
-    // If game is paused (Default: false)
-    var isGamePaused = true;
-    // Create a new game instance
-    var game = new TapTapBug(FPS);
+    var FPS = 60;                                       // Frames per second
+    var CANVAS_WIDTH = 400;                             // Canvas width
+    var CANVAS_HEIGHT = 600;                            // Canvas height
+    var PLAY_BUTTON_IMAGE = "assets/button_play.png";   // Play button image
+    var PAUSE_BUTTON_IMAGE = "assets/button_pause.png"; // Pause button image
+    var isGameStarted = false;                          // If game has started
+    var isGamePaused = true;                            // If game is paused
+    var game = new TapTapBug(FPS, "#time-text");        // New game instance
 
     // Function that sets up the HTML element events and game canvas
     this.init = function() {
@@ -58,7 +61,7 @@ var setup = (function() {
     this.pauseResumeToggleEvent = function() {
         // Pause the game is game is running and resume the game if paused
         isGamePaused = !isGamePaused;
-        game.setGamePaused(isGamePaused);
+        game.setPaused(isGamePaused);
         // Change the image of the button depending on the state of the game
         if (isGamePaused) {
             $("#pause-resume-button img").attr("src", PLAY_BUTTON_IMAGE);
