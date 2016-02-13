@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<!-- Head -->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other content must come *after* these tags -->
+    <title>Tap Tap Bug!</title>
+    <!-- Latest compiled and minified Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <link href="css/ie10-viewport-bug-workaround.css" rel="stylesheet">
+    <!-- Custom styles for this template -->
+    <link href="css/cover.css" rel="stylesheet">
+    <!-- Link external CSS -->
+	<link href="css/index.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+<!-- Body -->
+<body>
+    <div class="site-wrapper">
+        <div class="site-wrapper-inner">
+            <div class="cover-container">
+                <!-- Navigation -->
+                <div class="masthead clearfix">
+                    <div class="inner">
+                        <!-- Heading title -->
+                        <h3 class="masthead-brand">Tap Tap Bug!</h3>
+                        <!-- Navigation menu -->
+                        <nav>
+                            <ul class="nav masthead-nav">
+                                <li class="active"><a href="#">Home</a></li>
+                                <li><a href="#">Score</a></li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+                <!-- Page content -->
+                <div class="inner cover">
+                    <!-- Welcome section -->
+                    <section id="welcome-section">
+                        <h1 class="cover-heading">Welcome</h1>
+                        <p class="lead">Squish as many bugs as you can within one minute before the bugs eat all the food, good luck!</p>
+                        <p class="lead">
+                            <a href="#" class="btn btn-lg btn-default">Play Game</a>
+                        </p>
+                    </section>
+                    <!-- High Score section -->
+                    <section class="element-off" id="score-section">
+                        <h1 class="cover-heading">High Score: 0</h1>
+                        <p class="lead"></p>
+                        <p class="lead">
+                            <a href="#" class="btn btn-lg btn-default">Clear</a>
+                            <a href="#" class="btn btn-lg btn-default">Back</a>
+                        </p>
+                    </section>
+                    <!-- Game canvas section -->
+                    <section class="element-off" id="game-section">
+                        <section id="infobar">
+                            <!-- Time remaining in seconds -->
+                            <p class="lead" id="time-text">Time: 60</p>
+                            <!-- The current score -->
+                            <p class="lead" id="score-text" >Score: 0</p>
+                        </section>
+                        <canvas id="game-canvas" width="400" height="600"></canvas>
+                    </section>
+                </div>
+                <!-- Footer -->
+                <div class="mastfoot">
+                    <div class="inner">
+                        <p>Copyright &copy; 2016 <a href="https://github.com/SalinderSidhu">Salinder Sidhu</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <!-- Latest compiled and minified Bootstrap JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="js/ie10-viewport-bug-workaround.js"></script>
+    <!-- Link external JavaScript -->
+    <script src="js/index.js"></script>
+</body>
+</html>
