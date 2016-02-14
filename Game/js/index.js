@@ -5,36 +5,15 @@ function ResourceManager() {
     this.imageDict = {};
     // Functon that creates and stores a new Image
     function addImage(id, imageSource, width, height) {
-        // Error handling
-        if (arguments.length == 4) {
-            // Create and store image
-            var image = new Image();
-            image.src = imageSource;
-            image.width = width;
-            image.height = height;
-            _this.imageDict[id] = image;
-        } else {
-            // Throw error message
-            throw throwError(arguments.callee.name, "Incorrect arguments, " +
-                "required 4 found " + arguments.length + "!");
-        }
+        var image = new Image();
+        image.src = imageSource;
+        image.width = width;
+        image.height = height;
+        _this.imageDict[id] = image;
     }
     // Function that returns the Image corresponding to an ID
     function getImage(id) {
-        var image = _this.imageDict[id];
-        // Error handling
-        if (image) {
-            return image;
-        } else {
-            // Throw error message
-            throw throwError(arguments.callee.name, "Image with ID `" + id +
-                "` does not exist!");
-        }
-    }
-    // Function that returns a specific error message for a specific function
-    function throwError(functionName, message) {
-        return "error in Function (" + functionName + ") of module " +
-            "(ResourceManager): " + message;
+        return _this.imageDict[id];
     }
     // Functions returned by the module
     return {
@@ -88,7 +67,7 @@ function Animation(ctx, resMan, imageID, numFrames, TPF, FPS) {
         _this.ctx.save();
         // Configure the canvas opacity
         _this.ctx.globalAlpha = _this.opacity;
-        // Translate and rotate the canvas to render the Animation at an angle
+        // Translate and rotate the canvas to draw the Animation at an angle
         _this.ctx.translate(translateX, translateY);
         _this.ctx.rotate(_this.angle);
         _this.ctx.translate(-translateX, -translateY);
@@ -128,6 +107,7 @@ function Game(FPS, resMan, canvasID, canvasWidth, canvasHeight) {
     this.score = 0;
     this.timer = 61;
     this.timeTextID = null;
+    this.scoreTextID = null;
     this.bgPattern = null;
     this.ctx = null;
     this.isGamePaused = true;
@@ -135,10 +115,23 @@ function Game(FPS, resMan, canvasID, canvasWidth, canvasHeight) {
     // Function that handles initialization of the Game
     function init() {
         // Obtain the canvas and canvas context from the DOM
-        canvas = $(_this.canvasID).get(0);
+        var canvas = $(_this.canvasID).get(0);
         _this.ctx = canvas.getContext("2d");
+        // Add mouse click event handler to the canvas
+        canvas.addEventListener("mousedown", function() {
+            mouseClickEvents(event, canvas);
+        }, false);
         // Execute the game loop indefinitely
         setInterval(gameLoop, 1000 / _this.FPS);
+    }
+    // Function that handles all mouse click events for the Game
+    function mouseClickEvents(event, canvas) {
+        // Process mouse click events if Game is not paused
+        if (!_this.isGamePaused) {
+            // Obtain the mouse coordinates relative to the canvas
+            mouseX = event.pageX - canvas.offsetLeft;
+            mouseY = event.pageY - canvas.offsetTop;
+        }
     }
     // Function that sets the background Image for the Game
     function setBackgroundImage(imageID) {
@@ -153,6 +146,10 @@ function Game(FPS, resMan, canvasID, canvasWidth, canvasHeight) {
     // Function that sets the ID of the time text DOM element
     function setTimeTextID(timeTextID) {
         _this.timeTextID = timeTextID;
+    }
+    // Function that sets the ID of the score text DOM element
+    function setScoreTextID(scoreTextID) {
+        _this.scoreTextID = scoreTextID;
     }
     // Function that updates the Game and renders the Game's content
     function gameLoop() {
@@ -179,11 +176,16 @@ function Game(FPS, resMan, canvasID, canvasWidth, canvasHeight) {
     function setPaused(isGamePaused) {
         _this.isGamePaused = isGamePaused;
     }
+    // Function that returns a random number between an inclusive range
+    function getRandomNumber(minValue, maxValue) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
     // Functions returned by the module
     return {
         setPaused : setPaused,
         setBackgroundImage : setBackgroundImage,
-        setTimeTextID : setTimeTextID
+        setTimeTextID : setTimeTextID,
+        setScoreTextID : setScoreTextID
     }
 }
 
@@ -208,6 +210,7 @@ var Setup = (function() {
     var ID_GAME_SECTION = "#game-section";
     var ID_CANVAS = "#game-canvas";
     var ID_TIME_TEXT = "#time-text";
+    var ID_SCORE_TEXT = "#score-text";
     var isGameStarted = false;
     var isGamePaused = true;
     var resMan = new ResourceManager();
@@ -219,6 +222,7 @@ var Setup = (function() {
         // Setup remaining Game specific tasks
         game.setBackgroundImage("IMG_BG");
         game.setTimeTextID(ID_TIME_TEXT);
+        game.setScoreTextID(ID_SCORE_TEXT);
         // Bind unobtrusive event handlers
         $(ID_SCORE_LINK).click(function(){scoreLinkEvent();});
         $(ID_HOME_LINK).click(function(){homeLinkEvent();});
