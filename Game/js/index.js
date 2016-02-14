@@ -1,9 +1,8 @@
 // A module that handles creation and storage of resources such as Images
 function ResourceManager() {
     // Module constants and variables
-    var _this = this;       // Reference to this module
-    this.imageDict = {};    // Dictionary of Images (value) with a string (key)
-
+    var _this = this;
+    this.imageDict = {};
     // Functon that creates and stores a new Image
     function addImage(id, imageSource, width, height) {
         var image = new Image();
@@ -23,8 +22,79 @@ function ResourceManager() {
     }
 }
 
+// A module that handles control and rendering animations using sprite Images
+function Animation(ctx, resMan, imageID, numFrames, TPF, FPS) {
+    // Module constants and variables
+    var _this = this;
+    this.ctx = ctx;
+    this.numFrames = numFrames;
+    this.TPF = TPF; // Ticks per frame
+    this.FPS = FPS; // Frames per second
+    this.image = resMan.getImage(imageID);
+    this.width = this.image.width;
+    this.height = this.image.height;
+    this.opacity = 1;
+    this.angle = 0;
+    this.frameIndex = 0;
+    this.tickCounter = 0;
+    // Function that returns the opacity of the Animation
+    function getOpacity() {
+        return _this.opacity;
+    }
+    // Function that reduces the opacity of the Animation
+    function reduceOpacitiy(secondsToFade) {
+        _this.opacity -= 1 / (_this.FPS * secondsToFade);
+    }
+    // Function that updates the frame index of the Animation
+    function updateFrame() {
+        _this.tickCounter += 1;
+        // Update the frame index based on the passage of time
+        if (_this.tickCounter > _this.TPF) {
+            _this.tickCounter = 0;
+            // Reset the frame index at the end of the animation
+            if (_this.frameIndex < _this.numFrames - 1) {
+                _this.frameIndex += 1;
+            } else {
+                _this.frameIndex = 0;
+            }
+        }
+    }
+    // Function that handles drawing the Animation on the canvas
+    function render(x, y, angle) {
+        // Configure the translation points when rotating the canvas
+        var translateX = x + (_this.width / (2 * _this.numFrames));
+        var translateY = y + (_this.height / 2);
+        _this.ctx.save();
+        // Configure the canvas opacity
+        _this.ctx.globalAlpha = _this.opacity;
+        // Translate and rotate the canvas to render the Animation at an angle
+        _this.ctx.translate(translateX, translateY);
+        _this.ctx.rotate(_this.angle);
+        _this.ctx.translate(-translateX, -translateY);
+        // Draw the animation
+        _this.ctx.drawImage(
+            _this.image,
+            _this.frameIndex * _this.width / _this.numFrames,
+            0,
+            _this.width / _this.numFrames,
+            _this.height,
+            x,
+            y,
+            _this.width / _this.numFrames,
+            _this.height);
+        _this.ctx.restore();
+    }
+    // Functions returned by the module
+    return {
+        getOpacity : getOpacity,
+        reduceOpacitiy : reduceOpacitiy,
+        updateFrame : updateFrame,
+        render : render
+    }
+}
+
 // A singleton module that handles the setup of Game and HTML elements
-var setup = (function() {
+var Setup = (function() {
     // Singleton module constants and variables
     var FPS = 60;
     var CANVAS_WIDTH = 400;
@@ -43,11 +113,6 @@ var setup = (function() {
     var ID_GAME_SECTION = "#game-section";
     var isGameStarted = false;
     var isGamePaused = true;
-    //var game = new TapTapBug(FPS, "#time-text");
-
-    var test = new ResourceManager();
-    test.getImage("FF");
-
     // Function that sets up the HTML element events and game canvas
     this.init = function() {
         // Bind unobtrusive event handlers
@@ -62,7 +127,6 @@ var setup = (function() {
     this.pauseResumeToggleEvent = function() {
         // Pause the game is game is running and resume the game if paused
         isGamePaused = !isGamePaused;
-        //game.setPaused(isGamePaused);
         // Change the image of the button depending on the state of the game
         if (isGamePaused) {
             $(ID_BUTTON_PR + " img").attr("src", IMG_BUTTON_PLAY);
@@ -123,4 +187,4 @@ var setup = (function() {
 })();
 
 // Setup the game and events
-window.onload = setup.init;
+window.onload = Setup.init;
