@@ -5,34 +5,29 @@
     border-left: 2px solid black;
     border-bottom: 2px solid black;
 }
-
 /* Styles for the infobar */
 #infobar {
     margin: 0 auto;
-    border-top: 2px solid black;
-    border-left: 2px solid black;
-    border-right: 2px solid black;
-    width: 404px;
+    border: 2px solid black;
+    background-color: #404040; /* Shade of Grey */
+    width: 391px;
     height: auto;
     overflow: hidden;
 }
-
 /* Styles for the time remaining text */
 #time-text {
     margin: 0;
     padding-left: 10px;
-    padding-top: 5px;
+    padding-top: 10px;
     float: left;
 }
-
 /* Styles for the current score text */
 #score-text {
     margin: 0;
     padding-right: 10px;
-    padding-top: 5px;
+    padding-top: 10px;
     float: right;
 }
-
 /* Styles for the pause / resume button */
 #pause-resume-button img {
     margin: 0;

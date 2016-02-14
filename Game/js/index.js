@@ -5,15 +5,36 @@ function ResourceManager() {
     this.imageDict = {};
     // Functon that creates and stores a new Image
     function addImage(id, imageSource, width, height) {
-        var image = new Image();
-        image.src = imageSource;
-        image.width = width;
-        image.height = height;
-        _this.imageDict[id] = image;
+        // Error handling
+        if (arguments.length == 4) {
+            // Create and store image
+            var image = new Image();
+            image.src = imageSource;
+            image.width = width;
+            image.height = height;
+            _this.imageDict[id] = image;
+        } else {
+            // Throw error message
+            throw throwError(arguments.callee.name, "Incorrect arguments, " +
+                "required 4 found " + arguments.length + "!");
+        }
     }
     // Function that returns the Image corresponding to an ID
     function getImage(id) {
-        return _this.imageDict[id];
+        var image = _this.imageDict[id];
+        // Error handling
+        if (image) {
+            return image;
+        } else {
+            // Throw error message
+            throw throwError(arguments.callee.name, "Image with ID `" + id +
+                "` does not exist!");
+        }
+    }
+    // Function that returns a specific error message for a specific function
+    function throwError(functionName, message) {
+        return "error in Function (" + functionName + ") of module " +
+            "(ResourceManager): " + message;
     }
     // Functions returned by the module
     return {
@@ -93,14 +114,88 @@ function Animation(ctx, resMan, imageID, numFrames, TPF, FPS) {
     }
 }
 
-// A singleton module that handles the setup of Game and HTML elements
+// A module that handles all game related tasks for the Tap Tap Bug Game
+function Game(FPS, resMan, canvasID, canvasWidth, canvasHeight) {
+    // Module constants and variables
+    var _this = this;
+    this.FPS = FPS;
+    this.canvasID = canvasID;
+    this.canvasWidth = canvasWidth;
+    this.canvasHeight = canvasHeight;
+    this.resMan = resMan;
+    this.bugsArray = [];
+    this.foodArray = [];
+    this.score = 0;
+    this.timer = 61;
+    this.timeTextID = null;
+    this.bgPattern = null;
+    this.ctx = null;
+    this.isGamePaused = true;
+    init();
+    // Function that handles initialization of the Game
+    function init() {
+        // Obtain the canvas and canvas context from the DOM
+        canvas = $(_this.canvasID).get(0);
+        _this.ctx = canvas.getContext("2d");
+        // Execute the game loop indefinitely
+        setInterval(gameLoop, 1000 / _this.FPS);
+    }
+    // Function that sets the background Image for the Game
+    function setBackgroundImage(imageID) {
+        // Obtain the background Image from the ResourceManager
+        var image = _this.resMan.getImage(imageID);
+        // Execute function when background Image has fully loaded
+        image.onload = function() {
+            // Create a pattern using the background Image
+            _this.bgPattern = _this.ctx.createPattern(image, 'repeat');
+        }
+    }
+    // Function that sets the ID of the time text DOM element
+    function setTimeTextID(timeTextID) {
+        _this.timeTextID = timeTextID;
+    }
+    // Function that updates the Game and renders the Game's content
+    function gameLoop() {
+        if (!_this.isGamePaused) {
+            // Update the Game
+            update();
+            // Render the Game
+            render();
+        }
+    }
+    // Function that handles all the update events for the Game
+    function update() {
+        // Update the countdown timer and its corresponding time text
+        _this.timer -= 1 / _this.FPS;
+        $(_this.timeTextID).text("Time: " + Math.floor(_this.timer));
+    }
+    // Function that handles all the drawing for the Game
+    function render() {
+        // Render the Game's background
+        _this.ctx.fillStyle  = _this.bgPattern;
+        _this.ctx.fillRect(0, 0, _this.canvasWidth, _this.canvasHeight);
+    }
+    // Function that controls if the Game is paused or running
+    function setPaused(isGamePaused) {
+        _this.isGamePaused = isGamePaused;
+    }
+    // Functions returned by the module
+    return {
+        setPaused : setPaused,
+        setBackgroundImage : setBackgroundImage,
+        setTimeTextID : setTimeTextID
+    }
+}
+
+// A singleton module that handles the setup of Game and DOM elements
 var Setup = (function() {
     // Singleton module constants and variables
     var FPS = 60;
-    var CANVAS_WIDTH = 400;
+    var CANVAS_WIDTH = 387;
     var CANVAS_HEIGHT = 600;
     var IMG_BUTTON_PLAY = "assets/button_play.png";
     var IMG_BUTTON_PAUSE = "assets/button_pause.png";
+    var IMG_BG = "assets/table_texture.png";
     var ID_SCORE_LINK = "#score-link";
     var ID_HOME_LINK = "#home-link";
     var ID_BUTTON_CLEAR = "#clear-button";
@@ -111,10 +206,19 @@ var Setup = (function() {
     var ID_SCORE_SECTION = "#score-section";
     var ID_HOME_SECTION = "#home-section";
     var ID_GAME_SECTION = "#game-section";
+    var ID_CANVAS = "#game-canvas";
+    var ID_TIME_TEXT = "#time-text";
     var isGameStarted = false;
     var isGamePaused = true;
+    var resMan = new ResourceManager();
+    var game = new Game(FPS, resMan, ID_CANVAS, CANVAS_WIDTH, CANVAS_HEIGHT);
     // Function that sets up the HTML element events and game canvas
     this.init = function() {
+        // Initialize Game's resources
+        initResources();
+        // Setup remaining Game specific tasks
+        game.setBackgroundImage("IMG_BG");
+        game.setTimeTextID(ID_TIME_TEXT);
         // Bind unobtrusive event handlers
         $(ID_SCORE_LINK).click(function(){scoreLinkEvent();});
         $(ID_HOME_LINK).click(function(){homeLinkEvent();});
@@ -123,10 +227,16 @@ var Setup = (function() {
         $(ID_BUTTON_PLAY).click(function(){playLinkEvent();});
         $(ID_BUTTON_PR).click(function(){pauseResumeToggleEvent();});
     }
+    // Function that handles adding all of the Game's required resources
+    this.initResources = function() {
+        // Add all of the Game's Images
+        resMan.addImage("IMG_BG", IMG_BG, 387, 600);
+    }
     // Function that handles the pause and resume button events
     this.pauseResumeToggleEvent = function() {
         // Pause the game is game is running and resume the game if paused
         isGamePaused = !isGamePaused;
+        game.setPaused(isGamePaused);
         // Change the image of the button depending on the state of the game
         if (isGamePaused) {
             $(ID_BUTTON_PR + " img").attr("src", IMG_BUTTON_PLAY);
