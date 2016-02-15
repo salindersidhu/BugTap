@@ -1,36 +1,63 @@
-// A module that handles creation and storage of resources such as Images
+// An Object that stores and Image and additional attributes for a sprite
+function SpriteSheet() {
+    // Create a new Image and default variables for SpriteSheet
+    this.image = new Image();
+    this.numFrames = null;
+    this.frameWidth = null;
+    // Return the SpriteSheet object
+    return this;
+}
+
+// A module that handles creation and storage of resources
 function ResourceManager() {
     // Module constants and variables
     var _this = this;
     this.imageDict = {};
+    this.spriteSheetDict = {};
     // Functon that creates and stores a new Image
-    function addImage(id, imageSource, width, height) {
+    function addImage(id, source, width, height) {
         var image = new Image();
-        image.src = imageSource;
+        image.src = source;
         image.width = width;
         image.height = height;
         _this.imageDict[id] = image;
+    }
+    // Function that creates and stores a new SpriteSheet
+    function addSpriteSheet(id, source, width, height, numFrames) {
+        var spriteSheet = new SpriteSheet();
+        spriteSheet.image.src = source;
+        spriteSheet.image.width = width;
+        spriteSheet.image.height = height;
+        spriteSheet.numFrames = numFrames;
+        spriteSheet.frameWidth = width / numFrames;
+        _this.spriteSheetDict[id] = spriteSheet;
     }
     // Function that returns the Image corresponding to an ID
     function getImage(id) {
         return _this.imageDict[id];
     }
+    // Function that returns the SpriteSheet corresponding to an ID
+    function getSpriteSheet(id) {
+        return _this.spriteSheetDict[id];
+    }
     // Functions returned by the module
     return {
         addImage : addImage,
-        getImage : getImage
+        getImage : getImage,
+        addSpriteSheet : addSpriteSheet,
+        getSpriteSheet : getSpriteSheet,
     }
 }
 
-// A module that controls and renders static image sprites using Images
-function StaticSprite(spriteImage, numFrames, selectedFrame, FPS) {
+// A module that controls and renders static image sprites using SpriteSheets
+function StaticSprite(spriteSheet, selectedFrame, FPS) {
     // Module constants and variables
     var _this = this;
     this.selectedFrame = selectedFrame;
     this.FPS = FPS;
-    this.image = spriteImage;
-    this.width = spriteImage.width / numFrames;
-    this.height = spriteImage.height;
+    this.image = spriteSheet.image;
+    this.width = spriteSheet.frameWidth;
+    this.height = spriteSheet.image.height;
     this.opacity = 1;
     // Function that returns the opacity of the static sprite
     function getOpacity() {
@@ -69,16 +96,15 @@ function StaticSprite(spriteImage, numFrames, selectedFrame, FPS) {
     }
 }
 
-// A module that controls and renders animated sprites using Images
-function AnimatedSprite(spriteImage, numFrames, TPF, FPS) {
+// A module that controls and renders animated sprites using SpriteSheets
+function AnimatedSprite(spriteSheet, TPF, FPS) {
     // Module constants and variables
     var _this = this;
-    this.numFrames = numFrames;
     this.TPF = TPF;
     this.FPS = FPS;
-    this.image = spriteImage;
-    this.width = spriteImage.width;
-    this.height = spriteImage.height;
+    this.image = spriteSheet.image;
+    this.width = spriteSheet.frameWidth;
+    this.height = spriteSheet.image.height;
     this.opacity = 1;
     this.frameIndex = -1;
     this.tickCounter = 0;
@@ -99,14 +125,15 @@ function AnimatedSprite(spriteImage, numFrames, TPF, FPS) {
         // Update the frame index based on the passage of time
         if (_this.tickCounter > _this.TPF) {
             _this.tickCounter = 0;
-            // Reset the frame index at the end of the animation
+            // Update and reset the frame index at the end of the animation
             _this.frameIndex = (_this.frameIndex + 1) % _this.numFrames;
         }
     }
     // Function that handles drawing the animated sprite on the canvas
     function render(ctx, x, y, angle) {
-        // Configure the translation points when rotating the canvas
-        var translateX = x + (_this.width / (2 * _this.numFrames));
+        // Configure the translation points to center of image when rotating
+        var translateX = x + (_this.spriteSheet.image.width /
+            (2 * _this.spriteSheet.numFrames));
         var translateY = y + (_this.height / 2);
         ctx.save();
         // Configure the canvas opacity
@@ -118,13 +145,13 @@ function AnimatedSprite(spriteImage, numFrames, TPF, FPS) {
         // Draw the animated sprite
         ctx.drawImage(
             _this.image,
-            _this.frameIndex * _this.width / _this.numFrames,
+            _this.frameIndex * _this.width,
             0,
-            _this.width / _this.numFrames,
+            _this.width,
             _this.height,
             x,
             y,
-            _this.width / _this.numFrames,
+            _this.width,
             _this.height);
         ctx.restore();
     }
@@ -138,13 +165,12 @@ function AnimatedSprite(spriteImage, numFrames, TPF, FPS) {
 }
 
 // A Module that handles all the controls, events and drawing of the Food
-function Food(resMan, imageID, numFrames, selectedFrame, FPS, x, y) {
+function Food(spriteSheet, selectedFrame, FPS, x, y) {
 	// Module constants and variables
     var _this = this;
     this.x = x;
     this.y = y;
-    this.staticSprite = new StaticSprite(resMan.getImage(imageID), numFrames,
-        selectedFrame, FPS);
+    this.staticSprite = new StaticSprite(spriteSheet, selectedFrame, FPS);
     this.isEaten = false;
     this.canDelete = false;
     // Function that handles updating the Food's state
@@ -209,7 +235,7 @@ function Game(FPS, resMan, canvasID, canvasWidth, canvasHeight) {
             mouseClickEvents(event, canvas);
         }, false);
         // Create the required Food for the Game
-        createFood(6, 56, 10, 331, 100, 400)
+        makeFood(6, 10, 330, 100, 400);
         // Execute the game loop indefinitely
         setInterval(gameLoop, 1000 / _this.FPS);
     }
@@ -287,38 +313,62 @@ function Game(FPS, resMan, canvasID, canvasWidth, canvasHeight) {
     function getRandomNumber(min, max) {
         return Math.floor(Math.random() * (max - min + 1)) + min;
     }
-    // Function that creates a specific amount of Food positioned randomly
-    function createFood(amount, limit, lowerX, upperX, lowerY, upperY) {
-        // Keep track of Food created and position of previously created Food
+    // Function that clears an entire array using the fastest method
+    function clear(array) {
+        while(array.length > 0) {
+            array.pop();
+        }
+    }
+    // Function that makes a specific amount of Food positioned randomly
+    function makeFood(amount, lowerX, upperX, lowerY, upperY) {
         var foodCount = 0;
         var prevPos = [[]];
-        var prevFoodFrames = [];
+        var prevFrames = [];
+        // Obtain the Food's SpriteSheet
+        var sprFood = _this.resMan.getSpriteSheet(_this.sprFoodID);
         while (foodCount < amount) {
+            // Condition the Sprite's bound variables to stay within the canvas
+            if ((lowerX + sprFood.frameWidth) < 0) {
+                lowerX = 0;
+            }
+            if ((upperX + sprFood.frameWidth) > _this.canvasWidth) {
+                upperX -= (upperX + sprFood.frameWidth) % _this.canvasWidth;
+            }
+            if ((lowerY + sprFood.image.height) < 0) {
+                lowerY = 0;
+            }
+            if ((upperY + sprFood.image.height) > _this.canvasHeight) {
+                upperY -= (upperY + sprFood.image.height) % _this.canvasHeight;
+            }
             // Generate random position specified by the bound arguments
             var x = getRandomNumber(lowerX, upperX);
             var y = getRandomNumber(lowerY, upperY);
             // Generate a random frame index for the Food's static sprite
-            var foodFrame = getRandomNumber(0, 15);
+            var randFrame = getRandomNumber(0, sprFood.numFrames - 1);
             var isOverlap = false;
             // Ensure new position doesn't overlap with previous positions
             for (var i = 0; i < prevPos.length; i++) {
                 // If there is overlap within limit, set overlap to true
-                if (Math.abs(x - prevPos[i][0]) <= limit &&
-                    Math.abs(y - prevPos[i][1]) <= limit) {
+                if (Math.abs(x - prevPos[i][0]) <= sprFood.frameWidth &&
+                    Math.abs(y - prevPos[i][1]) <= sprFood.image.height) {
                     isOverlap = true;
                 }
             }
             // Ensure that a new frame index is generated for each Food
-            while (prevFoodFrames.indexOf(foodFrame) >= 0) {
-                foodFrame = getRandomNumber(0, 15);
+            while(prevFrames.indexOf(randFrame) >= 0) {
+                // If all possible frame indicies are used, clear the array
+                if (prevFrames.length == sprFood.numFrames) {
+                    clear(prevFrames);
+                }
+                randFrame = getRandomNumber(0, sprFood.numFrames - 1);
             }
-            // If there is no overlap, create food and record new position
+            // If there is no overlap then create food
             if (!isOverlap) {
-                _this.foodObjects.push(new Food(_this.resMan, _this.sprFoodID,
-                    16, foodFrame, _this.FPS, x, y));
+                _this.foodObjects.push(new Food(sprFood, randFrame, _this.FPS,
+                    x, y));
                 prevPos.push([x, y]);
-                prevFoodFrames.push(foodFrame);
-                foodCount += 1
+                prevFrames.push(randFrame);
+                foodCount += 1;
             }
         }
     }
@@ -342,8 +392,11 @@ function Setup() {
     this.CANVAS_HEIGHT = 600;
     this.IMG_BUTTON_PLAY = "assets/button_play.png";
     this.IMG_BUTTON_PAUSE = "assets/button_pause.png";
-    this.IMG_BG = "assets/table_texture.png";
+    this.IMG_BG = "assets/background_table.png";
     this.SPR_FOOD = "assets/food_sprite.png";
+    this.SPR_RED_BUG = "assets/red_bug_sprite.png";
+    this.SPR_ORANGE_BUG = "assets/orange_bug_sprite.png";
+    this.SPR_GREY_BUG = "assets/grey_bug_sprite.png";
     this.ID_SCORE_LINK = "#score-link";
     this.ID_HOME_LINK = "#home-link";
     this.ID_BUTTON_CLEAR = "#clear-button";
@@ -369,7 +422,13 @@ function Setup() {
             _this.CANVAS_WIDTH, _this.CANVAS_HEIGHT);
         // Add all of the Game's Image resources
         _this.resMan.addImage("IMG_BG", _this.IMG_BG, 387, 600);
-        _this.resMan.addImage("SPR_FOOD", _this.SPR_FOOD, 896, 56);
+        _this.resMan.addSpriteSheet("SPR_FOOD", _this.SPR_FOOD, 896, 56, 16);
+        _this.resMan.addSpriteSheet("SPR_RED_BUG", _this.SPR_RED_BUG, 90, 50,
+            2);
+        _this.resMan.addSpriteSheet("SPR_ORANGE_BUG", _this.SPR_ORANGE_BUG,
+            90, 50, 2);
+        _this.resMan.addSpriteSheet("SPR_GREY_BUG", _this.SPR_GREY_BUG, 90,
+            50, 2);
         // Setup remaining Game specific tasks
         _this.game.setBackgroundImage("IMG_BG");
         _this.game.setSpriteFoodID("SPR_FOOD");
