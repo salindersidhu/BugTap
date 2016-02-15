@@ -170,6 +170,8 @@ function Food(spriteSheet, selectedFrame, FPS, x, y) {
     var _this = this;
     this.x = x;
     this.y = y;
+    this.width = spriteSheet.frameWidth;
+    this.height = spriteSheet.image.height;
     this.staticSprite = new StaticSprite(spriteSheet, selectedFrame, FPS);
     this.isEaten = false;
     this.canDelete = false;
@@ -193,15 +195,193 @@ function Food(spriteSheet, selectedFrame, FPS, x, y) {
     function setEaten() {
         _this.isEaten = true;
     }
+    // Function that returns if the Food has been eaten
+    function getIsEaten() {
+        return _this.isEaten;
+    }
     // Function that returns the Food's delete flag
     function getCanDelete() {
         return _this.canDelete;
     }
+    // Function that returns the Food's x position
+    function getX() {
+        return _this.x;
+    }
+    // Function that returns the Food's y position
+    function getY() {
+        return _this.y;
+    }
+    // Function that returns the Food's width
+    function getWidth() {
+        return _this.width;
+    }
+    // Function that returns the Food's height
+    function getHeight() {
+        return _this.height;
+    }
     // Functions returned by the module
     return {
+        getX : getX,
+        getY : getY,
         render : render,
         update : update,
         setEaten : setEaten,
+        getWidth : getWidth,
+        getHeight : getHeight,
+        getIsEaten : getIsEaten,
+        getCanDelete : getCanDelete
+    }
+}
+
+// A Module that handles all the controls, events and drawing for the Bug
+function Bug(spriteSheet, points, speed, FPS, x, y, foodObjects) {
+	// Module constants and variables
+	var _this = this;
+    this.points = points;
+    this.speed = speed;
+    this.x = x;
+    this.y = y;
+    this.width = spriteSheet.frameWidth;
+    this.height = spriteSheet.image.height;
+    this.foodObjects = foodObjects;
+    this.animatedSprite = new AnimatedSprite(spriteSheet, 10 / speed, FPS);
+    this.angle = 0
+    this.isDead = false;
+    this.canDelete = false;
+    this.canMove = true;
+    this.foodPos = [];
+    // Function that handles updating the Bug's state
+    function update() {
+        // Update the Bug if it is alive
+        if(!_this.isDead) {
+            // Find the nearest Food from the Bug's current position
+            _this.findNearestFood();
+            // Handle collision with Food
+            _this.handleFoodCollision();
+            // If the Bug is able to move update the animation and position
+            if (_this.canMove) {
+                // Update the Bug's animation
+                _this.animatedSprite.updateFrame();
+                // Move the Bug to the nearest Food's position
+                _this.moveToPoint(_this.foodPos[0], _this.foodPos[1]);
+            }
+        } else {
+            // Fade the Bug within 2 seconds
+            _this.animatedSprite.reduceOpacitiy(2);
+            // Set the Bug delete flag to true once the Bug has faded
+            if (_this.animatedSprite.getOpacity() == 0) {
+                _this.canDelete = true;
+            }
+        }
+    }
+    // Function that finds and sets the nearest Food from the Bug's position
+    function findNearestFood() {
+        var shortestDist = Number.MAX_VALUE;
+        // Find the nearest Food object and obtain its position
+        for (var i = 0; i < _this.foodObjects.length; i++) {
+            var food = _this.foodObjects[i];
+            // If the Food has not been eaten
+            if (!food.getIsEaten()) {
+                // Calculate the distance between the Bug and Food
+                var foodX = food.getX() + (food.getWidth() / 2);
+                var foodY = food.getY() + (food.getHeight() / 2);
+                var distX = foodX - _this.x;
+                var distY = foodY - _this.y;
+                // Calculate the hypotenuse to find shortest distance to Food
+                var hypotenuse = Math.sqrt((distX * distX) + (distY * distY));
+                // If hypotenuse is shorter than current shortest distance
+                if (hypotenuse < shortestDist) {
+                    // Set Food target position to current Food's position
+                    _this.foodPos = [foodX, foodY];
+                    shortestDist = hypotenuse; // Update shortest distance
+                }
+            } else {
+                // If the last Food was eaten stop the bug from moving
+                if (_this.food) {
+                    _this.canMove = false;
+                }
+            }
+        }
+    }
+    // Function that handles collision with Food and the current Bug
+    function handleFoodCollision() {
+        for (var i = 0; i < _this.foodObjects.length; i++) {
+            var food = _this.foodObjects[i];
+            // If Food has not been eaten
+            if (!food.getIsEaten()) {
+                // Check if the Bug is colliding with a Food object
+                if ((_this.x < (food.getX() + food.getWidth()) &&
+                    (_this.x + _this.width) > food.getX()) &&
+                    (_this.y < (food.getY() + food.getHeight()) &&
+                    (_this.height + _this.y) > food.getY())) {
+                    // Set the Food's state to eaten
+                    food.setEaten();
+                }
+            }
+        }
+    }
+    // Function that moves the Bug's position to a specific target point
+    function moveToPoint(targetX, targetY) {
+        // Calculate the distance to the target point
+        var distX = targetX - _this.x - (_this.width / 2);
+        var distY = targetY - _this.y - (_this.height / 2);
+        // Calculate the hypotenuse
+        var hypotenuse = Math.sqrt((distX * distX) + (distY * distY));
+        distX /= hypotenuse;
+        distY /= hypotenuse;
+        // Move towards point
+        _this.x += distX * _this.speed;
+        _this.y += distY * _this.speed;
+        // Update the Bug's angle depending on the movement direction
+        _this.angle = Math.atan2(distY, distX);
+    }
+    // Function that handles drawing the Bug
+    function render(ctx) {
+        _this.animatedSprite.render(ctx, _this.x, _this.y, _this.angle);
+    }
+    // Function that sets the state of the Bug to dead
+    function setDead() {
+        _this.isDead = true;
+    }
+    // Function that returns if the Bug has been killed
+    function getIsDead() {
+        return _this.isDead;
+    }
+    // Return the number of points the Bug is worth
+    function getPoints() {
+        return _this.points;
+    }
+    // Function that returns the Bug's delete flag
+    function getCanDelete() {
+        return _this.canDelete;
+    }
+    // Function that returns the Bug's x position
+    function getX() {
+        return _this.x;
+    }
+    // Function that returns the Bug's y position
+    function getY() {
+        return _this.y;
+    }
+    // Function that returns the Bug's width
+    function getWidth() {
+        return _this.width;
+    }
+    // Function that returns the Bug's height
+    function getHeight() {
+        return _this.height;
+    }
+    // Functions returned by the module
+    return {
+        getX : getX,
+        getY : getY,
+        render : render,
+        update : update,
+        setDead : setDead,
+        getWidth : getWidth,
+        getHeight : getHeight,
+        getIsDead : getIsDead,
+        getPoints : getPoints,
         getCanDelete : getCanDelete
     }
 }
@@ -244,8 +424,24 @@ function Game(FPS, resMan, canvasID, canvasWidth, canvasHeight) {
         // Process mouse click events if Game is not paused
         if (!_this.isGamePaused) {
             // Obtain the mouse coordinates relative to the canvas
-            mouseX = event.pageX - canvas.offsetLeft;
-            mouseY = event.pageY - canvas.offsetTop;
+            mX = event.pageX - canvas.offsetLeft;
+            mY = event.pageY - canvas.offsetTop;
+            // Handle mouse click on Bug objects
+            for (var i = 0; i < bugObjects.length; i++) {
+                var bug = bugObjects[i];
+                // If a Bug was clicked
+                if ((mX > bug.getX() && mX < (bug.getX() + bug.getWidth())) &&
+                    (mY > bug.getY() && mY < (bug.getY() + bug.getHeight()))) {
+                    // Update score only once
+                    if (!bug.getIsDead()) {
+                        // Update score and update corresponding DOM element
+                        _this.score += bug.getPoints();
+                        $(_this.scoreTextID).text("Score: " + _this.score);
+                    }
+                    // Kill the Bug
+                    bug.setDead();
+                }
+            }
         }
     }
     // Function that sets the background Image for the Game
@@ -294,6 +490,16 @@ function Game(FPS, resMan, canvasID, canvasWidth, canvasHeight) {
                 _this.foodObjects.splice(_this.foodObjects.indexOf(food), 1);
             }
         }
+        // Update all of the Bugs
+        for (var i = 0; i < _this.bugObjects.length; i++) {
+            // Obtain Bug from bugObjects array and update it
+            var bug = _this.bugObjects[i];
+            bug.update();
+            // Delete Bug if it is flagged for removal
+            if (bug.getCanDelete()) {
+                _this.bugObjects.splice(_this.bugObjects.indexOf(bug), 1);
+            }
+        }
     }
     // Function that handles all the drawing for the Game
     function render() {
@@ -303,6 +509,10 @@ function Game(FPS, resMan, canvasID, canvasWidth, canvasHeight) {
         // Render all of the Food
         for (var i = 0; i < _this.foodObjects.length; i++) {
             _this.foodObjects[i].render(_this.ctx);
+        }
+        // Render all of the Bugs
+        for (var i = 0; i < _this.bugObjects.length; i++) {
+            _this.bugObjects[i].render(_this.ctx);
         }
     }
     // Function that controls if the Game is paused or running
