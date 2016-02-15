@@ -22,57 +22,101 @@ function ResourceManager() {
     }
 }
 
-// A module that handles control and rendering animations using sprite Images
-function Animation(ctx, resMan, imageID, numFrames, TPF, FPS) {
+// A module that controls and renders static image sprites using Images
+function StaticSprite(resMan, imageID, numFrames, selectedFrame, FPS) {
     // Module constants and variables
     var _this = this;
-    this.ctx = ctx;
+    this.selectedFrame = selectedFrame;
+    this.FPS = FPS;
+    this.image = resMan.getImage(imageID);
+    this.width = this.image.width / numFrames;
+    this.height = this.image.height;
+    this.opacity = 1;
+    // Function that returns the opacity of the static sprite
+    function getOpacity() {
+        return _this.opacity;
+    }
+    // Function that reduces the opacity of the static sprite
+    function reduceOpacitiy() {
+        _this.opacity -= 1 / (_this.FPS * 0.5);
+        if (_this.opacity < 0) {
+            _this.opacity - 0;
+        }
+    }
+    // Function that handles drawing the static sprite on the canvas
+    function render(ctx, x, y) {
+        ctx.save();
+        // Configure the canvas opacity
+        ctx.globalAlpha = _this.opacity;
+        // Draw the static sprite
+        ctx.drawImage(
+            _this.image,
+            _this.width * _this.selectedFrame,
+            0,
+            _this.width,
+            _this.height,
+            x,
+            y,
+            _this.width,
+            _this.height);
+        ctx.restore();
+    }
+    // Functions returned by the module
+    return {
+        getOpacity : getOpacity,
+        reduceOpacitiy : reduceOpacitiy,
+        render : render
+    }
+}
+
+// A module that controls and renders animated sprites using Images
+function AnimatedSprite(resMan, imageID, numFrames, TPF, FPS) {
+    // Module constants and variables
+    var _this = this;
     this.numFrames = numFrames;
-    this.TPF = TPF; // Ticks per frame
-    this.FPS = FPS; // Frames per second
+    this.TPF = TPF;
+    this.FPS = FPS;
     this.image = resMan.getImage(imageID);
     this.width = this.image.width;
     this.height = this.image.height;
     this.opacity = 1;
-    this.angle = 0;
-    this.frameIndex = 0;
+    this.frameIndex = -1;
     this.tickCounter = 0;
-    // Function that returns the opacity of the Animation
+    // Function that returns the opacity of the animated sprite
     function getOpacity() {
         return _this.opacity;
     }
-    // Function that reduces the opacity of the Animation
+    // Function that reduces the opacity of the animated sprite
     function reduceOpacitiy(secondsToFade) {
         _this.opacity -= 1 / (_this.FPS * secondsToFade);
+        if (_this.opacity < 0) {
+            _this.opacity = 0;
+        }
     }
-    // Function that updates the frame index of the Animation
+    // Function that updates the frame index of the animated sprite
     function updateFrame() {
         _this.tickCounter += 1;
         // Update the frame index based on the passage of time
         if (_this.tickCounter > _this.TPF) {
             _this.tickCounter = 0;
             // Reset the frame index at the end of the animation
-            if (_this.frameIndex < _this.numFrames - 1) {
-                _this.frameIndex += 1;
-            } else {
-                _this.frameIndex = 0;
-            }
+            _this.frameIndex = (_this.frameIndex + 1) % _this.numFrames;
         }
     }
-    // Function that handles drawing the Animation on the canvas
-    function render(x, y, angle) {
+    // Function that handles drawing the animated sprite on the canvas
+    function render(ctx, x, y, angle) {
         // Configure the translation points when rotating the canvas
         var translateX = x + (_this.width / (2 * _this.numFrames));
         var translateY = y + (_this.height / 2);
-        _this.ctx.save();
+        ctx.save();
         // Configure the canvas opacity
-        _this.ctx.globalAlpha = _this.opacity;
-        // Translate and rotate the canvas to draw the Animation at an angle
-        _this.ctx.translate(translateX, translateY);
-        _this.ctx.rotate(_this.angle);
-        _this.ctx.translate(-translateX, -translateY);
-        // Draw the animation
-        _this.ctx.drawImage(
+        ctx.globalAlpha = _this.opacity;
+        // Translate and rotate canvas to draw the animated sprite at an angle
+        ctx.translate(translateX, translateY);
+        ctx.rotate(angle);
+        ctx.translate(-translateX, -translateY);
+        // Draw the animated sprite
+        ctx.drawImage(
             _this.image,
             _this.frameIndex * _this.width / _this.numFrames,
             0,
@@ -82,7 +126,7 @@ function Animation(ctx, resMan, imageID, numFrames, TPF, FPS) {
             y,
             _this.width / _this.numFrames,
             _this.height);
-        _this.ctx.restore();
+        ctx.restore();
     }
     // Functions returned by the module
     return {
@@ -111,7 +155,6 @@ function Game(FPS, resMan, canvasID, canvasWidth, canvasHeight) {
     this.bgPattern = null;
     this.ctx = null;
     this.isGamePaused = true;
-    init();
     // Function that handles initialization of the Game
     function init() {
         // Obtain the canvas and canvas context from the DOM
@@ -182,6 +225,7 @@ function Game(FPS, resMan, canvasID, canvasWidth, canvasHeight) {
     }
     // Functions returned by the module
     return {
+        init : init,
         setPaused : setPaused,
         setBackgroundImage : setBackgroundImage,
         setTimeTextID : setTimeTextID,
@@ -189,116 +233,119 @@ function Game(FPS, resMan, canvasID, canvasWidth, canvasHeight) {
     }
 }
 
-// A singleton module that handles the setup of Game and DOM elements
-var Setup = (function() {
+// A module that handles the setup of the Tap Tap Bug Game and DOM elements
+function Setup() {
     // Singleton module constants and variables
-    var FPS = 60;
-    var CANVAS_WIDTH = 387;
-    var CANVAS_HEIGHT = 600;
-    var IMG_BUTTON_PLAY = "assets/button_play.png";
-    var IMG_BUTTON_PAUSE = "assets/button_pause.png";
-    var IMG_BG = "assets/table_texture.png";
-    var ID_SCORE_LINK = "#score-link";
-    var ID_HOME_LINK = "#home-link";
-    var ID_BUTTON_CLEAR = "#clear-button";
-    var ID_BUTTON_BACK = "#back-button";
-    var ID_BUTTON_PLAY = "#play-button";
-    var ID_BUTTON_PR = "#pause-resume-button";
-    var ID_HEADING_SCORE = "#score-heading";
-    var ID_SCORE_SECTION = "#score-section";
-    var ID_HOME_SECTION = "#home-section";
-    var ID_GAME_SECTION = "#game-section";
-    var ID_CANVAS = "#game-canvas";
-    var ID_TIME_TEXT = "#time-text";
-    var ID_SCORE_TEXT = "#score-text";
-    var isGameStarted = false;
-    var isGamePaused = true;
-    var resMan = new ResourceManager();
-    var game = new Game(FPS, resMan, ID_CANVAS, CANVAS_WIDTH, CANVAS_HEIGHT);
+    var _this = this;
+    this.FPS = 60;
+    this.CANVAS_WIDTH = 387;
+    this.CANVAS_HEIGHT = 600;
+    this.IMG_BUTTON_PLAY = "assets/button_play.png";
+    this.IMG_BUTTON_PAUSE = "assets/button_pause.png";
+    this.IMG_BG = "assets/table_texture.png";
+    this.SPR_FOOD = "assets/food_sprite.png";
+    this.ID_SCORE_LINK = "#score-link";
+    this.ID_HOME_LINK = "#home-link";
+    this.ID_BUTTON_CLEAR = "#clear-button";
+    this.ID_BUTTON_BACK = "#back-button";
+    this.ID_BUTTON_PLAY = "#play-button";
+    this.ID_BUTTON_PR = "#pause-resume-button";
+    this.ID_HEADING_SCORE = "#score-heading";
+    this.ID_SCORE_SECTION = "#score-section";
+    this.ID_HOME_SECTION = "#home-section";
+    this.ID_GAME_SECTION = "#game-section";
+    this.ID_CANVAS = "#game-canvas";
+    this.ID_TIME_TEXT = "#time-text";
+    this.ID_SCORE_TEXT = "#score-text";
+    this.isGameStarted = false;
+    this.isGamePaused = true;
+    this.resMan = null;
+    this.game = null;
     // Function that sets up the HTML element events and game canvas
-    this.init = function() {
-        // Initialize Game's resources
-        initResources();
+    function init() {
+        // Initialize ResourceManager and Game
+        _this.resMan = new ResourceManager();
+        _this.game = new Game(_this.FPS, _this.resMan, _this.ID_CANVAS,
+            _this.CANVAS_WIDTH, _this.CANVAS_HEIGHT);
+        _this.game.init();
+        // Add all of the Game's Image resources
+        _this.resMan.addImage("IMG_BG", _this.IMG_BG, 387, 600);
+        _this.resMan.addImage("SPR_FOOD", _this.SPR_FOOD, 896, 56);
         // Setup remaining Game specific tasks
-        game.setBackgroundImage("IMG_BG");
-        game.setTimeTextID(ID_TIME_TEXT);
-        game.setScoreTextID(ID_SCORE_TEXT);
+        _this.game.setBackgroundImage("IMG_BG");
+        _this.game.setTimeTextID(_this.ID_TIME_TEXT);
+        _this.game.setScoreTextID(_this.ID_SCORE_TEXT);
         // Bind unobtrusive event handlers
-        $(ID_SCORE_LINK).click(function(){scoreLinkEvent();});
-        $(ID_HOME_LINK).click(function(){homeLinkEvent();});
-        $(ID_BUTTON_BACK).click(function(){homeLinkEvent();});
-        $(ID_BUTTON_CLEAR).click(function(){scoreClearEvent();});
-        $(ID_BUTTON_PLAY).click(function(){playLinkEvent();});
-        $(ID_BUTTON_PR).click(function(){pauseResumeToggleEvent();});
-    }
-    // Function that handles adding all of the Game's required resources
-    this.initResources = function() {
-        // Add all of the Game's Images
-        resMan.addImage("IMG_BG", IMG_BG, 387, 600);
+        $(_this.ID_SCORE_LINK).click(function(){scoreLinkEvent();});
+        $(_this.ID_HOME_LINK).click(function(){homeLinkEvent();});
+        $(_this.ID_BUTTON_BACK).click(function(){homeLinkEvent();});
+        $(_this.ID_BUTTON_CLEAR).click(function(){scoreClearEvent();});
+        $(_this.ID_BUTTON_PLAY).click(function(){playLinkEvent();});
+        $(_this.ID_BUTTON_PR).click(function(){pauseResumeToggleEvent();});
     }
     // Function that handles the pause and resume button events
-    this.pauseResumeToggleEvent = function() {
+    function pauseResumeToggleEvent() {
         // Pause the game is game is running and resume the game if paused
-        isGamePaused = !isGamePaused;
-        game.setPaused(isGamePaused);
+        _this.isGamePaused = !_this.isGamePaused;
+        _this.game.setPaused(_this.isGamePaused);
         // Change the image of the button depending on the state of the game
-        if (isGamePaused) {
-            $(ID_BUTTON_PR + " img").attr("src", IMG_BUTTON_PLAY);
+        if (_this.isGamePaused) {
+            $(_this.ID_BUTTON_PR + " img").attr("src", _this.IMG_BUTTON_PLAY);
         } else {
-            $(ID_BUTTON_PR + " img").attr("src", IMG_BUTTON_PAUSE);
+            $(_this.ID_BUTTON_PR + " img").attr("src", _this.IMG_BUTTON_PAUSE);
         }
     }
     // Function that handles loading the high score value from local storage
-    this.refreshScoreEvent = function() {
+    function refreshScoreEvent() {
         // Obtain the highScore from local storage, use 0 if it doesn't exist
         var rawScore = window.localStorage.getItem("highScore");
         var highScore = rawScore ? rawScore : 0;
-        $(ID_HEADING_SCORE).text("High Score: " + highScore);
+        $(_this.ID_HEADING_SCORE).text("High Score: " + highScore);
     }
     // Function that handles clearing the score from local storage
-    this.scoreClearEvent = function() {
+    function scoreClearEvent() {
         window.localStorage.removeItem("highScore");
         refreshScoreEvent(); // Refresh the displayed score
     }
     // Function that handles the event for the score naviation link
-    this.scoreLinkEvent = function() {
+    function scoreLinkEvent() {
         // If game is not running
-        if (!isGameStarted) {
+        if (!_this.isGameStarted) {
             // Set score link item to active and home link to inactive
-            $(ID_SCORE_LINK).addClass("active");
-            $(ID_HOME_LINK).removeClass("active");
+            $(_this.ID_SCORE_LINK).addClass("active");
+            $(_this.ID_HOME_LINK).removeClass("active");
             // Hide the welcome section and show the score section
-            $(ID_HOME_SECTION).hide();
-            $(ID_SCORE_SECTION).show();
+            $(_this.ID_HOME_SECTION).hide();
+            $(_this.ID_SCORE_SECTION).show();
             refreshScoreEvent(); // Refresh the displayed score
         }
     }
     // Function that handles the event for the home navigation link
-    this.homeLinkEvent = function() {
+    function homeLinkEvent() {
         // If game is not running
-        if (!isGameStarted) {
+        if (!_this.isGameStarted) {
             // Set home link to active and score link to inactive
-            $(ID_HOME_LINK).addClass("active");
-            $(ID_SCORE_LINK).removeClass("active");
+            $(_this.ID_HOME_LINK).addClass("active");
+            $(_this.ID_SCORE_LINK).removeClass("active");
             // Hide the score section and show the welcome section
-            $(ID_SCORE_SECTION).hide();
-            $(ID_HOME_SECTION).show();
+            $(_this.ID_SCORE_SECTION).hide();
+            $(_this.ID_HOME_SECTION).show();
         }
     }
     // Function that handles the event for the play game button
-    this.playLinkEvent = function() {
+    function playLinkEvent() {
         // Hide the welcome section and show the game section
-        $(ID_HOME_SECTION).hide();
-        $(ID_GAME_SECTION).show();
+        $(_this.ID_HOME_SECTION).hide();
+        $(_this.ID_GAME_SECTION).show();
         // Start the page and unpause it
-        isGameStarted = true;
+        _this.isGameStarted = true;
         pauseResumeToggleEvent();
     }
     // Functions returned by the module
     return {
-        init : this.init
+        init : init
     }
-})();
+}
 
 // Setup the game and events
-window.onload = Setup.init;
+window.onload = new Setup().init;
