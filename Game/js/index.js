@@ -23,22 +23,22 @@ function ResourceManager() {
 }
 
 // A module that controls and renders static image sprites using Images
-function StaticSprite(resMan, imageID, numFrames, selectedFrame, FPS) {
+function StaticSprite(spriteImage, numFrames, selectedFrame, FPS) {
     // Module constants and variables
     var _this = this;
     this.selectedFrame = selectedFrame;
     this.FPS = FPS;
-    this.image = resMan.getImage(imageID);
-    this.width = this.image.width / numFrames;
-    this.height = this.image.height;
+    this.image = spriteImage;
+    this.width = spriteImage.width / numFrames;
+    this.height = spriteImage.height;
     this.opacity = 1;
     // Function that returns the opacity of the static sprite
     function getOpacity() {
         return _this.opacity;
     }
     // Function that reduces the opacity of the static sprite
-    function reduceOpacitiy() {
-        _this.opacity -= 1 / (_this.FPS * 0.5);
+    function reduceOpacitiy(secondsToFade) {
+        _this.opacity -= 1 / (_this.FPS * secondsToFade);
         if (_this.opacity < 0) {
             _this.opacity - 0;
         }
@@ -63,22 +63,22 @@ function StaticSprite(resMan, imageID, numFrames, selectedFrame, FPS) {
     }
     // Functions returned by the module
     return {
+        render : render,
         getOpacity : getOpacity,
-        reduceOpacitiy : reduceOpacitiy,
-        render : render
+        reduceOpacitiy : reduceOpacitiy
     }
 }
 
 // A module that controls and renders animated sprites using Images
-function AnimatedSprite(resMan, imageID, numFrames, TPF, FPS) {
+function AnimatedSprite(spriteImage, numFrames, TPF, FPS) {
     // Module constants and variables
     var _this = this;
     this.numFrames = numFrames;
     this.TPF = TPF;
     this.FPS = FPS;
-    this.image = resMan.getImage(imageID);
-    this.width = this.image.width;
-    this.height = this.image.height;
+    this.image = spriteImage;
+    this.width = spriteImage.width;
+    this.height = spriteImage.height;
     this.opacity = 1;
     this.frameIndex = -1;
     this.tickCounter = 0;
@@ -130,10 +130,53 @@ function AnimatedSprite(resMan, imageID, numFrames, TPF, FPS) {
     }
     // Functions returned by the module
     return {
+        render : render,
         getOpacity : getOpacity,
-        reduceOpacitiy : reduceOpacitiy,
         updateFrame : updateFrame,
-        render : render
+        reduceOpacitiy : reduceOpacitiy
+    }
+}
+
+// A Module that handles all the controls, events and drawing of the Food
+function Food(resMan, imageID, numFrames, selectedFrame, FPS, x, y) {
+	// Module constants and variables
+    var _this = this;
+    this.x = x;
+    this.y = y;
+    this.staticSprite = new StaticSprite(resMan.getImage(imageID), numFrames,
+        selectedFrame, FPS);
+    this.isEaten = false;
+    this.canDelete = false;
+    // Function that handles updating the Food's state
+    function update() {
+        // If Food has been eaten then fade it out within half a second
+        if (_this.isEaten) {
+            _this.staticSprite.reduceOpacitiy(0.5);
+            // Set the Food delete flag to true once the Food has faded
+            if (_this.staticSprite.getOpacity() == 0) {
+                _this.canDelete = true;
+            }
+        }
+    }
+    // Function that handles drawing the Food
+    function render(ctx) {
+        // Render the static sprite representing the Food
+        _this.staticSprite.render(ctx, _this.x, _this.y);
+    }
+    // Function that sets the state of the Food to eaten
+    function setEaten() {
+        _this.isEaten = true;
+    }
+    // Function that returns the Food's delete flag
+    function getCanDelete() {
+        return _this.canDelete;
+    }
+    // Functions returned by the module
+    return {
+        render : render,
+        update : update,
+        setEaten : setEaten,
+        getCanDelete : getCanDelete
     }
 }
 
@@ -146,12 +189,13 @@ function Game(FPS, resMan, canvasID, canvasWidth, canvasHeight) {
     this.canvasWidth = canvasWidth;
     this.canvasHeight = canvasHeight;
     this.resMan = resMan;
-    this.bugsArray = [];
-    this.foodArray = [];
+    this.bugObjects = [];
+    this.foodObjects = [];
     this.score = 0;
     this.timer = 61;
     this.timeTextID = null;
     this.scoreTextID = null;
+    this.sprFoodID = null;
     this.bgPattern = null;
     this.ctx = null;
     this.isGamePaused = true;
@@ -164,6 +208,8 @@ function Game(FPS, resMan, canvasID, canvasWidth, canvasHeight) {
         canvas.addEventListener("mousedown", function() {
             mouseClickEvents(event, canvas);
         }, false);
+        // Create the required Food for the Game
+        createFood(6, 56, 10, 331, 100, 400)
         // Execute the game loop indefinitely
         setInterval(gameLoop, 1000 / _this.FPS);
     }
@@ -183,7 +229,7 @@ function Game(FPS, resMan, canvasID, canvasWidth, canvasHeight) {
         // Execute function when background Image has fully loaded
         image.onload = function() {
             // Create a pattern using the background Image
-            _this.bgPattern = _this.ctx.createPattern(image, 'repeat');
+            _this.bgPattern = _this.ctx.createPattern(image, "repeat");
         }
     }
     // Function that sets the ID of the time text DOM element
@@ -193,6 +239,10 @@ function Game(FPS, resMan, canvasID, canvasWidth, canvasHeight) {
     // Function that sets the ID of the score text DOM element
     function setScoreTextID(scoreTextID) {
         _this.scoreTextID = scoreTextID;
+    }
+    // Function that sets the sprite Image for the Food
+    function setSpriteFoodID(sprFoodID) {
+        _this.sprFoodID = sprFoodID;
     }
     // Function that updates the Game and renders the Game's content
     function gameLoop() {
@@ -208,28 +258,78 @@ function Game(FPS, resMan, canvasID, canvasWidth, canvasHeight) {
         // Update the countdown timer and its corresponding time text
         _this.timer -= 1 / _this.FPS;
         $(_this.timeTextID).text("Time: " + Math.floor(_this.timer));
+        // Update all of the Food
+        for (var i = 0; i < _this.foodObjects.length; i++) {
+            // Obtain Food from foodObjects array and update it
+            var food = _this.foodObjects[i];
+            food.update();
+            // Delete Food if it is flagged for removal
+            if (food.getCanDelete()) {
+                _this.foodObjects.splice(_this.foodObjects.indexOf(food), 1);
+            }
+        }
     }
     // Function that handles all the drawing for the Game
     function render() {
         // Render the Game's background
         _this.ctx.fillStyle  = _this.bgPattern;
         _this.ctx.fillRect(0, 0, _this.canvasWidth, _this.canvasHeight);
+        // Render all of the Food
+        for (var i = 0; i < _this.foodObjects.length; i++) {
+            _this.foodObjects[i].render(_this.ctx);
+        }
     }
     // Function that controls if the Game is paused or running
     function setPaused(isGamePaused) {
         _this.isGamePaused = isGamePaused;
     }
     // Function that returns a random number between an inclusive range
-    function getRandomNumber(minValue, maxValue) {
+    function getRandomNumber(min, max) {
         return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+    // Function that creates a specific amount of Food positioned randomly
+    function createFood(amount, limit, lowerX, upperX, lowerY, upperY) {
+        // Keep track of Food created and position of previously created Food
+        var foodCount = 0;
+        var prevPos = [[]];
+        var prevFoodFrames = [];
+        while (foodCount < amount) {
+            // Generate random position specified by the bound arguments
+            var x = getRandomNumber(lowerX, upperX);
+            var y = getRandomNumber(lowerY, upperY);
+            // Generate a random frame index for the Food's static sprite
+            var foodFrame = getRandomNumber(0, 15);
+            var isOverlap = false;
+            // Ensure new position doesn't overlap with previous positions
+            for (var i = 0; i < prevPos.length; i++) {
+                // If there is overlap within limit, set overlap to true
+                if (Math.abs(x - prevPos[i][0]) <= limit &&
+                    Math.abs(y - prevPos[i][1]) <= limit) {
+                    isOverlap = true;
+                }
+            }
+            // Ensure that a new frame index is generated for each Food
+            while (prevFoodFrames.indexOf(foodFrame) >= 0) {
+                foodFrame = getRandomNumber(0, 15);
+            }
+            // If there is no overlap, create food and record new position
+            if (!isOverlap) {
+                _this.foodObjects.push(new Food(_this.resMan, _this.sprFoodID,
+                    16, foodFrame, _this.FPS, x, y));
+                prevPos.push([x, y]);
+                prevFoodFrames.push(foodFrame);
+                foodCount += 1
+            }
+        }
     }
     // Functions returned by the module
     return {
         init : init,
         setPaused : setPaused,
-        setBackgroundImage : setBackgroundImage,
         setTimeTextID : setTimeTextID,
-        setScoreTextID : setScoreTextID
+        setScoreTextID : setScoreTextID,
+        setSpriteFoodID : setSpriteFoodID,
+        setBackgroundImage : setBackgroundImage,
     }
 }
 
@@ -267,14 +367,16 @@ function Setup() {
         _this.resMan = new ResourceManager();
         _this.game = new Game(_this.FPS, _this.resMan, _this.ID_CANVAS,
             _this.CANVAS_WIDTH, _this.CANVAS_HEIGHT);
-        _this.game.init();
         // Add all of the Game's Image resources
         _this.resMan.addImage("IMG_BG", _this.IMG_BG, 387, 600);
         _this.resMan.addImage("SPR_FOOD", _this.SPR_FOOD, 896, 56);
         // Setup remaining Game specific tasks
         _this.game.setBackgroundImage("IMG_BG");
+        _this.game.setSpriteFoodID("SPR_FOOD");
         _this.game.setTimeTextID(_this.ID_TIME_TEXT);
         _this.game.setScoreTextID(_this.ID_SCORE_TEXT);
+        // Finish initializing the Game
+        _this.game.init();
         // Bind unobtrusive event handlers
         $(_this.ID_SCORE_LINK).click(function(){scoreLinkEvent();});
         $(_this.ID_HOME_LINK).click(function(){homeLinkEvent();});
