@@ -22,12 +22,12 @@
 </head>
 <!-- Body -->
 <body>
-    <section class="site-wrapper">
-        <section class="site-wrapper-inner">
-            <section class="cover-container">
+    <div class="site-wrapper">
+        <div class="site-wrapper-inner">
+            <div class="cover-container">
                 <!-- Navigation -->
-                <section class="masthead clearfix">
-                    <section class="inner">
+                <div class="masthead clearfix">
+                    <div class="inner">
                         <!-- Heading title -->
                         <h3 class="masthead-brand"><i class="fa fa-bug fa-lg"></i> Tap Tap Bug!</h3>
                         <!-- Navigation menu -->
@@ -37,56 +37,56 @@
                                 <li id="score-link"><a href="#"><i class="fa fa-trophy fa-1x"></i> Score</a></li>
                             </ul>
                         </nav>
-                    </section>
-                </section>
+                    </div>
+                </div>
                 <!-- Page content -->
-                <section class="inner cover">
+                <div class="inner cover">
                     <!-- Welcome section -->
-                    <section id="home-section">
+                    <div id="home-section">
                         <h1 class="cover-heading">Welcome</h1>
                         <p class="lead">Squish as many bugs as you can within one minute before the bugs eat all the food, good luck!</p>
                         <p class="lead">
                             <a id="play-button" class="btn btn-lg btn-primary"><i class="fa fa-play-circle fa-1x"></i> Play Game</a>
                         </p>
-                    </section>
+                    </div>
                     <!-- High Score section -->
-                    <section id="score-section" style="display:none;">
+                    <div id="score-section" style="display:none;">
                         <h1 id="game-lose-message" style="display:none;" class="cover-heading">Game Over - The Bugs Won <i class="fa fa-frown-o fa-lg"></i></h1>
                         <h1 id="game-won-message" style="display:none;" class="cover-heading">Game Over - You Won <i class="fa fa-smile-o fa-lg"></i></h1>
-                        <h1 id="score-heading" class="cover-heading"></h1>
+                        <h1 id="score-heading" class="cover-heading">High Score: 0</h1>
                         <p class="lead"></p>
                         <p class="lead">
                             <a id="clear-button" class="btn btn-lg btn-danger"><i class="fa fa-trash fa-1x"></i> Clear</a>
                             <a id="back-button" class="btn btn-lg btn-primary"><i class="fa fa-backward fa-1x"></i> Back</a>
                         </p>
-                    </section>
+                    </div>
                     <!-- Game canvas section -->
-                    <section id="game-section" style="display:none;">
-                        <section id="infobar">
+                    <div id="game-section" style="display:none;">
+                        <div id="infobar">
                             <!-- Time remaining in seconds -->
                             <p id="time-text" class="lead">Time: 60</p>
                             <!-- Pause and resume image button -->
                             <a href="#" id="pause-resume-button">
-                                <img src="assets/button_pause.png"/>
+                                <img alt="Pause/Resume Button" src="assets/button_pause.png"/>
                             </a>
                             <!-- The current score -->
                             <p id="score-text" class="lead">Score: 0</p>
-                        </section>
+                        </div>
                         <canvas id="game-canvas" width="387" height="600">
                             <p class="lead">Your browser does not support the canvas functionality to play this game.</p>
                             <p class="lead">Please update to a modern browser such as <a href="www.google.com/chrome/">Google Chrome</a> to play.</p>
                         </canvas>
-                    </section>
-                </section>
+                    </div>
+                </div>
                 <!-- Footer -->
-                <section class="mastfoot">
-                    <section class="inner">
+                <div class="mastfoot">
+                    <div class="inner">
                         <p>Copyright &copy; 2016 <a href="https://github.com/SalinderSidhu">Salinder Sidhu</a></p>
-                    </section>
-                </section>
-            </section>
-        </section>
-    </section>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
