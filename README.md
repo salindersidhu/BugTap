@@ -12,6 +12,7 @@ In this game, there are 6 pieces of food randomly positioned near the center of 
     - Bug sprite from [E-String](http://e-string.com/articles/create-simple-game-using-sprite-kit/)
     - Food sprites from [Free Vector](http://all-free-download.com/free-vector/download/vivid_food_icon_design_vector_535039.html)
     - Media button images from [Vector.me](http://vector.me/browse/695406/icon_set_player)
+    - Favicon generated from [Font Awesome Favicon Generator](http://paulferrett.com/fontawesome-favicon/)
     - Tablecloth texture created by `Patrick Hoesly` from [Flickr](http://www.everystockphoto.com/photo.php?imageId=5778707) under [Create Commons Attribution](http://creativecommons.org/licenses/by/2.5/)
 
 ## License:
