@@ -64,14 +64,14 @@ function SpriteAnimation(spriteSheet, initFrame, FPS, TPF) {
     _this.height = spriteSheet.image.height;
     _this.numFrames = spriteSheet.numFrames;
     _this.opacity = 1;
-    _this.frameIndex = initFrame - 1;
+    _this.frameIndex = initFrame; // Default is -1 for animations
     _this.tickCounter = 0;
     // Function that returns the opacity of the SpriteAnimation
     function getOpacity() {
         return _this.opacity;
     }
     // Function that reduces the opacity of the SpriteAnimation
-    function reduceOpacitiy(secondsTillFade) {
+    function reduceOpacity(secondsTillFade) {
         _this.opacity -= 1 / (_this.FPS * secondsTillFade);
         if (_this.opacity < 0) {
             _this.opacity = 0;
@@ -133,33 +133,34 @@ function GameSystem(FPS, resMan, canvasID, canvasWidth, canvasHeight) {
     _this.isGameOver = false;
     _this.isGamePaused = false;
     _this.isGameStarted = false;
+    _this.boundGame = null;
     _this.ctx = null;
     // Function that initializes the GameSystem
     function init() {
         // Obtain the canvas and canvas context from the DOM
         var canvas = $(_this.canvasID).get(0);
         _this.ctx = canvas.getContext('2d');
-        //
+        // Add event listener for mouse click events to the canvas
         canvas.addEventListener('mousedown', function() {
             mouseClickEvents(event, canvas);
         }, false);
+        // Initialize the bound game module
+        if (_this.boundGame) {
+            _this.boundGame.init(_this.FPS, _this.resMan, _this.ctx);
+        }
         // Execute the GameSystem event loop indefinitely
         setInterval(gameSystemLoop, 100 / _this.FPS);
     }
     // Function that continuously updates and renders the GameSystem
     function gameSystemLoop() {
         if (_this.isGameStarted && !_this.isGamePaused && !_this.isGameOver) {
-            // Update the GameSystem
-            update();
-            // Render the GameSystem
-            render();
+            if (_this.boundGame) {
+                // Update the bound game module
+                _this.boundGame.update();
+                // Render the bound game module
+                _this.boundGame.render();
+            }
         }
-    }
-    // Function that handles all of the GameSystem's update events
-    function update() {
-    }
-    // Function that handles all of the GameSystem's drawing
-    function render() {
     }
     // Function that handles all the mouse click events for the GameSystem
     function mouseClickEvents(event, canvas) {
@@ -168,6 +169,10 @@ function GameSystem(FPS, resMan, canvasID, canvasWidth, canvasHeight) {
             // Obtain the mouse coordinates relative to the canvas
             var mouseX = event.pageX - canvas.offsetLeft;
             var mouseY = event.pageY - canvas.offsetTop;
+            // Trigger bound game module's mouse click event
+            if (_this.boundGame) {
+                _this.boundGame.mouseClickEvent(mouseX, mouseY);
+            }
         }
     }
     // Function that toggles the GameSystem's state between paused or running
@@ -186,11 +191,21 @@ function GameSystem(FPS, resMan, canvasID, canvasWidth, canvasHeight) {
     function start() {
         _this.isGameStarted = true;
     }
+    // Function that binds a game module to the GameSystem
+    function bindGame(game) {
+        _this.boundGame = game;
+    }
+    // Function that removes a bound game module from the GameSystem
+    function releaseGame(game) {
+        _this.boundGame = null;
+    }
     // Functions returned by the module
     return {
         init : init,
         start : start,
+        bindGame : bindGame,
         getIsPaused : getIsPaused,
+        releaseGame : releaseGame,
         getIsStarted : getIsStarted,
         togglePauseResume : togglePauseResume
     }
