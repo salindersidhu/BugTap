@@ -51,6 +51,76 @@ function ResourceManager() {
     }
 }
 
+// SpriteAnimation handles control and rendering of sprite animations
+function SpriteAnimation(spriteSheet, initFrame, FPS, TPF) {
+    // Module constants and variables
+    const _this = this;
+    _this.initFrame = initFrame;
+    _this.FPS = FPS;
+    _this.TPF = TPF;
+    _this.image = spriteSheet.image;
+    _this.width = spriteSheet.image.width;
+    _this.fwidth = spriteSheet.frameWidth;
+    _this.height = spriteSheet.image.height;
+    _this.numFrames = spriteSheet.numFrames;
+    _this.opacity = 1;
+    _this.frameIndex = initFrame - 1;
+    _this.tickCounter = 0;
+    // Function that returns the opacity of the SpriteAnimation
+    function getOpacity() {
+        return _this.opacity;
+    }
+    // Function that reduces the opacity of the SpriteAnimation
+    function reduceOpacitiy(secondsTillFade) {
+        _this.opacity -= 1 / (_this.FPS * secondsTillFade);
+        if (_this.opacity < 0) {
+            _this.opacity = 0;
+        }
+    }
+    // Function that updates the frame index of the SpriteAnimation
+    function updateFrame() {
+        _this.tickCounter += 1;
+        // Update the frame index when the timer has triggered
+        if (_this.tickCounter > _this.TPF) {
+            _this.tickCounter = 0;
+            // Update and reset the frame index at the end of the animation
+            _this.frameIndex = ++_this.frameIndex % _this.numFrames;
+        }
+    }
+    // Function that draws the SpriteAnimation
+    function render(ctx, x, y, angle) {
+        // Configure the translation points to center of image when rotating
+        var translateX = x + (_this.width / (2 * _this.numFrames));
+        var translateY = y + (_this.height / 2);
+        ctx.save();
+        // Configure the canvas opacity
+        ctx.globalAlpha = _this.opacity;
+        // Translate and rotate canvas to draw the animated sprite at an angle
+        ctx.translate(translateX, translateY);
+        ctx.rotate(angle);
+        ctx.translate(-translateX, -translateY);
+        // Draw the animated sprite
+        ctx.drawImage(
+            _this.image,
+            _this.frameIndex * _this.fwidth,
+            0,
+            _this.fwidth,
+            _this.height,
+            x,
+            y,
+            _this.fwidth,
+            _this.height);
+        ctx.restore();
+    }
+    // Functions returned by the module
+    return {
+        render : render,
+        getOpacity : getOpacity,
+        updateFrame : updateFrame,
+        reduceOpacity : reduceOpacity
+    }
+}
+
 // GameSystem handles the core Game event management and rendering tasks
 function GameSystem(FPS, resMan, canvasID, canvasWidth, canvasHeight) {
     // Module constants and variables
