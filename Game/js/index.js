@@ -1,3 +1,6 @@
+// Enable whole-script strict mode syntax
+"use strict";
+
 // An Object that stores and Image and additional attributes for a sprite
 function SpriteSheet() {
     // Create a new Image and default variables for SpriteSheet
@@ -67,7 +70,7 @@ function StaticSprite(spriteSheet, selectedFrame, FPS) {
     function reduceOpacitiy(secondsToFade) {
         _this.opacity -= 1 / (_this.FPS * secondsToFade);
         if (_this.opacity < 0) {
-            _this.opacity - 0;
+            _this.opacity = 0;
         }
     }
     // Function that handles drawing the static sprite on the canvas
@@ -105,6 +108,7 @@ function AnimatedSprite(spriteSheet, TPF, FPS) {
     this.image = spriteSheet.image;
     this.width = spriteSheet.frameWidth;
     this.height = spriteSheet.image.height;
+    this.numFrames = spriteSheet.numFrames;
     this.opacity = 1;
     this.frameIndex = -1;
     this.tickCounter = 0;
@@ -132,8 +136,7 @@ function AnimatedSprite(spriteSheet, TPF, FPS) {
     // Function that handles drawing the animated sprite on the canvas
     function render(ctx, x, y, angle) {
         // Configure the translation points to center of image when rotating
-        var translateX = x + (_this.spriteSheet.image.width /
-            (2 * _this.spriteSheet.numFrames));
+        var translateX = x + (_this.image.width / (2 * _this.numFrames));
         var translateY = y + (_this.height / 2);
         ctx.save();
         // Configure the canvas opacity
@@ -248,23 +251,19 @@ function Bug(spriteSheet, points, speed, FPS, x, y, foodObjects) {
     this.angle = 0
     this.isDead = false;
     this.canDelete = false;
-    this.canMove = true;
     this.foodPos = [];
     // Function that handles updating the Bug's state
     function update() {
         // Update the Bug if it is alive
         if(!_this.isDead) {
             // Find the nearest Food from the Bug's current position
-            _this.findNearestFood();
+            findNearestFood();
             // Handle collision with Food
-            _this.handleFoodCollision();
-            // If the Bug is able to move update the animation and position
-            if (_this.canMove) {
-                // Update the Bug's animation
-                _this.animatedSprite.updateFrame();
-                // Move the Bug to the nearest Food's position
-                _this.moveToPoint(_this.foodPos[0], _this.foodPos[1]);
-            }
+            handleFoodCollision();
+            // Update the Bug's animation
+            _this.animatedSprite.updateFrame();
+            // Move the Bug to the nearest Food's position
+            moveToPoint(_this.foodPos[0], _this.foodPos[1]);
         } else {
             // Fade the Bug within 2 seconds
             _this.animatedSprite.reduceOpacitiy(2);
@@ -296,9 +295,9 @@ function Bug(spriteSheet, points, speed, FPS, x, y, foodObjects) {
                     shortestDist = hypotenuse; // Update shortest distance
                 }
             } else {
-                // If the last Food was eaten stop the bug from moving
-                if (_this.food) {
-                    _this.canMove = false;
+                // If the last Food was eaten kill this Bug
+                if (_this.foodObjects.length == 1) {
+                    setDead();
                 }
             }
         }
@@ -397,6 +396,11 @@ function Game(FPS, resMan, canvasID, canvasWidth, canvasHeight) {
     this.resMan = resMan;
     this.bugObjects = [];
     this.foodObjects = [];
+    this.bugDB = {};
+    this.bugProbs = [];
+    this.bugMakeTimes = [];
+    this.bugMakeTime = 0;
+    this.ticks = 0;
     this.score = 0;
     this.timer = 61;
     this.timeTextID = null;
@@ -416,22 +420,35 @@ function Game(FPS, resMan, canvasID, canvasWidth, canvasHeight) {
         }, false);
         // Create the required Food for the Game
         makeFood(6, 10, 330, 100, 400);
+        // Reset the Bug make timer and init Bug make probability distribution
+        resetBugMakeTimer();
+        setMakeBugProbability();
         // Execute the game loop indefinitely
         setInterval(gameLoop, 1000 / _this.FPS);
+    }
+    // Function that updates the Game and renders the Game's content
+    function gameLoop() {
+        if (!_this.isGamePaused) {
+            // Update the Game
+            update();
+            // Render the Game
+            render();
+        }
     }
     // Function that handles all mouse click events for the Game
     function mouseClickEvents(event, canvas) {
         // Process mouse click events if Game is not paused
         if (!_this.isGamePaused) {
             // Obtain the mouse coordinates relative to the canvas
-            mX = event.pageX - canvas.offsetLeft;
-            mY = event.pageY - canvas.offsetTop;
+            var mouseX = event.pageX - canvas.offsetLeft;
+            var mouseY = event.pageY - canvas.offsetTop;
             // Handle mouse click on Bug objects
-            for (var i = 0; i < bugObjects.length; i++) {
-                var bug = bugObjects[i];
+            for (var i = 0; i < _this.bugObjects.length; i++) {
+                var bug = _this.bugObjects[i];
                 // If a Bug was clicked
-                if ((mX > bug.getX() && mX < (bug.getX() + bug.getWidth())) &&
-                    (mY > bug.getY() && mY < (bug.getY() + bug.getHeight()))) {
+                if ((mouseX > bug.getX() && mouseX < (bug.getX() +
+                    bug.getWidth())) && (mouseY > bug.getY() && mouseY <
+                    (bug.getY() + bug.getHeight()))) {
                     // Update score only once
                     if (!bug.getIsDead()) {
                         // Update score and update corresponding DOM element
@@ -444,42 +461,13 @@ function Game(FPS, resMan, canvasID, canvasWidth, canvasHeight) {
             }
         }
     }
-    // Function that sets the background Image for the Game
-    function setBackgroundImage(imageID) {
-        // Obtain the background Image from the ResourceManager
-        var image = _this.resMan.getImage(imageID);
-        // Execute function when background Image has fully loaded
-        image.onload = function() {
-            // Create a pattern using the background Image
-            _this.bgPattern = _this.ctx.createPattern(image, "repeat");
-        }
-    }
-    // Function that sets the ID of the time text DOM element
-    function setTimeTextID(timeTextID) {
-        _this.timeTextID = timeTextID;
-    }
-    // Function that sets the ID of the score text DOM element
-    function setScoreTextID(scoreTextID) {
-        _this.scoreTextID = scoreTextID;
-    }
-    // Function that sets the sprite Image for the Food
-    function setSpriteFoodID(sprFoodID) {
-        _this.sprFoodID = sprFoodID;
-    }
-    // Function that updates the Game and renders the Game's content
-    function gameLoop() {
-        if (!_this.isGamePaused) {
-            // Update the Game
-            update();
-            // Render the Game
-            render();
-        }
-    }
     // Function that handles all the update events for the Game
     function update() {
         // Update the countdown timer and its corresponding time text
         _this.timer -= 1 / _this.FPS;
         $(_this.timeTextID).text("Time: " + Math.floor(_this.timer));
+        // Create a new Bug
+        makeBugs();
         // Update all of the Food
         for (var i = 0; i < _this.foodObjects.length; i++) {
             // Obtain Food from foodObjects array and update it
@@ -513,20 +501,6 @@ function Game(FPS, resMan, canvasID, canvasWidth, canvasHeight) {
         // Render all of the Bugs
         for (var i = 0; i < _this.bugObjects.length; i++) {
             _this.bugObjects[i].render(_this.ctx);
-        }
-    }
-    // Function that controls if the Game is paused or running
-    function setPaused(isGamePaused) {
-        _this.isGamePaused = isGamePaused;
-    }
-    // Function that returns a random number between an inclusive range
-    function getRandomNumber(min, max) {
-        return Math.floor(Math.random() * (max - min + 1)) + min;
-    }
-    // Function that clears an entire array using the fastest method
-    function clear(array) {
-        while(array.length > 0) {
-            array.pop();
         }
     }
     // Function that makes a specific amount of Food positioned randomly
@@ -568,7 +542,7 @@ function Game(FPS, resMan, canvasID, canvasWidth, canvasHeight) {
             while(prevFrames.indexOf(randFrame) >= 0) {
                 // If all possible frame indicies are used, clear the array
                 if (prevFrames.length == sprFood.numFrames) {
-                    clear(prevFrames);
+                    prevFrames = [];
                 }
                 randFrame = getRandomNumber(0, sprFood.numFrames - 1);
             }
@@ -582,13 +556,93 @@ function Game(FPS, resMan, canvasID, canvasWidth, canvasHeight) {
             }
         }
     }
+    // Function that handles creating a new Bug with random attributes
+    function makeBugs() {
+        _this.ticks += 1;
+        // If Bug make timer has triggered
+        if (_this.ticks > _this.bugMakeTime * _this.FPS) {
+            // Reset the Bug make timer system
+            resetBugMakeTimer();
+            // Configure Bug using randomly generated attributes
+            var bugSpriteID = getRandomItem(_this.bugProbs);
+            var bugItem = _this.bugDB[bugSpriteID];
+            var bugSprite = _this.resMan.getSpriteSheet(bugSpriteID);
+            var y = getRandomItem([0 - bugSprite.image.height,
+                _this.canvasHeight + bugSprite.frameWidth]);
+            var x = getRandomItem([bugSprite.frameWidth,
+                _this.canvasWidth - bugSprite.frameWidth]);
+            // Create a new Bug using the above attributes
+            _this.bugObjects.push(new Bug(bugSprite, bugItem["points"],
+                bugItem["speed"], _this.FPS, x, y, _this.foodObjects));
+        }
+    }
+    // Function that creates the probability distribution for making Bugs
+    function setMakeBugProbability() {
+        for (var key in _this.bugDB) {
+            var factor = _this.bugDB[key]["weight"] * 10;
+            // Append Bug ID equal to the weight of the Bug's probability
+            for (var i = 0; i < factor; i++) {
+                _this.bugProbs.push(key);
+            }
+        }
+    }
+    // Function that sets the background Image for the Game
+    function setBackgroundImage(imageID) {
+        // Obtain the background Image from the ResourceManager
+        var image = _this.resMan.getImage(imageID);
+        // Execute function when background Image has fully loaded
+        image.onload = function() {
+            // Create a pattern using the background Image
+            _this.bgPattern = _this.ctx.createPattern(image, "repeat");
+        }
+    }
+    // Function that sets the bug make time variables to their default values
+    function resetBugMakeTimer() {
+        _this.ticks = 0;
+        _this.bugMakeTime = getRandomItem(_this.bugMakeTimes);
+    }
+    // Function that adds
+    function addBug(spriteID, points, speed, weight) {
+        _this.bugDB[spriteID] = {"points" : points, "speed" : speed,
+            "weight" : weight};
+    }
+    // Function that sets the make times array for the Bug
+    function setBugMakeTimes(makeTimes) {
+        _this.bugMakeTimes = makeTimes;
+    }
+    // Function that sets the ID of the time text DOM element
+    function setTimeTextID(timeTextID) {
+        _this.timeTextID = timeTextID;
+    }
+    // Function that sets the ID of the score text DOM element
+    function setScoreTextID(scoreTextID) {
+        _this.scoreTextID = scoreTextID;
+    }
+    // Function that sets the sprite Image for the Food
+    function setSpriteFoodID(sprFoodID) {
+        _this.sprFoodID = sprFoodID;
+    }
+    // Function that controls if the Game is paused or running
+    function setPaused(isGamePaused) {
+        _this.isGamePaused = isGamePaused;
+    }
+    // Function that randomly returns an item from an array
+    function getRandomItem(items) {
+        return items[Math.floor(Math.random() * items.length)];
+    }
+    // Function that returns a random number between an inclusive range
+    function getRandomNumber(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
     // Functions returned by the module
     return {
         init : init,
+        addBug : addBug,
         setPaused : setPaused,
         setTimeTextID : setTimeTextID,
         setScoreTextID : setScoreTextID,
         setSpriteFoodID : setSpriteFoodID,
+        setBugMakeTimes : setBugMakeTimes,
         setBackgroundImage : setBackgroundImage,
     }
 }
@@ -639,11 +693,15 @@ function Setup() {
             90, 50, 2);
         _this.resMan.addSpriteSheet("SPR_GREY_BUG", _this.SPR_GREY_BUG, 90,
             50, 2);
-        // Setup remaining Game specific tasks
+        // Setup remaining Game attributes
         _this.game.setBackgroundImage("IMG_BG");
         _this.game.setSpriteFoodID("SPR_FOOD");
         _this.game.setTimeTextID(_this.ID_TIME_TEXT);
         _this.game.setScoreTextID(_this.ID_SCORE_TEXT);
+        _this.game.setBugMakeTimes([0.5, 1, 1.5]);
+        _this.game.addBug("SPR_RED_BUG", 3, 2.5, 0.3);
+        _this.game.addBug("SPR_ORANGE_BUG", 1, 2, 0.4);
+        _this.game.addBug("SPR_GREY_BUG", 5, 5, 0.3);
         // Finish initializing the Game
         _this.game.init();
         // Bind unobtrusive event handlers
