@@ -198,73 +198,88 @@ function GameSystem(FPS, resMan, canvasID) {
     }
 }
 
-// Food handles event management and rendering tasks for Food
-function Food(sprite, FPS, selectedFrame, x, y) {
+// BaseObj handles basic event manegement and rendering tasks for a game Object
+function BaseObj(sprite, initFrame, TPF, FPS, x, y) {
     // Module constants and variables
     const _this = this;
+    _this.animation = new SpriteAnimation(sprite, initFrame, TPF, FPS);
     _this.x = x;
     _this.y = y;
     _this.width = sprite.frameWidth;
     _this.height = sprite.image.height;
-    _this.sprite = new SpriteAnimation(sprite, selectedFrame, 0, FPS);
-    _this.isEaten = false;
     _this.canDelete = false;
-    // Function that handles updating the Food's state
-    function update() {
-        // If Food has been eaten then fade it out within half a second
-        if (_this.isEaten) {
-            _this.sprite.reduceOpacity(0.5);
-            // Set the Food delete flag to true once the Food has faded
-            if (_this.sprite.getOpacity() === 0) {
-                _this.canDelete = true;
-            }
-        }
-    }
-    // Function that handles drawing the Food
-    function render(ctx) {
-        // Render the Sprite representing the Food
-        _this.sprite.render(ctx, _this.x, _this.y, 0);
-    }
-    // Function that sets the state of the Food to eaten
-    function setEaten() {
-        _this.isEaten = true;
-    }
-    // Function that returns if the Food has been eaten
-    function getIsEaten() {
-        return _this.isEaten;
-    }
-    // Function that returns the Food's delete flag
-    function getCanDelete() {
-        return _this.canDelete;
-    }
-    // Function that returns the Food's x position
+    _this.angle = 0;
+    // Function that returns the Object's x position
     function getX() {
         return _this.x;
     }
-    // Function that returns the Food's y position
+    // Function that returns the Object's y position
     function getY() {
         return _this.y;
     }
-    // Function that returns the Food's width
+    // Function that returns the Object's width
     function getWidth() {
         return _this.width;
     }
-    // Function that returns the Food's height
+    // Function that returns the Object's height
     function getHeight() {
         return _this.height;
     }
+    // Function that returns the Object's delete flag
+    function getCanDelete() {
+        return _this.canDelete;
+    }
+    // Function that handles drawing the Object
+    function render(ctx) {
+        _this.animation.render(ctx, _this.x, _this.y, _this.angle);
+    }
+    // function that returns the local scope of BaseObj
+    function scope() {
+        return _this;
+    }
     // Functions returned by the module
     return {
-        getX : getX,
+        getX : getY,
         getY : getY,
+        scope : scope,
         render : render,
-        update : update,
-        setEaten : setEaten,
         getWidth : getWidth,
         getHeight : getHeight,
-        getIsEaten : getIsEaten,
-        getCanDelete : getCanDelete
+        getCanDelete : getCanDelete,
     }
+}
+
+// Food handles event management and rendering tasks for Food
+function Food(sprite, FPS, selectedFrame, x, y) {
+    // Module constants and variables
+    const _this = this;
+    _this.isEaten = false;
+    // Create a parent object to 'inherit' and 'override' functions
+    _this.parentObj = new BaseObj(sprite, selectedFrame, 0, FPS, x, y);
+    // Function that handles updating the Food's state
+    _this.parentObj.update = function() {
+        // If Food has been eaten then fade it out within half a second
+        if (_this.isEaten) {
+            _this.baseObj.scope().sprite.reduceOpacity(0.5);
+            // Set the Food delete flag to true once the Food has faded
+            if (_this.parentObj.scope().sprite.getOpacity() === 0) {
+                _this.parentObj.scope().canDelete = true;
+            }
+        }
+    }
+    // Function that returns if the Food has been eaten
+    _this.parentObj.getIsEaten = function() {
+        return _this.isEaten;
+    }
+    // Function that sets the state of the Food to eaten
+    _this.parentObj.setEaten = function() {
+        _this.isEaten = true;
+    }
+    // Create a shallow copy the parent and remove scope from child copy
+    var child = $.extend({}, _this.parentObj);
+    delete child.scope;
+    // Child object returned by the module
+    return child;
 }
 
 // TapTapBugGame handles event management and rendering tasks for TapTapBugGame
@@ -303,7 +318,7 @@ function TapTapBugGame() {
         // Set the game's background
         setBackground();
         // Create the required Food for the Game
-        makeFood(6, 10, 330, 150, 350);
+        makeFood(6, 30, 10, 330, 120, 380);
         // Reset the Bug make timer and init Bug make probability distribution
         resetBugMakeTimer();
         setMakeBugProbability();
@@ -338,7 +353,7 @@ function TapTapBugGame() {
     function mouseClickEvent(mouseX, mouseY) {
     }
     // Function that makes a specific amount of Food positioned randomly
-    function makeFood(amount, lowX, highX, lowY, highY) {
+    function makeFood(amount, tol, lowX, highX, lowY, highY) {
         var foodCount = 0;
         var prevPos = [[]];
         var prevFrames = [];
@@ -367,8 +382,9 @@ function TapTapBugGame() {
             // Ensure new position doesn't overlap with previous positions
             for (var i = 0; i < prevPos.length; i++) {
                 // If there is overlap, set overlap to true
-                if (Math.abs(x - prevPos[i][0]) <= foodSpr.frameWidth &&
-                    Math.abs(y - prevPos[i][1]) <= foodSpr.image.height) {
+                if (Math.abs(x - prevPos[i][0]) <= foodSpr.frameWidth + tol &&
+                    Math.abs(y - prevPos[i][1]) <= foodSpr.image.height +
+                    tol) {
                     isOverlap = true;
                 }
             }
