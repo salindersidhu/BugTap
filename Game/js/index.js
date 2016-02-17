@@ -198,88 +198,219 @@ function GameSystem(FPS, resMan, canvasID) {
     }
 }
 
-// BaseObj handles basic event manegement and rendering tasks for a game Object
-function BaseObj(sprite, initFrame, TPF, FPS, x, y) {
+// Food handles event management and rendering tasks for Food
+function Food(sprite, FPS, selectedFrame, x, y) {
     // Module constants and variables
     const _this = this;
-    _this.animation = new SpriteAnimation(sprite, initFrame, TPF, FPS);
+    _this.animation = new SpriteAnimation(sprite, selectedFrame, FPS, 0);
     _this.x = x;
     _this.y = y;
     _this.width = sprite.frameWidth;
     _this.height = sprite.image.height;
+    _this.isEaten = false;
     _this.canDelete = false;
-    _this.angle = 0;
-    // Function that returns the Object's x position
-    function getX() {
-        return _this.x;
-    }
-    // Function that returns the Object's y position
-    function getY() {
-        return _this.y;
-    }
-    // Function that returns the Object's width
-    function getWidth() {
-        return _this.width;
-    }
-    // Function that returns the Object's height
-    function getHeight() {
-        return _this.height;
-    }
-    // Function that returns the Object's delete flag
-    function getCanDelete() {
-        return _this.canDelete;
+    // Function that handles updating the Food's state
+    function update() {
+        // If Food has been eaten then fade it out within half a second
+        if (_this.isEaten) {
+            _this.animation.reduceOpacity(0.5);
+            // Set the Food delete flag to true once the Food has faded
+            if (_this.animation.getOpacity() === 0) {
+                _this.canDelete = true;
+            }
+        }
     }
     // Function that handles drawing the Object
     function render(ctx) {
         _this.animation.render(ctx, _this.x, _this.y, _this.angle);
     }
-    // function that returns the local scope of BaseObj
-    function scope() {
-        return _this;
-    }
-    // Functions returned by the module
-    return {
-        getX : getY,
-        getY : getY,
-        scope : scope,
-        render : render,
-        getWidth : getWidth,
-        getHeight : getHeight,
-        getCanDelete : getCanDelete,
-    }
-}
-
-// Food handles event management and rendering tasks for Food
-function Food(sprite, FPS, selectedFrame, x, y) {
-    // Module constants and variables
-    const _this = this;
-    _this.isEaten = false;
-    // Create a parent object to 'inherit' and 'override' functions
-    _this.parentObj = new BaseObj(sprite, selectedFrame, 0, FPS, x, y);
-    // Function that handles updating the Food's state
-    _this.parentObj.update = function() {
-        // If Food has been eaten then fade it out within half a second
-        if (_this.isEaten) {
-            _this.baseObj.scope().sprite.reduceOpacity(0.5);
-            // Set the Food delete flag to true once the Food has faded
-            if (_this.parentObj.scope().sprite.getOpacity() === 0) {
-                _this.parentObj.scope().canDelete = true;
-            }
-        }
-    }
     // Function that returns if the Food has been eaten
-    _this.parentObj.getIsEaten = function() {
+    function getIsEaten() {
         return _this.isEaten;
     }
     // Function that sets the state of the Food to eaten
-    _this.parentObj.setEaten = function() {
+    function setEaten() {
         _this.isEaten = true;
     }
-    // Create a shallow copy the parent and remove scope from child copy
-    var child = $.extend({}, _this.parentObj);
-    delete child.scope;
-    // Child object returned by the module
-    return child;
+    // Function that returns the Food's x position
+    function getX() {
+        return _this.x;
+    }
+    // Function that returns the Food's y position
+    function getY() {
+        return _this.y;
+    }
+    // Function that returns the Food's width
+    function getWidth() {
+        return _this.width;
+    }
+    // Function that returns the Food's height
+    function getHeight() {
+        return _this.height;
+    }
+    // Function that returns the Food's delete flag
+    function getCanDelete() {
+        return _this.canDelete;
+    }
+    // Functions returned by the module
+    return {
+        getX : getX,
+        getY : getY,
+        update : update,
+        render : render,
+        getWidth : getWidth,
+        setEaten : setEaten,
+        getHeight : getHeight,
+        getIsEaten : getIsEaten,
+        getCanDelete : getCanDelete
+    }
+}
+
+// Bug handles all event management and rendering tasks for Bug
+function Bug(sprite, points, speed, FPS, x, y, foodObjects) {
+    // Module constants and variables
+    const _this = this;
+    _this.points = points;
+    _this.speed = speed;
+    _this.x = x;
+    _this.y = y;
+    _this.width = sprite.frameWidth;
+    _this.height = sprite.image.height;
+    _this.foodObjects = foodObjects;
+    _this.animation = new SpriteAnimation(sprite, -1, FPS, 10 / speed);
+    _this.angle = 0;
+    _this.isDead = false;
+    _this.canDelete = false;
+    _this.foodPos = [];
+    // Function that handles updating the Bug's state
+    function update() {
+        // Update the Bug if it is alive
+        if (!_this.isDead) {
+            // Find the nearest Food from the Bug's current position
+            findNearestFood();
+            // Handle collision with Food
+            handleFoodCollision();
+            // Update the Bug's animation
+            _this.animation.updateFrame();
+            // Move the Bug to the nearest Food's position
+            moveToPoint(_this.foodPos[0], _this.foodPos[1]);
+        } else {
+            // Fade the Bug within 2 seconds
+            _this.animation.reduceOpacity(2);
+            // Set the Bug delete flag to true once the Bug has faded
+            if (_this.animation.getOpacity() === 0) {
+                _this.canDelete = true;
+            }
+        }
+    }
+    // Function that handles drawing the Bug
+    function render(ctx) {
+        _this.animation.render(ctx, _this.x, _this.y, _this.angle);
+    }
+    // Function that moves the Bug's position to a specific target point
+    function moveToPoint(targetX, targetY) {
+        // Calculate the distance to the target point
+        var distX = targetX - _this.x -
+            (_this.width / 2);
+        var distY = targetY - _this.y -
+            (_this.height / 2);
+        // Calculate the hypotenuse
+        var hypotenuse = Math.sqrt((distX * distX) + (distY * distY));
+        distX /= hypotenuse;
+        distY /= hypotenuse;
+        // Move towards point
+        _this.x += distX * _this.speed;
+        _this.y += distY * _this.speed;
+        // Update the Bug's angle depending on the movement direction
+        _this.angle = Math.atan2(distY, distX);
+    }
+    // Function that handles collision with Food and the current Bug
+    function handleFoodCollision() {
+        for (var i = 0; i < _this.foodObjects.length; i++) {
+            var food = _this.foodObjects[i];
+            // If Food has not been eaten
+            if (!food.getIsEaten()) {
+                // Check if the Bug is colliding with a Food object
+                if ((_this.x < (food.getX() +
+                    food.getWidth()) && (_this.x +
+                    _this.width) > food.getX()) &&
+                    (_this.y < (food.getY() +
+                    food.getHeight()) && (_this.height +
+                    _this.y) > food.getY())) {
+                    // Set the Food's state to eaten
+                    food.setEaten();
+                }
+            }
+        }
+    }
+    // Function that finds and sets the nearest Food from the Bug's position
+    function findNearestFood() {
+        var shortestDist = Number.MAX_VALUE;
+        // Find the nearest Food object and obtain its position
+        for (var i = 0; i < _this.foodObjects.length; i++) {
+            var food = _this.foodObjects[i];
+            // If the Food has not been eaten
+            if (!food.getIsEaten()) {
+                // Calculate the distance between the Bug and Food
+                var foodX = food.getX() + (food.getWidth() / 2);
+                var foodY = food.getY() + (food.getHeight() / 2);
+                var distX = foodX - _this.x;
+                var distY = foodY - _this.y;
+                // Calculate the hypotenuse to find shortest distance to Food
+                var hypotenuse = Math.sqrt((distX * distX) + (distY * distY));
+                // If hypotenuse is shorter than current shortest distance
+                if (hypotenuse < shortestDist) {
+                    // Set Food target position to current Food's position
+                    _this.foodPos = [foodX, foodY];
+                    shortestDist = hypotenuse; // Update shortest distance
+                }
+            }
+        }
+    }
+    // Function that returns the Bug's x position
+    function getX() {
+        return _this.x;
+    }
+    // Function that returns the Bug's y position
+    function getY() {
+        return _this.y;
+    }
+    // Function that returns the Bug's width
+    function getWidth() {
+        return _this.width;
+    }
+    // Function that returns the Bug's height
+    function getHeight() {
+        return _this.height;
+    }
+    // Function that returns the Bug's delete flag
+    function getCanDelete() {
+        return _this.canDelete;
+    }
+    // Function that sets the state of the Bug to dead
+    function setDead() {
+        _this.isDead = true;
+    }
+    // Function that returns if the Bug has been killed
+    function getIsDead() {
+        return _this.isDead;
+    }
+    // Return the number of points the Bug is worth
+    function getPoints() {
+        return _this.points;
+    }
+    return {
+        getX : getX,
+        getY : getY,
+        update : update,
+        render : render,
+        setDead : setDead,
+        getWidth : getWidth,
+        getPoints : getPoints,
+        getIsDead : getIsDead,
+        getHeight : getHeight,
+        getCanDelete : getCanDelete
+    }
 }
 
 // TapTapBugGame handles event management and rendering tasks for TapTapBugGame
@@ -300,8 +431,8 @@ function TapTapBugGame() {
     _this.bugDB = {};
     _this.bugProbs = [];
     _this.bugMakeTimes = [];
-    this.bugObjects = [];
-    this.foodObjects = [];
+    _this.bugObjects = [];
+    _this.foodObjects = [];
     _this.bugMakeTime = 0;
     _this.score = 0;
     _this.ticks = 0;
@@ -338,6 +469,18 @@ function TapTapBugGame() {
                 _this.foodObjects.splice(_this.foodObjects.indexOf(food), 1);
             }
         }
+        // Update all of the Bugs
+        for (var i = 0; i < _this.bugObjects.length; i++) {
+            // Obtain Bug from bugObjects array and update it
+            var bug = _this.bugObjects[i];
+            bug.update();
+            // Delete Bug if it is flagged for removal
+            if (bug.getCanDelete()) {
+                _this.bugObjects.splice(_this.bugObjects.indexOf(bug), 1);
+            }
+        }
+        // Create new Bug objects
+        makeBugs();
     }
     // Function that handles drawing tasks for TapTapBugGame
     function render() {
@@ -348,9 +491,30 @@ function TapTapBugGame() {
         for (var i = 0; i < _this.foodObjects.length; i++) {
             _this.foodObjects[i].render(_this.ctx);
         }
+        // Render all of the Bugs
+        for (var i = 0; i < _this.bugObjects.length; i++) {
+            _this.bugObjects[i].render(_this.ctx);
+        }
     }
     // Function that handles all mouse click tasks for TapTapBugGame
     function mouseClickEvent(mouseX, mouseY) {
+        // Handle mouse click on Bug objects
+        for (var i = 0; i < _this.bugObjects.length; i++) {
+            var bug = _this.bugObjects[i];
+            // If a Bug was clicked
+            if ((mouseX > bug.getX() && mouseX < (bug.getX() +
+                bug.getWidth())) && (mouseY > bug.getY() && mouseY <
+                (bug.getY() + bug.getHeight()))) {
+                // Update score only once
+                if (!bug.getIsDead()) {
+                    // Update score and update corresponding DOM element
+                    _this.score += bug.getPoints();
+                    _this.updateScoreFunc(_this.score);
+                }
+                // Kill the Bug
+                bug.setDead();
+            }
+        }
     }
     // Function that makes a specific amount of Food positioned randomly
     function makeFood(amount, tol, lowX, highX, lowY, highY) {
@@ -406,10 +570,31 @@ function TapTapBugGame() {
             }
         }
     }
+    // Function that handles creating a new Bug with random attributes
+    function makeBugs() {
+        _this.ticks += 1;
+        // If Bug make timer has triggered
+        if (_this.ticks > _this.bugMakeTime * _this.FPS) {
+            // Reset the Bug make timer
+            resetBugMakeTimer();
+            // Configure Bug using randomly generated attributes
+            var bugSpriteID = getRandomItem(_this.bugProbs);
+            var bugItem = _this.bugDB[bugSpriteID];
+            var bugSprite = _this.resMan.getSprite(bugSpriteID);
+            var y = getRandomItem([0 - bugSprite.image.height,
+                _this.canvas.height + bugSprite.frameWidth]);
+            var x = getRandomItem([bugSprite.frameWidth,
+                _this.canvas.width - bugSprite.frameWidth]);
+            console.log(x, y);
+            // Create a new Bug using the above attributes
+            _this.bugObjects.push(new Bug(bugSprite, bugItem['points'],
+                bugItem['speed'], _this.FPS, x, y, _this.foodObjects));
+        }
+    }
     // Function that creates the probability distribution for making Bugs
     function setMakeBugProbability() {
         for (var key in _this.bugDB) {
-            var factor = _this.bugDB[key]["weight"] * 10;
+            var factor = _this.bugDB[key]['weight'] * 10;
             // Append Bug ID equal to the weight of the Bug's probability
             for (var i = 0; i < factor; i++) {
                 _this.bugProbs.push(key);
