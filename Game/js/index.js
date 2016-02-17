@@ -440,7 +440,6 @@ function TapTapBugGame() {
     _this.ctx = null;
     _this.canvas = null;
     _this.isGamePaused = null;
-    _this.saveScoreFunc = null;
     _this.updateScoreTextFunc = null;
     _this.updateTimeTextFunc = null;
     _this.gameOverEventFunc = null;
@@ -637,7 +636,7 @@ function TapTapBugGame() {
                 bugItem['speed'], _this.FPS, x, y));
         }
     }
-    // Function that
+    // Function that handles the offical game over ends for TapTapBugGame
     function handleGaveOver() {
         // Game is over if the timer has expired or all Food is eaten
         if (_this.timeAlloted < 1 || _this.foodObjects.length < 1) {
@@ -645,8 +644,6 @@ function TapTapBugGame() {
         }
         // If game is over and all Bugs are dead then officially end the game
         if (_this.isGameOver && _this.bugObjects.length < 1) {
-            // Execute the save score and game over event functions
-            _this.saveScoreFunc(_this.score);
             // If the alloted time reached 0 then user has won
             if (_this.timeAlloted < 1) {
                 _this.gameOverEventFunc(_this.score, true);
@@ -701,10 +698,6 @@ function TapTapBugGame() {
     function bindUpdateTimeTextFunc(updateTimeTextFunc) {
         _this.updateTimeTextFunc = updateTimeTextFunc;
     }
-    // Function that binds the save score function to the game
-    function bindSaveScoreFunc(saveScoreFunc) {
-        _this.saveScoreFunc = saveScoreFunc;
-    }
     // Function that binds the game over event function to the game
     function bindGameOverEventFunc(gameOverEventFunc) {
         _this.gameOverEventFunc = gameOverEventFunc;
@@ -737,7 +730,6 @@ function TapTapBugGame() {
         setBugMakeTimes : setBugMakeTimes,
         setSpriteFoodID : setSpriteFoodID,
         mouseClickEvent : mouseClickEvent,
-        bindSaveScoreFunc : bindSaveScoreFunc,
         setImageBackgroundID : setImageBackgroundID,
         bindGameOverEventFunc : bindGameOverEventFunc,
         bindUpdateTimeTextFunc : bindUpdateTimeTextFunc,
@@ -756,7 +748,7 @@ function Setup() {
     _this.ID_SCORE_LINK = '#score-link';
     _this.ID_HOME_LINK = '#home-link';
     _this.ID_BUTTON_CLEAR = '#clear-button';
-    _this.ID_BUTTON_BACK = '#back-button';
+    _this.ID_BUTTON_RETRY = '#retry-button';
     _this.ID_BUTTON_PLAY = '#play-button';
     _this.ID_BUTTON_PR = '#pause-resume-button';
     _this.ID_HEADING_SCORE = '#score-heading';
@@ -800,8 +792,8 @@ function Setup() {
         $(_this.ID_HOME_LINK).click(function() {
             navHomeEvent();
         })
-        $(_this.ID_BUTTON_BACK).click(function() {
-            navHomeEvent();
+        $(_this.ID_BUTTON_RETRY).click(function() {
+            retryButtonEvent();
         });
         $(_this.ID_BUTTON_CLEAR).click(function() {
             clearScoreButtonEvent();
@@ -836,7 +828,6 @@ function Setup() {
         _this.ttbGame.setImageBackgroundID('IMG_BG');
         _this.ttbGame.bindUpdateScoreTextFunc(updateScore);
         _this.ttbGame.bindUpdateTimeTextFunc(updateTime);
-        _this.ttbGame.bindSaveScoreFunc(saveScore);
         _this.ttbGame.bindGameOverEventFunc(gameOverEvent);
         _this.ttbGame.addBug('SPR_R_BUG', 3, 2.5, 0.4);
         _this.ttbGame.addBug('SPR_O_BUG', 1, 2, 0.4);
@@ -861,10 +852,13 @@ function Setup() {
     function gameOverEvent(score, isWin) {
         // Stop the GameSystem
         _this.sys.stop();
-        // Hide the game page section
-        $(_this.ID_GAME_SECTION).hide();
+        // Save the highscore
+        saveScore(score);
         // Navigate to score page
         navScoreEvent();
+        // Hide the game page section and show the retry button
+        $(_this.ID_GAME_SECTION).hide();
+        $(_this.ID_BUTTON_RETRY).show();
         // If user has won display win message, otherwise display lose message
         if (isWin) {
             $(_this.ID_WON_MSG).show();
@@ -896,10 +890,16 @@ function Setup() {
             // Hide the score page section and show the home page section
             $(_this.ID_SCORE_SECTION).hide();
             $(_this.ID_HOME_SECTION).show();
-            // Hide the win and lose messages
+            // Hide the win and lose messages and the retry button
             $(_this.ID_WON_MSG).hide();
             $(_this.ID_LOST_MSG).hide();
+            $(_this.ID_BUTTON_RETRY).hide();
         }
+    }
+    // Function that handles the events for the retry button
+    function retryButtonEvent() {
+        navHomeEvent();
+        playGameButtonEvent();
     }
     // Function that handles the events for the play game button
     function playGameButtonEvent() {
