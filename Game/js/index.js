@@ -288,7 +288,7 @@ function Food(sprite, FPS, selectedFrame, x, y) {
 }
 
 // Bug handles all event management and rendering tasks for Bug
-function Bug(sprite, points, speed, FPS, x, y, foodObjects) {
+function Bug(sprite, points, speed, FPS, x, y) {
     // Module constants and variables
     const _this = this;
     _this.points = points;
@@ -297,20 +297,19 @@ function Bug(sprite, points, speed, FPS, x, y, foodObjects) {
     _this.y = y;
     _this.width = sprite.frameWidth;
     _this.height = sprite.image.height;
-    _this.foodObjects = foodObjects;
     _this.animation = new SpriteAnimation(sprite, -1, FPS, 10 / speed);
     _this.angle = 0;
     _this.isDead = false;
     _this.canDelete = false;
     _this.foodPos = [];
     // Function that handles updating the Bug's state
-    function update() {
+    function update(foodObjects) {
         // Update the Bug if it is alive
         if (!_this.isDead) {
             // Find the nearest Food from the Bug's current position
-            findNearestFood();
+            findNearestFood(foodObjects);
             // Handle collision with Food
-            handleFoodCollision();
+            handleFoodCollision(foodObjects);
             // Update the Bug's animation
             _this.animation.updateFrame();
             // Move the Bug to the nearest Food's position
@@ -346,18 +345,16 @@ function Bug(sprite, points, speed, FPS, x, y, foodObjects) {
         _this.angle = Math.atan2(distY, distX);
     }
     // Function that handles collision with Food and the current Bug
-    function handleFoodCollision() {
-        for (var i = 0; i < _this.foodObjects.length; i++) {
-            var food = _this.foodObjects[i];
+    function handleFoodCollision(foodObjects) {
+        for (var i = 0; i < foodObjects.length; i++) {
+            var food = foodObjects[i];
             // If Food has not been eaten
             if (!food.getEaten()) {
                 // Check if the Bug is colliding with a Food object
-                if ((_this.x < (food.getX() +
-                    food.getWidth()) && (_this.x +
-                    _this.width) > food.getX()) &&
-                    (_this.y < (food.getY() +
-                    food.getHeight()) && (_this.height +
-                    _this.y) > food.getY())) {
+                if ((_this.x < (food.getX() + food.getWidth()) &&
+                    (_this.x + _this.width) > food.getX()) &&
+                    (_this.y < (food.getY() + food.getHeight()) &&
+                    (_this.y + _this.height) > food.getY())) {
                     // Set the Food's state to eaten
                     food.setEaten();
                 }
@@ -365,11 +362,11 @@ function Bug(sprite, points, speed, FPS, x, y, foodObjects) {
         }
     }
     // Function that finds and sets the nearest Food from the Bug's position
-    function findNearestFood() {
+    function findNearestFood(foodObjects) {
         var shortestDist = Number.MAX_VALUE;
         // Find the nearest Food object and obtain its position
-        for (var i = 0; i < _this.foodObjects.length; i++) {
-            var food = _this.foodObjects[i];
+        for (var i = 0; i < foodObjects.length; i++) {
+            var food = foodObjects[i];
             // If the Food has not been eaten
             if (!food.getEaten()) {
                 // Calculate the distance between the Bug and Food
@@ -518,7 +515,7 @@ function TapTapBugGame() {
         for (var i = 0; i < _this.bugObjects.length; i++) {
             // Obtain Bug from bugObjects array and update it
             var bug = _this.bugObjects[i];
-            bug.update();
+            bug.update(_this.foodObjects);
             // If the game is over then kill this Bug
             if (_this.isGameOver) {
                 bug.setDead();
@@ -633,11 +630,11 @@ function TapTapBugGame() {
             var bugSprite = _this.resMan.getSprite(bugSpriteID);
             var y = getRandomItem([0 - bugSprite.image.height,
                 _this.canvas.height + bugSprite.frameWidth]);
-            var x = getRandomItem([bugSprite.frameWidth,
-                _this.canvas.width - bugSprite.frameWidth]);
+            var x = getRandomNumber(bugSprite.frameWidth, _this.canvas.width -
+                bugSprite.frameWidth);
             // Create a new Bug using the above attributes
             _this.bugObjects.push(new Bug(bugSprite, bugItem['points'],
-                bugItem['speed'], _this.FPS, x, y, _this.foodObjects));
+                bugItem['speed'], _this.FPS, x, y));
         }
     }
     // Function that
