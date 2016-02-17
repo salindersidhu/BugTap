@@ -1,7 +1,7 @@
-# TapTapBug
+# Tap Tap Bug!
 
 ## Description
-A single player game adapted from Assignment 2 of CSC309 at the University of Toronto and developed using HTML5, CSS3 and JavaScript.
+A single player game adapted from Assignment 2 of CSC309 at the University of Toronto and developed using HTML5, CSS3 and JavaScript with jQuery.
 
 In this game, there are 6 pieces of food randomly positioned near the center of the table. Bugs will randomly appear from the top and bottom of the table and they will move towards the nearest piece of food. The first bug that reaches a piece of food immediately eats it, the bugs will then move to the next closest piece of food. The player's objective is to tap (or click) the bugs before they eat all the food. The game ends when either the 60 second timer expires or when the bugs have eaten all the food.
 

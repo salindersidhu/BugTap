@@ -327,13 +327,16 @@ function Bug(sprite, points, speed, FPS, x, y) {
     function render(ctx) {
         _this.animation.render(ctx, _this.x, _this.y, _this.angle);
     }
+    // Function that returns if the mouse is hovering over the Bug
+    function isMouseHovering(mouseX, mouseY) {
+        return (mouseX > _this.x && mouseX < (_this.x + _this.width)) &&
+            (mouseY > _this.y && mouseY < (_this.y + _this.height))
+    }
     // Function that moves the Bug's position to a specific target point
     function moveToPoint(targetX, targetY) {
         // Calculate the distance to the target point
-        var distX = targetX - _this.x -
-            (_this.width / 2);
-        var distY = targetY - _this.y -
-            (_this.height / 2);
+        var distX = targetX - _this.x - (_this.width / 2);
+        var distY = targetY - _this.y - (_this.height / 2);
         // Calculate the hypotenuse
         var hypotenuse = Math.sqrt((distX * distX) + (distY * distY));
         distX /= hypotenuse;
@@ -385,22 +388,6 @@ function Bug(sprite, points, speed, FPS, x, y) {
             }
         }
     }
-    // Function that returns the Bug's x position
-    function getX() {
-        return _this.x;
-    }
-    // Function that returns the Bug's y position
-    function getY() {
-        return _this.y;
-    }
-    // Function that returns the Bug's width
-    function getWidth() {
-        return _this.width;
-    }
-    // Function that returns the Bug's height
-    function getHeight() {
-        return _this.height;
-    }
     // Function that returns the Bug's delete flag
     function getCanDelete() {
         return _this.canDelete;
@@ -418,16 +405,13 @@ function Bug(sprite, points, speed, FPS, x, y) {
         return _this.points;
     }
     return {
-        getX : getX,
-        getY : getY,
         update : update,
         render : render,
         setDead : setDead,
         getDead : getDead,
-        getWidth : getWidth,
         getPoints : getPoints,
-        getHeight : getHeight,
-        getCanDelete : getCanDelete
+        getCanDelete : getCanDelete,
+        isMouseHovering : isMouseHovering,
     }
 }
 
@@ -452,6 +436,8 @@ function TapTapBugGame() {
     _this.bugObjects = [];
     _this.foodObjects = [];
     _this.bugMakeTime = 0;
+    _this.mouseX = 0;
+    _this.mouseY = 0;
     _this.score = 0;
     _this.ticks = 0;
     _this.timeAlloted = 0;
@@ -500,6 +486,8 @@ function TapTapBugGame() {
         }
         // Handle game over for TapTapBugGame
         handleGaveOver();
+        // Update the canvas cursor when hovering over a Bug
+        updateBugHoverCanvasCursor();
         // Update all of the Food
         for (var i = 0; i < _this.foodObjects.length; i++) {
             // Obtain Food from foodObjects array and update it
@@ -544,10 +532,8 @@ function TapTapBugGame() {
         // Handle mouse click on Bug objects
         for (var i = 0; i < _this.bugObjects.length; i++) {
             var bug = _this.bugObjects[i];
-            // If a Bug was clicked
-            if ((mouseX > bug.getX() && mouseX < (bug.getX() +
-                bug.getWidth())) && (mouseY > bug.getY() && mouseY <
-                (bug.getY() + bug.getHeight()))) {
+            // If mouse cursor is hovering over the Bug
+            if (bug.isMouseHovering(mouseX, mouseY)) {
                 // Update score only once
                 if (!bug.getDead()) {
                     // Update score and update corresponding DOM element
@@ -561,6 +547,22 @@ function TapTapBugGame() {
     }
     // Function that handles all mouse move tasks for TapTapBugGame
     function mouseMoveEvent(mouseX, mouseY) {
+        // Record the mouse coordinates when the mouse has moved
+        _this.mouseX = mouseX;
+        _this.mouseY = mouseY;
+    }
+    // Function that updates the canvas cursor when hovering over a Bug
+    function updateBugHoverCanvasCursor() {
+        for (var i = 0; i < _this.bugObjects.length; i++) {
+            var bug = _this.bugObjects[i];
+            // If hovering over Bug change cursor to 'pointer' and break loop
+            if (bug.isMouseHovering(_this.mouseX, _this.mouseY)) {
+                $('body').css('cursor', 'pointer');
+                break;
+            }
+            // Change the cursor back to 'defualt' when not hovering
+            $('body').css('cursor', 'default');
+        }
     }
     // Function that makes a specific amount of Food positioned randomly
     function makeFood(amount, tol, lowX, highX, lowY, highY) {
