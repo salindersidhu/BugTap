@@ -128,9 +128,8 @@ function GameSystem(FPS, resMan, canvasID) {
     _this.FPS = FPS;
     _this.resMan = resMan;
     _this.canvasID = canvasID;
-    _this.isGameOver = false;
     _this.isGamePaused = false;
-    _this.isGameStarted = false;
+    _this.isGameActive = false;
     _this.boundGame = null;
     // Function that initializes the GameSystem
     function init() {
@@ -141,30 +140,45 @@ function GameSystem(FPS, resMan, canvasID) {
         canvas.addEventListener('mousedown', function() {
             mouseClickEvents(event, canvas);
         }, false);
+        // Add event listener for mouse move events to the canvas
+        canvas.addEventListener('mousemove', function() {
+            mouseMoveEvents(event, canvas);
+        }, false);
         // Initialize the bound game module
         _this.boundGame.init(_this.FPS, _this.resMan, ctx, canvas,
-            _this.isGameOver, _this.isGamePaused);
+            /*_this.isGameOver,*/ _this.isGamePaused);
         // Execute the GameSystem event loop indefinitely
         setInterval(gameSystemLoop, 1000 / _this.FPS);
     }
     // Function that continuously updates and renders the GameSystem
     function gameSystemLoop() {
-        if (_this.isGameStarted && !_this.isGamePaused && !_this.isGameOver) {
+        if (_this.isGameActive && !_this.isGamePaused) {
             // Update the bound game module
             _this.boundGame.update();
             // Render the bound game module
             _this.boundGame.render();
         }
     }
-    // Function that handles all the mouse click events for the GameSystem
+    // Function that handles all the mouse click events for GameSystem
     function mouseClickEvents(event, canvas) {
-        // Process mouse click events if Game is active and not paused
-        if (_this.isGameStarted && !_this.isGamePaused && !_this.isGameOver) {
+        // Process mouse click events if GameSystem is active and not paused
+        if (_this.isGameActive && !_this.isGamePaused) {
             // Obtain the mouse coordinates relative to the canvas
             const mouseX = event.pageX - canvas.offsetLeft;
             const mouseY = event.pageY - canvas.offsetTop;
             // Trigger bound game module's mouse click event
             _this.boundGame.mouseClickEvent(mouseX, mouseY);
+        }
+    }
+    // Function that handles all mouse move events for GameSystem
+    function mouseMoveEvents(event, canvas) {
+        // Process mouse move events if GameSystem is active and not paused
+        if (_this.isGameActive && !_this.isGamePaused) {
+            // Obtain the mouse coordinates relative to the canvas
+            const mouseX = event.pageX - canvas.offsetLeft;
+            const mouseY = event.pageY - canvas.offsetTop;
+            // Trigger bound game module's mouse move event
+            _this.boundGame.mouseMoveEvent(mouseX, mouseY);
         }
     }
     // Function that toggles the GameSystem's state between paused or running
@@ -176,12 +190,18 @@ function GameSystem(FPS, resMan, canvasID) {
         return _this.isGamePaused;
     }
     // Function that returns if the GameSystem has started
-    function getIsStarted() {
-        return _this.isGameStarted;
+    function getIsActive() {
+        return _this.isGameActive;
     }
     // Function that officially starts the GameSystem
     function start() {
-        _this.isGameStarted = true;
+        // Reset the bound game module
+        _this.boundGame.reset();
+        _this.isGameActive = true;
+    }
+    // Function that officially stops the GameSystem
+    function stop() {
+        _this.isGameActive = false;
     }
     // Function that binds a game module to the GameSystem
     function bindGame(game) {
@@ -190,10 +210,11 @@ function GameSystem(FPS, resMan, canvasID) {
     // Functions returned by the module
     return {
         init : init,
+        stop : stop,
         start : start,
         bindGame : bindGame,
         getIsPaused : getIsPaused,
-        getIsStarted : getIsStarted,
+        getIsActive : getIsActive,
         togglePauseResume : togglePauseResume
     }
 }
@@ -421,7 +442,6 @@ function TapTapBugGame() {
     _this.resMan = null;
     _this.ctx = null;
     _this.canvas = null;
-    _this.isGameOver = null;
     _this.isGamePaused = null;
     _this.updateScoreFunc = null;
     _this.updateTimeFunc = null;
@@ -437,14 +457,14 @@ function TapTapBugGame() {
     _this.score = 0;
     _this.ticks = 0;
     _this.timeAlloted = 0;
+    _this.isGameOver = false;
     // Function that initializes TapTapBugGame
-    function init(FPS, resMan, ctx, canvas, isGameOver, isGamePaused) {
+    function init(FPS, resMan, ctx, canvas, isGamePaused) {
         // Set game variables
         _this.FPS = FPS;
         _this.resMan = resMan;
         _this.ctx = ctx;
         _this.canvas = canvas;
-        _this.isGameOver = isGameOver;
         _this.isGamePaused = isGamePaused;
         // Set the game's background
         setBackground();
@@ -453,6 +473,9 @@ function TapTapBugGame() {
         // Reset the Bug make timer and init Bug make probability distribution
         resetBugMakeTimer();
         setMakeBugProbability();
+    }
+    // Function that resets the instance variables to their default values
+    function reset() {
     }
     // Function that handles updating attributes for TapTapBugGame
     function update() {
@@ -515,6 +538,9 @@ function TapTapBugGame() {
                 bug.setDead();
             }
         }
+    }
+    // Function that handles all mouse move tasks for TapTapBugGame
+    function mouseMoveEvent(mouseX, mouseY) {
     }
     // Function that makes a specific amount of Food positioned randomly
     function makeFood(amount, tol, lowX, highX, lowY, highY) {
@@ -656,10 +682,12 @@ function TapTapBugGame() {
     // Functions returned by the module
     return {
         init : init,
+        reset : reset,
         addBug : addBug,
         render : render,
         update : update,
         setAllotedTime : setAllotedTime,
+        mouseMoveEvent : mouseMoveEvent,
         setBugMakeTimes : setBugMakeTimes,
         setSpriteFoodID : setSpriteFoodID,
         mouseClickEvent : mouseClickEvent,
@@ -762,7 +790,7 @@ function Setup() {
         _this.ttbGame.bindUpdateTimeFunc(updateTime);
         _this.ttbGame.addBug('SPR_R_BUG', 3, 2.5, 0.4);
         _this.ttbGame.addBug('SPR_O_BUG', 1, 2, 0.4);
-        _this.ttbGame.addBug('SPR_G_BUG', 5, 4, 0.2)
+        _this.ttbGame.addBug('SPR_G_BUG', 5, 4, 0.2);
         _this.sys.bindGame(_this.ttbGame);
     }
     // Function that updates the score text
@@ -782,7 +810,7 @@ function Setup() {
     // Function that handles the events for the score navigation link
     function navScoreEvent() {
         // Call events if game is not running
-        if (!_this.sys.getIsStarted()) {
+        if (!_this.sys.getIsActive()) {
             // Set score link item to active and home link item to inactive
             $(_this.ID_SCORE_LINK).addClass('active');
             $(_this.ID_HOME_LINK).removeClass('active');
@@ -796,7 +824,7 @@ function Setup() {
     // Function that handles the events for the home navigation link
     function navHomeEvent() {
         // Call events if game is not running
-        if (!_this.sys.getIsStarted()) {
+        if (!_this.sys.getIsActive()) {
             // Set home link item to active and score link item to inactive
             $(_this.ID_HOME_LINK).addClass('active');
             $(_this.ID_SCORE_LINK).removeClass('active');
