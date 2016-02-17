@@ -109,7 +109,8 @@ function SpriteAnimation(sprite, initFrame, FPS, TPF) {
             x,
             y,
             _this.fwidth,
-            _this.height);
+            _this.height
+        );
         ctx.restore();
     }
     // Functions returned by the module
@@ -122,15 +123,15 @@ function SpriteAnimation(sprite, initFrame, FPS, TPF) {
 }
 
 // GameSystem handles the core Game event management and rendering tasks
-function GameSystem(FPS, resMan, canvasID) {
+function GameSystem(FPS, canvasID) {
     // Module constants and variables
     const _this = this;
     _this.FPS = FPS;
-    _this.resMan = resMan;
     _this.canvasID = canvasID;
     _this.isGamePaused = false;
     _this.isGameActive = false;
     _this.boundGame = null;
+    _this.resMan = new ResourceManager();
     // Function that initializes the GameSystem
     function init() {
         // Obtain the canvas and canvas context from the DOM
@@ -145,8 +146,9 @@ function GameSystem(FPS, resMan, canvasID) {
             mouseMoveEvents(event, canvas);
         }, false);
         // Initialize the bound game module
-        _this.boundGame.init(_this.FPS, _this.resMan, ctx, canvas,
-            _this.isGamePaused);
+        _this.boundGame.init(
+            _this.FPS, _this.resMan, ctx, canvas, _this.isGamePaused
+        );
         // Execute the GameSystem event loop indefinitely
         setInterval(gameSystemLoop, 1000 / _this.FPS);
     }
@@ -180,6 +182,10 @@ function GameSystem(FPS, resMan, canvasID) {
             // Trigger bound game module's mouse move event
             _this.boundGame.mouseMoveEvent(mouseX, mouseY);
         }
+    }
+    // Function that returns the GameSystem's ResourceManager
+    function getResourceManager() {
+        return _this.resMan;
     }
     // Function that toggles the GameSystem's state between paused or running
     function togglePauseResume() {
@@ -215,7 +221,8 @@ function GameSystem(FPS, resMan, canvasID) {
         bindGame : bindGame,
         getPaused : getPaused,
         getActive : getActive,
-        togglePauseResume : togglePauseResume
+        togglePauseResume : togglePauseResume,
+        getResourceManager : getResourceManager
     }
 }
 
@@ -329,8 +336,11 @@ function Bug(sprite, points, speed, FPS, x, y) {
     }
     // Function that returns if the mouse is hovering over the Bug
     function isMouseHovering(mouseX, mouseY) {
-        return (mouseX > _this.x && mouseX < (_this.x + _this.width)) &&
-            (mouseY > _this.y && mouseY < (_this.y + _this.height))
+        return (
+            mouseX > _this.x && mouseX < (_this.x + _this.width)
+        ) && (
+            mouseY > _this.y && mouseY < (_this.y + _this.height)
+        );
     }
     // Function that moves the Bug's position to a specific target point
     function moveToPoint(targetX, targetY) {
@@ -354,10 +364,12 @@ function Bug(sprite, points, speed, FPS, x, y) {
             // If Food has not been eaten
             if (!food.getEaten()) {
                 // Check if the Bug is colliding with a Food object
-                if ((_this.x < (food.getX() + food.getWidth()) &&
+                if (
+                    (_this.x < (food.getX() + food.getWidth()) &&
                     (_this.x + _this.width) > food.getX()) &&
                     (_this.y < (food.getY() + food.getHeight()) &&
-                    (_this.y + _this.height) > food.getY())) {
+                    (_this.y + _this.height) > food.getY())
+                ) {
                     // Set the Food's state to eaten
                     food.setEaten();
                 }
@@ -584,15 +596,17 @@ function TapTapBugGame() {
                 _this.lowX = 0;
             }
             if ((_this.highX + foodSpr.frameWidth) > _this.canvas.width) {
-                _this.highX -= (_this.highX + foodSpr.frameWidth) %
-                _this.canvas.width;
+                _this.highX -= (
+                    _this.highX + foodSpr.frameWidth
+                ) % _this.canvas.width;
             }
             if ((_this.lowY + foodSpr.image.height) < 0) {
                 _this.lowY = 0;
             }
             if ((_this.highY + foodSpr.image.height) > _this.canvas.height) {
-                _this.highY -= (_this.highY + foodSpr.image.height) %
-                _this.canvas.height;
+                _this.highY -= (
+                    _this.highY + foodSpr.image.height
+                ) % _this.canvas.height;
             }
             // Generate random positions specified by the bound variables
             const x = getRandomNumber(_this.lowX, _this.highX);
@@ -603,9 +617,13 @@ function TapTapBugGame() {
             // Ensure new position doesn't overlap with previous positions
             for (var i = 0; i < prevPos.length; i++) {
                 // If there is overlap, set overlap to true
-                if (Math.abs(x - prevPos[i][0]) <= foodSpr.frameWidth +
-                    _this.tolX && Math.abs(y - prevPos[i][1]) <=
-                    foodSpr.image.height + _this.tolY) {
+                if (
+                    Math.abs(x - prevPos[i][0]) <= (
+                        foodSpr.frameWidth + _this.tolX
+                    ) && Math.abs(y - prevPos[i][1]) <= (
+                        foodSpr.image.height + _this.tolY
+                    )
+                ) {
                     isOverlap = true;
                 }
             }
@@ -619,8 +637,9 @@ function TapTapBugGame() {
             }
             // If there is no overlap then create the Food
             if (!isOverlap) {
-                _this.foodObjects.push(new Food(foodSpr, _this.FPS, randFrame,
-                    x, y));
+                _this.foodObjects.push(
+                    new Food(foodSpr, _this.FPS, randFrame, x, y)
+                );
                 prevPos.push([x, y]);
                 prevFrames.push(randFrame);
                 foodCount += 1;
@@ -636,15 +655,19 @@ function TapTapBugGame() {
             resetBugMakeTimer();
             // Configure Bug using randomly generated attributes
             var bugSpriteID = getRandomItem(_this.bugProbs);
-            var bugItem = _this.bugDB[bugSpriteID];
             var bugSprite = _this.resMan.getSprite(bugSpriteID);
-            var y = getRandomItem([0 - bugSprite.image.height,
-                _this.canvas.height + bugSprite.frameWidth]);
-            var x = getRandomNumber(bugSprite.frameWidth, _this.canvas.width -
-                bugSprite.frameWidth);
+            var bugPoints = _this.bugDB[bugSpriteID]['points'];
+            var bugSpeed = _this.bugDB[bugSpriteID]['speed'];
+            var bugWidth = bugSprite.frameWidth;
+            var bugHeight = bugSprite.image.height;
+            var y = getRandomItem(
+                [0 - bugHeight, _this.canvas.height + bugHeight]
+            );
+            var x = getRandomNumber(bugHeight, _this.canvas.width - bugHeight);
             // Create a new Bug using the above attributes
-            _this.bugObjects.push(new Bug(bugSprite, bugItem['points'],
-                bugItem['speed'], _this.FPS, x, y));
+            _this.bugObjects.push(
+                new Bug(bugSprite, bugPoints, bugSpeed, _this.FPS, x, y)
+            );
         }
     }
     // Function that handles the offical game over ends for TapTapBugGame
@@ -690,8 +713,9 @@ function TapTapBugGame() {
     }
     // Function that adds information about a new Bug to the Bug database
     function addBug(spriteID, points, speed, weight) {
-        _this.bugDB[spriteID] = {'points' : points, 'speed' : speed,
-            'weight' : weight};
+        _this.bugDB[spriteID] = {
+            'points' : points, 'speed' : speed, 'weight' : weight
+        };
     }
     // Function that sets the amount of time alloted for the game
     function setAllotedTime(timeAlloted) {
@@ -798,7 +822,6 @@ function Setup() {
     _this.SPR_ORAN_BUG = 'assets/orange_bug_sprite.png';
     _this.SPR_GREY_BUG = 'assets/grey_bug_sprite.png';
     // Instance variables
-    _this.resMan = null;
     _this.sys = null;
     _this.ttbGame = null;
     // Function that initializes tasks to setup the game page and DOM elements
@@ -838,17 +861,26 @@ function Setup() {
     // Function that initializes all the main objects for the game
     function initGameObjects() {
         // Create new ResourceManager, GameSystem and TapTapBugGame objects
-        _this.resMan = new ResourceManager();
         _this.ttbGame = new TapTapBugGame();
-        _this.sys = new GameSystem(_this.FPS, _this.resMan, _this.ID_CANVAS);
+        _this.sys = new GameSystem(_this.FPS, _this.ID_CANVAS);
     }
     // Function that adds all of the game resources using the ResourceManager
     function initResources() {
-        _this.resMan.addImage('IMG_BG', _this.IMG_BG, 387, 600);
-        _this.resMan.addSprite('SPR_FOOD', _this.SPR_FOOD, 896, 56, 16);
-        _this.resMan.addSprite('SPR_RED_BUG', _this.SPR_RED_BUG, 90, 50, 2);
-        _this.resMan.addSprite('SPR_ORAN_BUG', _this.SPR_ORAN_BUG, 90, 50, 2);
-        _this.resMan.addSprite('SPR_GREY_BUG', _this.SPR_GREY_BUG, 90, 50, 2);
+        _this.sys.getResourceManager().addImage(
+            'IMG_BG', _this.IMG_BG, 387, 600
+        );
+        _this.sys.getResourceManager().addSprite(
+            'SPR_FOOD', _this.SPR_FOOD, 896, 56, 16
+        );
+        _this.sys.getResourceManager().addSprite(
+            'SPR_RED_BUG', _this.SPR_RED_BUG, 90, 50, 2
+        );
+        _this.sys.getResourceManager().addSprite(
+            'SPR_ORAN_BUG', _this.SPR_ORAN_BUG, 90, 50, 2
+        );
+        _this.sys.getResourceManager().addSprite(
+            'SPR_GREY_BUG', _this.SPR_GREY_BUG, 90, 50, 2
+        );
     }
     // Function that configures the games attributes
     function configGame() {
