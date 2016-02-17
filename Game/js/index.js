@@ -146,7 +146,7 @@ function GameSystem(FPS, resMan, canvasID) {
         }, false);
         // Initialize the bound game module
         _this.boundGame.init(_this.FPS, _this.resMan, ctx, canvas,
-            /*_this.isGameOver,*/ _this.isGamePaused);
+            _this.isGamePaused);
         // Execute the GameSystem event loop indefinitely
         setInterval(gameSystemLoop, 1000 / _this.FPS);
     }
@@ -159,7 +159,7 @@ function GameSystem(FPS, resMan, canvasID) {
             _this.boundGame.render();
         }
     }
-    // Function that handles all the mouse click events for GameSystem
+    // Function that handles all of the mouse click events for GameSystem
     function mouseClickEvents(event, canvas) {
         // Process mouse click events if GameSystem is active and not paused
         if (_this.isGameActive && !_this.isGamePaused) {
@@ -170,7 +170,7 @@ function GameSystem(FPS, resMan, canvasID) {
             _this.boundGame.mouseClickEvent(mouseX, mouseY);
         }
     }
-    // Function that handles all mouse move events for GameSystem
+    // Function that handles all of the mouse move events for GameSystem
     function mouseMoveEvents(event, canvas) {
         // Process mouse move events if GameSystem is active and not paused
         if (_this.isGameActive && !_this.isGamePaused) {
@@ -186,11 +186,11 @@ function GameSystem(FPS, resMan, canvasID) {
         _this.isGamePaused = !_this.isGamePaused;
     }
     // Function that returns if the GameSystem is paused
-    function getIsPaused() {
+    function getPaused() {
         return _this.isGamePaused;
     }
     // Function that returns if the GameSystem has started
-    function getIsActive() {
+    function getActive() {
         return _this.isGameActive;
     }
     // Function that officially starts the GameSystem
@@ -213,8 +213,8 @@ function GameSystem(FPS, resMan, canvasID) {
         stop : stop,
         start : start,
         bindGame : bindGame,
-        getIsPaused : getIsPaused,
-        getIsActive : getIsActive,
+        getPaused : getPaused,
+        getActive : getActive,
         togglePauseResume : togglePauseResume
     }
 }
@@ -246,7 +246,7 @@ function Food(sprite, FPS, selectedFrame, x, y) {
         _this.animation.render(ctx, _this.x, _this.y, _this.angle);
     }
     // Function that returns if the Food has been eaten
-    function getIsEaten() {
+    function getEaten() {
         return _this.isEaten;
     }
     // Function that sets the state of the Food to eaten
@@ -281,8 +281,8 @@ function Food(sprite, FPS, selectedFrame, x, y) {
         render : render,
         getWidth : getWidth,
         setEaten : setEaten,
+        getEaten : getEaten,
         getHeight : getHeight,
-        getIsEaten : getIsEaten,
         getCanDelete : getCanDelete
     }
 }
@@ -350,7 +350,7 @@ function Bug(sprite, points, speed, FPS, x, y, foodObjects) {
         for (var i = 0; i < _this.foodObjects.length; i++) {
             var food = _this.foodObjects[i];
             // If Food has not been eaten
-            if (!food.getIsEaten()) {
+            if (!food.getEaten()) {
                 // Check if the Bug is colliding with a Food object
                 if ((_this.x < (food.getX() +
                     food.getWidth()) && (_this.x +
@@ -371,7 +371,7 @@ function Bug(sprite, points, speed, FPS, x, y, foodObjects) {
         for (var i = 0; i < _this.foodObjects.length; i++) {
             var food = _this.foodObjects[i];
             // If the Food has not been eaten
-            if (!food.getIsEaten()) {
+            if (!food.getEaten()) {
                 // Calculate the distance between the Bug and Food
                 var foodX = food.getX() + (food.getWidth() / 2);
                 var foodY = food.getY() + (food.getHeight() / 2);
@@ -413,7 +413,7 @@ function Bug(sprite, points, speed, FPS, x, y, foodObjects) {
         _this.isDead = true;
     }
     // Function that returns if the Bug has been killed
-    function getIsDead() {
+    function getDead() {
         return _this.isDead;
     }
     // Return the number of points the Bug is worth
@@ -426,9 +426,9 @@ function Bug(sprite, points, speed, FPS, x, y, foodObjects) {
         update : update,
         render : render,
         setDead : setDead,
+        getDead : getDead,
         getWidth : getWidth,
         getPoints : getPoints,
-        getIsDead : getIsDead,
         getHeight : getHeight,
         getCanDelete : getCanDelete
     }
@@ -443,8 +443,10 @@ function TapTapBugGame() {
     _this.ctx = null;
     _this.canvas = null;
     _this.isGamePaused = null;
-    _this.updateScoreFunc = null;
-    _this.updateTimeFunc = null;
+    _this.saveScoreFunc = null;
+    _this.updateScoreTextFunc = null;
+    _this.updateTimeTextFunc = null;
+    _this.gameOverEventFunc = null;
     _this.sprFoodID = null;
     _this.imgBackgroundID = null;
     _this.bgPattern = null;
@@ -457,6 +459,7 @@ function TapTapBugGame() {
     _this.score = 0;
     _this.ticks = 0;
     _this.timeAlloted = 0;
+    _this.defaultTimeAlloted = 0;
     _this.isGameOver = false;
     // Function that initializes TapTapBugGame
     function init(FPS, resMan, ctx, canvas, isGamePaused) {
@@ -468,20 +471,39 @@ function TapTapBugGame() {
         _this.isGamePaused = isGamePaused;
         // Set the game's background
         setBackground();
-        // Create the required Food for the Game
-        makeFood(6, 30, 10, 330, 120, 380);
         // Reset the Bug make timer and init Bug make probability distribution
         resetBugMakeTimer();
         setMakeBugProbability();
+        // Reset game variables
+        reset();
     }
-    // Function that resets the instance variables to their default values
+    // Function that resets the game variables to their default values
     function reset() {
+        // Set default initialized values
+        _this.timeAlloted = _this.defaultTimeAlloted;
+        // Set default instance values
+        _this.score = 0;
+        _this.ticks = 0;
+        _this.bugMakeTime = 0;
+        _this.bugObjects = [];
+        _this.foodObjects = [];
+        _this.isGameOver = false;
+        _this.updateScoreTextFunc(0);
+        // Create the required Food for the Game
+        makeFood(6, 30, 10, 330, 120, 380);
     }
     // Function that handles updating attributes for TapTapBugGame
     function update() {
-        // Update the time alloted and it's corresponding time display text
-        _this.timeAlloted -= 1 / _this.FPS;
-        _this.updateTimeFunc(Math.floor(_this.timeAlloted));
+        // If game is not over
+        if (!_this.isGameOver) {
+            // Update the time alloted and it's corresponding time display text
+            _this.timeAlloted -= 1 / _this.FPS;
+            _this.updateTimeTextFunc(Math.floor(_this.timeAlloted));
+            // Create new Bugs
+            makeBugs();
+        }
+        // Handle game over for TapTapBugGame
+        handleGaveOver();
         // Update all of the Food
         for (var i = 0; i < _this.foodObjects.length; i++) {
             // Obtain Food from foodObjects array and update it
@@ -497,13 +519,15 @@ function TapTapBugGame() {
             // Obtain Bug from bugObjects array and update it
             var bug = _this.bugObjects[i];
             bug.update();
+            // If the game is over then kill this Bug
+            if (_this.isGameOver) {
+                bug.setDead();
+            }
             // Delete Bug if it is flagged for removal
             if (bug.getCanDelete()) {
                 _this.bugObjects.splice(_this.bugObjects.indexOf(bug), 1);
             }
         }
-        // Create new Bug objects
-        makeBugs();
     }
     // Function that handles drawing tasks for TapTapBugGame
     function render() {
@@ -529,10 +553,10 @@ function TapTapBugGame() {
                 bug.getWidth())) && (mouseY > bug.getY() && mouseY <
                 (bug.getY() + bug.getHeight()))) {
                 // Update score only once
-                if (!bug.getIsDead()) {
+                if (!bug.getDead()) {
                     // Update score and update corresponding DOM element
                     _this.score += bug.getPoints();
-                    _this.updateScoreFunc(_this.score);
+                    _this.updateScoreTextFunc(_this.score);
                 }
                 // Kill the Bug
                 bug.setDead();
@@ -611,10 +635,27 @@ function TapTapBugGame() {
                 _this.canvas.height + bugSprite.frameWidth]);
             var x = getRandomItem([bugSprite.frameWidth,
                 _this.canvas.width - bugSprite.frameWidth]);
-            console.log(x, y);
             // Create a new Bug using the above attributes
             _this.bugObjects.push(new Bug(bugSprite, bugItem['points'],
                 bugItem['speed'], _this.FPS, x, y, _this.foodObjects));
+        }
+    }
+    // Function that
+    function handleGaveOver() {
+        // Game is over if the timer has expired or all Food is eaten
+        if (_this.timeAlloted < 1 || _this.foodObjects.length < 1) {
+            _this.isGameOver = true;
+        }
+        // If game is over and all Bugs are dead then officially end the game
+        if (_this.isGameOver && _this.bugObjects.length < 1) {
+            // Execute the save score and game over event functions
+            _this.saveScoreFunc(_this.score);
+            // If the alloted time reached 0 then user has won
+            if (_this.timeAlloted < 1) {
+                _this.gameOverEventFunc(_this.score, true);
+            } else {
+                _this.gameOverEventFunc(_this.score, false);
+            }
         }
     }
     // Function that creates the probability distribution for making Bugs
@@ -649,19 +690,27 @@ function TapTapBugGame() {
     }
     // Function that sets the amount of time alloted for the game
     function setAllotedTime(timeAlloted) {
-        _this.timeAlloted = timeAlloted + 1;
+        _this.defaultTimeAlloted = timeAlloted + 1;
     }
     // Function that sets the make times array for the Bug
     function setBugMakeTimes(makeTimes) {
         _this.bugMakeTimes = makeTimes;
     }
-    // Function that binds the update score function to the game
-    function bindUpdateScoreFunc(updateScoreFunc) {
-        _this.updateScoreFunc = updateScoreFunc;
+    // Function that binds the update score text function to the game
+    function bindUpdateScoreTextFunc(updateScoreTextFunc) {
+        _this.updateScoreTextFunc = updateScoreTextFunc;
     }
-    // Function that binds the update time function to the game
-    function bindUpdateTimeFunc(updateTimeFunc) {
-        _this.updateTimeFunc = updateTimeFunc;
+    // Function that binds the update time text function to the game
+    function bindUpdateTimeTextFunc(updateTimeTextFunc) {
+        _this.updateTimeTextFunc = updateTimeTextFunc;
+    }
+    // Function that binds the save score function to the game
+    function bindSaveScoreFunc(saveScoreFunc) {
+        _this.saveScoreFunc = saveScoreFunc;
+    }
+    // Function that binds the game over event function to the game
+    function bindGameOverEventFunc(gameOverEventFunc) {
+        _this.gameOverEventFunc = gameOverEventFunc;
     }
     // Function that sets the Sprite ID for the Food
     function setSpriteFoodID(sprFoodID) {
@@ -691,9 +740,11 @@ function TapTapBugGame() {
         setBugMakeTimes : setBugMakeTimes,
         setSpriteFoodID : setSpriteFoodID,
         mouseClickEvent : mouseClickEvent,
-        bindUpdateTimeFunc : bindUpdateTimeFunc,
-        bindUpdateScoreFunc : bindUpdateScoreFunc,
-        setImageBackgroundID : setImageBackgroundID
+        bindSaveScoreFunc : bindSaveScoreFunc,
+        setImageBackgroundID : setImageBackgroundID,
+        bindGameOverEventFunc : bindGameOverEventFunc,
+        bindUpdateTimeTextFunc : bindUpdateTimeTextFunc,
+        bindUpdateScoreTextFunc : bindUpdateScoreTextFunc
     }
 }
 
@@ -786,8 +837,10 @@ function Setup() {
         _this.ttbGame.setBugMakeTimes([0.5, 0.9, 1.2]);
         _this.ttbGame.setSpriteFoodID('SPR_FOOD');
         _this.ttbGame.setImageBackgroundID('IMG_BG');
-        _this.ttbGame.bindUpdateScoreFunc(updateScore);
-        _this.ttbGame.bindUpdateTimeFunc(updateTime);
+        _this.ttbGame.bindUpdateScoreTextFunc(updateScore);
+        _this.ttbGame.bindUpdateTimeTextFunc(updateTime);
+        _this.ttbGame.bindSaveScoreFunc(saveScore);
+        _this.ttbGame.bindGameOverEventFunc(gameOverEvent);
         _this.ttbGame.addBug('SPR_R_BUG', 3, 2.5, 0.4);
         _this.ttbGame.addBug('SPR_O_BUG', 1, 2, 0.4);
         _this.ttbGame.addBug('SPR_G_BUG', 5, 4, 0.2);
@@ -807,10 +860,25 @@ function Setup() {
             window.localStorage.setItem(_this.WIN_LS_HIGHSCORE, score);
         }
     }
+    // Function that handles events for when TapTapBugGame is finished
+    function gameOverEvent(score, isWin) {
+        // Stop the GameSystem
+        _this.sys.stop();
+        // Hide the game page section
+        $(_this.ID_GAME_SECTION).hide();
+        // Navigate to score page
+        navScoreEvent();
+        // If user has won display win message, otherwise display lose message
+        if (isWin) {
+            $(_this.ID_WON_MSG).show();
+        } else {
+            $(_this.ID_LOST_MSG).show();
+        }
+    }
     // Function that handles the events for the score navigation link
     function navScoreEvent() {
         // Call events if game is not running
-        if (!_this.sys.getIsActive()) {
+        if (!_this.sys.getActive()) {
             // Set score link item to active and home link item to inactive
             $(_this.ID_SCORE_LINK).addClass('active');
             $(_this.ID_HOME_LINK).removeClass('active');
@@ -824,13 +892,16 @@ function Setup() {
     // Function that handles the events for the home navigation link
     function navHomeEvent() {
         // Call events if game is not running
-        if (!_this.sys.getIsActive()) {
+        if (!_this.sys.getActive()) {
             // Set home link item to active and score link item to inactive
             $(_this.ID_HOME_LINK).addClass('active');
             $(_this.ID_SCORE_LINK).removeClass('active');
             // Hide the score page section and show the home page section
             $(_this.ID_SCORE_SECTION).hide();
             $(_this.ID_HOME_SECTION).show();
+            // Hide the win and lose messages
+            $(_this.ID_WON_MSG).hide();
+            $(_this.ID_LOST_MSG).hide();
         }
     }
     // Function that handles the events for the play game button
@@ -846,7 +917,7 @@ function Setup() {
         // Pause the game if the game is running and resume if game is paused
         _this.sys.togglePauseResume();
         // Change the image of the button depending on the state of the game
-        if (_this.sys.getIsPaused()) {
+        if (_this.sys.getPaused()) {
             $(_this.ID_BUTTON_PR + ' img').attr('src', _this.IMG_BUTTON_PLAY);
         } else {
             $(_this.ID_BUTTON_PR + ' img').attr('src', _this.IMG_BUTTON_PAUSE);
