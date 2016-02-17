@@ -440,6 +440,13 @@ function TapTapBugGame() {
     _this.mouseY = 0;
     _this.score = 0;
     _this.ticks = 0;
+    _this.lowX = 0;
+    _this.highX = 0;
+    _this.lowY = 0;
+    _this.highY = 0;
+    _this.tolX = 0;
+    _this.tolY = 0;
+    _this.foodAmount = 0;
     _this.timeAlloted = 0;
     _this.defaultTimeAlloted = 0;
     _this.isGameOver = false;
@@ -472,7 +479,7 @@ function TapTapBugGame() {
         _this.isGameOver = false;
         _this.updateScoreTextFunc(0);
         // Create the required Food for the Game
-        makeFood(6, 30, 10, 330, 120, 380);
+        makeFood();
     }
     // Function that handles updating attributes for TapTapBugGame
     function update() {
@@ -565,38 +572,40 @@ function TapTapBugGame() {
         }
     }
     // Function that makes a specific amount of Food positioned randomly
-    function makeFood(amount, tol, lowX, highX, lowY, highY) {
+    function makeFood() {
         var foodCount = 0;
         var prevPos = [[]];
         var prevFrames = [];
         // Obtain the Food's Sprite
         const foodSpr = _this.resMan.getSprite(_this.sprFoodID);
-        while (foodCount < amount) {
+        while (foodCount < _this.foodAmount) {
             // Condition the Sprite's bound variables to stay within the canvas
-            if ((lowX + foodSpr.frameWidth) < 0) {
-                lowX = 0;
+            if ((_this.lowX + foodSpr.frameWidth) < 0) {
+                _this.lowX = 0;
             }
-            if ((highX + foodSpr.frameWidth) > _this.canvas.width) {
-                highX -= (highX + foodSpr.frameWidth) % _this.canvas.width;
+            if ((_this.highX + foodSpr.frameWidth) > _this.canvas.width) {
+                _this.highX -= (_this.highX + foodSpr.frameWidth) %
+                _this.canvas.width;
             }
-            if ((lowY + foodSpr.image.height) < 0) {
-                lowY = 0;
+            if ((_this.lowY + foodSpr.image.height) < 0) {
+                _this.lowY = 0;
             }
-            if ((highY + foodSpr.image.height) > _this.canvas.height) {
-                highY -= (highY + foodSpr.image.height) % _this.canvas.height;
+            if ((_this.highY + foodSpr.image.height) > _this.canvas.height) {
+                _this.highY -= (_this.highY + foodSpr.image.height) %
+                _this.canvas.height;
             }
             // Generate random positions specified by the bound variables
-            const x = getRandomNumber(lowX, highX);
-            const y = getRandomNumber(lowY, highY);
+            const x = getRandomNumber(_this.lowX, _this.highX);
+            const y = getRandomNumber(_this.lowY, _this.highY);
             // Generate a random frame index for the Food's Sprite image
             var randFrame = getRandomNumber(0, foodSpr.numFrames - 1);
             var isOverlap = false;
             // Ensure new position doesn't overlap with previous positions
             for (var i = 0; i < prevPos.length; i++) {
                 // If there is overlap, set overlap to true
-                if (Math.abs(x - prevPos[i][0]) <= foodSpr.frameWidth + tol &&
-                    Math.abs(y - prevPos[i][1]) <= foodSpr.image.height +
-                    tol) {
+                if (Math.abs(x - prevPos[i][0]) <= foodSpr.frameWidth +
+                    _this.tolX && Math.abs(y - prevPos[i][1]) <=
+                    foodSpr.image.height + _this.tolY) {
                     isOverlap = true;
                 }
             }
@@ -692,6 +701,22 @@ function TapTapBugGame() {
     function setBugMakeTimes(makeTimes) {
         _this.bugMakeTimes = makeTimes;
     }
+    // Function that sets the range in which to make and position Food
+    function setFoodMakeRange(lowX, highX, lowY, highY) {
+        _this.lowX = lowX;
+        _this.highX = highX;
+        _this.lowY = lowY;
+        _this.highY = highY;
+    }
+    // Function that sets the tolerance values for positioning Food apart
+    function setFoodMakeTolerance(tolX, tolY) {
+        _this.tolX = tolX;
+        _this.tolY = tolY;
+    }
+    // Function that sets the amount of Food to make for the game
+    function setFoodMakeAmount(foodAmount) {
+        _this.foodAmount = foodAmount;
+    }
     // Function that binds the update score text function to the game
     function bindUpdateScoreTextFunc(updateScoreTextFunc) {
         _this.updateScoreTextFunc = updateScoreTextFunc;
@@ -732,6 +757,9 @@ function TapTapBugGame() {
         setBugMakeTimes : setBugMakeTimes,
         setSpriteFoodID : setSpriteFoodID,
         mouseClickEvent : mouseClickEvent,
+        setFoodMakeRange : setFoodMakeRange,
+        setFoodMakeAmount : setFoodMakeAmount,
+        setFoodMakeTolerance : setFoodMakeTolerance,
         setImageBackgroundID : setImageBackgroundID,
         bindGameOverEventFunc : bindGameOverEventFunc,
         bindUpdateTimeTextFunc : bindUpdateTimeTextFunc,
@@ -766,9 +794,9 @@ function Setup() {
     _this.IMG_BUTTON_PAUSE = 'assets/button_pause.png';
     _this.IMG_BG = 'assets/background_table.png';
     _this.SPR_FOOD = 'assets/food_sprite.png';
-    _this.SPR_R_BUG = 'assets/red_bug_sprite.png';
-    _this.SPR_O_BUG = 'assets/orange_bug_sprite.png';
-    _this.SPR_G_BUG = 'assets/grey_bug_sprite.png';
+    _this.SPR_RED_BUG = 'assets/red_bug_sprite.png';
+    _this.SPR_ORAN_BUG = 'assets/orange_bug_sprite.png';
+    _this.SPR_GREY_BUG = 'assets/grey_bug_sprite.png';
     // Instance variables
     _this.resMan = null;
     _this.sys = null;
@@ -818,22 +846,25 @@ function Setup() {
     function initResources() {
         _this.resMan.addImage('IMG_BG', _this.IMG_BG, 387, 600);
         _this.resMan.addSprite('SPR_FOOD', _this.SPR_FOOD, 896, 56, 16);
-        _this.resMan.addSprite('SPR_R_BUG', _this.SPR_R_BUG, 90, 50, 2);
-        _this.resMan.addSprite('SPR_O_BUG', _this.SPR_O_BUG, 90, 50, 2);
-        _this.resMan.addSprite('SPR_G_BUG', _this.SPR_G_BUG, 90, 50, 2);
+        _this.resMan.addSprite('SPR_RED_BUG', _this.SPR_RED_BUG, 90, 50, 2);
+        _this.resMan.addSprite('SPR_ORAN_BUG', _this.SPR_ORAN_BUG, 90, 50, 2);
+        _this.resMan.addSprite('SPR_GREY_BUG', _this.SPR_GREY_BUG, 90, 50, 2);
     }
     // Function that configures the games attributes
     function configGame() {
         _this.ttbGame.setAllotedTime(60);
+        _this.ttbGame.setFoodMakeAmount(6);
+        _this.ttbGame.setFoodMakeTolerance(30, 30);
         _this.ttbGame.setBugMakeTimes([0.5, 0.9, 1.2]);
+        _this.ttbGame.setFoodMakeRange(10, 300, 120, 380);
         _this.ttbGame.setSpriteFoodID('SPR_FOOD');
         _this.ttbGame.setImageBackgroundID('IMG_BG');
         _this.ttbGame.bindUpdateScoreTextFunc(updateScore);
         _this.ttbGame.bindUpdateTimeTextFunc(updateTime);
         _this.ttbGame.bindGameOverEventFunc(gameOverEvent);
-        _this.ttbGame.addBug('SPR_R_BUG', 3, 2.5, 0.4);
-        _this.ttbGame.addBug('SPR_O_BUG', 1, 2, 0.4);
-        _this.ttbGame.addBug('SPR_G_BUG', 5, 4, 0.2);
+        _this.ttbGame.addBug('SPR_RED_BUG', 3, 2.5, 0.4);
+        _this.ttbGame.addBug('SPR_ORAN_BUG', 1, 1.5, 0.4);
+        _this.ttbGame.addBug('SPR_GREY_BUG', 5, 4, 0.2);
         _this.sys.bindGame(_this.ttbGame);
     }
     // Function that updates the score text
