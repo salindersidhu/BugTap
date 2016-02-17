@@ -51,18 +51,18 @@ function ResourceManager() {
     }
 }
 
-// SpriteAnimation handles control and rendering of sprite animations
-function SpriteAnimation(spriteSheet, initFrame, FPS, TPF) {
+// SpriteAnimation handles control and rendering of animations
+function SpriteAnimation(sprite, initFrame, FPS, TPF) {
     // Module constants and variables
     const _this = this;
     _this.initFrame = initFrame;
     _this.FPS = FPS;
     _this.TPF = TPF;
-    _this.image = spriteSheet.image;
-    _this.width = spriteSheet.image.width;
-    _this.fwidth = spriteSheet.frameWidth;
-    _this.height = spriteSheet.image.height;
-    _this.numFrames = spriteSheet.numFrames;
+    _this.image = sprite.image;
+    _this.width = sprite.image.width;
+    _this.fwidth = sprite.frameWidth;
+    _this.height = sprite.image.height;
+    _this.numFrames = sprite.numFrames;
     _this.opacity = 1;
     _this.frameIndex = initFrame; // Default is -1 for animations
     _this.tickCounter = 0;
@@ -95,11 +95,11 @@ function SpriteAnimation(spriteSheet, initFrame, FPS, TPF) {
         ctx.save();
         // Configure the canvas opacity
         ctx.globalAlpha = _this.opacity;
-        // Translate and rotate canvas to draw the animated sprite at an angle
+        // Translate and rotate canvas to draw the animated Sprite at an angle
         ctx.translate(translateX, translateY);
         ctx.rotate(angle);
         ctx.translate(-translateX, -translateY);
-        // Draw the animated sprite
+        // Draw the animated Sprite
         ctx.drawImage(
             _this.image,
             _this.frameIndex * _this.fwidth,
@@ -198,6 +198,75 @@ function GameSystem(FPS, resMan, canvasID) {
     }
 }
 
+// Food handles event management and rendering tasks for Food
+function Food(sprite, FPS, selectedFrame, x, y) {
+    // Module constants and variables
+    const _this = this;
+    _this.x = x;
+    _this.y = y;
+    _this.width = sprite.frameWidth;
+    _this.height = sprite.image.height;
+    _this.sprite = new SpriteAnimation(sprite, selectedFrame, 0, FPS);
+    _this.isEaten = false;
+    _this.canDelete = false;
+    // Function that handles updating the Food's state
+    function update() {
+        // If Food has been eaten then fade it out within half a second
+        if (_this.isEaten) {
+            _this.sprite.reduceOpacity(0.5);
+            // Set the Food delete flag to true once the Food has faded
+            if (_this.sprite.getOpacity() === 0) {
+                _this.canDelete = true;
+            }
+        }
+    }
+    // Function that handles drawing the Food
+    function render(ctx) {
+        // Render the Sprite representing the Food
+        _this.sprite.render(ctx, _this.x, _this.y, 0);
+    }
+    // Function that sets the state of the Food to eaten
+    function setEaten() {
+        _this.isEaten = true;
+    }
+    // Function that returns if the Food has been eaten
+    function getIsEaten() {
+        return _this.isEaten;
+    }
+    // Function that returns the Food's delete flag
+    function getCanDelete() {
+        return _this.canDelete;
+    }
+    // Function that returns the Food's x position
+    function getX() {
+        return _this.x;
+    }
+    // Function that returns the Food's y position
+    function getY() {
+        return _this.y;
+    }
+    // Function that returns the Food's width
+    function getWidth() {
+        return _this.width;
+    }
+    // Function that returns the Food's height
+    function getHeight() {
+        return _this.height;
+    }
+    // Functions returned by the module
+    return {
+        getX : getX,
+        getY : getY,
+        render : render,
+        update : update,
+        setEaten : setEaten,
+        getWidth : getWidth,
+        getHeight : getHeight,
+        getIsEaten : getIsEaten,
+        getCanDelete : getCanDelete
+    }
+}
+
 // TapTapBugGame handles event management and rendering tasks for TapTapBugGame
 function TapTapBugGame() {
     // Module constants and variables
@@ -216,6 +285,8 @@ function TapTapBugGame() {
     _this.bugDB = {};
     _this.bugProbs = [];
     _this.bugMakeTimes = [];
+    this.bugObjects = [];
+    this.foodObjects = [];
     _this.bugMakeTime = 0;
     _this.score = 0;
     _this.ticks = 0;
@@ -231,6 +302,8 @@ function TapTapBugGame() {
         _this.isGamePaused = isGamePaused;
         // Set the game's background
         setBackground();
+        // Create the required Food for the Game
+        makeFood(6, 10, 330, 150, 350);
         // Reset the Bug make timer and init Bug make probability distribution
         resetBugMakeTimer();
         setMakeBugProbability();
@@ -240,15 +313,82 @@ function TapTapBugGame() {
         // Update the time alloted and it's corresponding time display text
         _this.timeAlloted -= 1 / _this.FPS;
         _this.updateTimeFunc(Math.floor(_this.timeAlloted));
+        // Update all of the Food
+        for (var i = 0; i < _this.foodObjects.length; i++) {
+            // Obtain Food from foodObjects array and update it
+            var food = _this.foodObjects[i];
+            food.update();
+            // Delete Food if it is flagged for removal
+            if (food.getCanDelete()) {
+                _this.foodObjects.splice(_this.foodObjects.indexOf(food), 1);
+            }
+        }
     }
     // Function that handles drawing tasks for TapTapBugGame
     function render() {
         // Render the Game's background
         _this.ctx.fillStyle = _this.bgPattern;
         _this.ctx.fillRect(0, 0, _this.canvas.width, _this.canvas.height);
+        // Render all of the Food
+        for (var i = 0; i < _this.foodObjects.length; i++) {
+            _this.foodObjects[i].render(_this.ctx);
+        }
     }
     // Function that handles all mouse click tasks for TapTapBugGame
     function mouseClickEvent(mouseX, mouseY) {
+    }
+    // Function that makes a specific amount of Food positioned randomly
+    function makeFood(amount, lowX, highX, lowY, highY) {
+        var foodCount = 0;
+        var prevPos = [[]];
+        var prevFrames = [];
+        // Obtain the Food's Sprite
+        const foodSpr = _this.resMan.getSprite(_this.sprFoodID);
+        while (foodCount < amount) {
+            // Condition the Sprite's bound variables to stay within the canvas
+            if ((lowX + foodSpr.frameWidth) < 0) {
+                lowX = 0;
+            }
+            if ((highX + foodSpr.frameWidth) > _this.canvas.width) {
+                highX -= (highX + foodSpr.frameWidth) % _this.canvas.width;
+            }
+            if ((lowY + foodSpr.image.height) < 0) {
+                lowY = 0;
+            }
+            if ((highY + foodSpr.image.height) > _this.canvas.height) {
+                highY -= (highY + foodSpr.image.height) % _this.canvas.height;
+            }
+            // Generate random positions specified by the bound variables
+            const x = getRandomNumber(lowX, highX);
+            const y = getRandomNumber(lowY, highY);
+            // Generate a random frame index for the Food's Sprite image
+            var randFrame = getRandomNumber(0, foodSpr.numFrames - 1);
+            var isOverlap = false;
+            // Ensure new position doesn't overlap with previous positions
+            for (var i = 0; i < prevPos.length; i++) {
+                // If there is overlap, set overlap to true
+                if (Math.abs(x - prevPos[i][0]) <= foodSpr.frameWidth &&
+                    Math.abs(y - prevPos[i][1]) <= foodSpr.image.height) {
+                    isOverlap = true;
+                }
+            }
+            // Ensure that a new frame index is generated for each Food
+            while(prevFrames.indexOf(randFrame) >= 0) {
+                // If all possible frame indicies are used, clear the array
+                if (prevFrames.length === foodSpr.numFrames) {
+                    prevFrames = [];
+                }
+                randFrame = getRandomNumber(0, foodSpr.numFrames - 1);
+            }
+            // If there is no overlap then create the Food
+            if (!isOverlap) {
+                _this.foodObjects.push(new Food(foodSpr, _this.FPS, randFrame,
+                    x, y));
+                prevPos.push([x, y]);
+                prevFrames.push(randFrame);
+                foodCount += 1;
+            }
+        }
     }
     // Function that creates the probability distribution for making Bugs
     function setMakeBugProbability() {
@@ -296,7 +436,7 @@ function TapTapBugGame() {
     function bindUpdateTimeFunc(updateTimeFunc) {
         _this.updateTimeFunc = updateTimeFunc;
     }
-    // Function that sets the sprite Image for the Food
+    // Function that sets the Sprite ID for the Food
     function setSpriteFoodID(sprFoodID) {
         _this.sprFoodID = sprFoodID;
     }
