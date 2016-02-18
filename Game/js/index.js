@@ -302,6 +302,8 @@ function Bug(sprite, points, speed, FPS, x, y) {
     _this.speed = speed;
     _this.x = x;
     _this.y = y;
+    _this.defaultX = x;
+    _this.defaultY = y;
     _this.width = sprite.frameWidth;
     _this.height = sprite.image.height;
     _this.animation = new SpriteAnimation(sprite, -1, FPS, 10 / speed);
@@ -379,6 +381,10 @@ function Bug(sprite, points, speed, FPS, x, y) {
     // Function that finds and sets the nearest Food from the Bug's position
     function findNearestFood(foodObjects) {
         var shortestDist = Number.MAX_VALUE;
+        //
+        if (foodObjects.length == 1 && foodObjects[0].getEaten()) {
+            _this.foodPos = [_this.defaultX, _this.defaultY];
+        }
         // Find the nearest Food object and obtain its position
         for (var i = 0; i < foodObjects.length; i++) {
             var food = foodObjects[i];
@@ -894,9 +900,9 @@ function Setup() {
         _this.ttbGame.bindUpdateScoreTextFunc(updateScore);
         _this.ttbGame.bindUpdateTimeTextFunc(updateTime);
         _this.ttbGame.bindGameOverEventFunc(gameOverEvent);
-        _this.ttbGame.addBug('SPR_RED_BUG', 3, 2.6, 0.3);
+        _this.ttbGame.addBug('SPR_RED_BUG', 3, 2.5, 0.3);
         _this.ttbGame.addBug('SPR_ORAN_BUG', 1, 1.5, 0.5);
-        _this.ttbGame.addBug('SPR_GREY_BUG', 5, 4.1, 0.2);
+        _this.ttbGame.addBug('SPR_GREY_BUG', 5, 4, 0.2);
         _this.sys.bindGame(_this.ttbGame);
     }
     // Function that updates the score text
