@@ -381,7 +381,7 @@ function Bug(sprite, points, speed, FPS, x, y) {
     // Function that finds and sets the nearest Food from the Bug's position
     function findNearestFood(foodObjects) {
         var shortestDist = Number.MAX_VALUE;
-        //
+        // If there is no avaliable Food to eat then move outside the table
         if (foodObjects.length == 1 && foodObjects[0].getEaten()) {
             _this.foodPos = [_this.defaultX, _this.defaultY];
         }
