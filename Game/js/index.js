@@ -51,6 +51,73 @@ function ResourceManager() {
     }
 }
 
+// BoundingBox provides an object an interface for collision detection
+function BoundingBox(x, y, width, height) {
+    // Module constants and variables
+    const _this = this;
+    _this.x = x;
+    _this.y = y;
+    _this.width = width;
+    _this.height = height;
+    // Function returns true if this BoundingBox overlaps other BoundingBox
+    function getOverlap(other) {
+        return (
+            _this.x <= other.getX() &&
+            _this.y <= other.getY() &&
+            (_this.x + _this.width) >= (other.getX() + other.getWidth()) &&
+            (_this.y + _this.height) >= (other.getY() + other.getHeight())
+        );
+    }
+    // Function returns true if this BoundingBox intersects other BoundingBox
+    function getIntersect(other) {
+        return (
+            _this.x <= (other.getX() + other.getWidth()) &&
+            (_this.x + _this.width) >= other.getX() &&
+            _this.y <= (other.getY() + other.getHeight()) &&
+            (_this.y + _this.height) >= other.getY()
+        );
+    }
+    // Function returns true if BoundingBox intersects with the mouse cursor
+    function getMouseOverlap(mouseX, mouseY) {
+        return (
+            mouseX > _this.x && mouseX < (_this.x + _this.width) &&
+            mouseY > _this.y && mouseY < (_this.y + _this.height)
+        );
+    }
+    // Function that sets the value of the BoundingBox's x and y positions
+    function update(x, y) {
+        _this.x = x;
+        _this.y = y;
+    }
+    // Function that returns the BoundingBox's x position
+    function getX() {
+        return _this.x;
+    }
+    // Function that returns the BoundingBox's y position
+    function getY() {
+        return _this.y;
+    }
+    // Function that returns the width of the BoundingBox
+    function getWidth() {
+        return _this.width;
+    }
+    // Function that returns the height of the BoundingBox
+    function getHeight() {
+        return _this.height;
+    }
+    // Functions returned by the module
+    return {
+        getX : getX,
+        getY : getY,
+        update : update,
+        getWidth : getWidth,
+        getHeight : getHeight,
+        getOverlap : getOverlap,
+        getIntersect : getIntersect,
+        getMouseOverlap : getMouseOverlap
+    }
+}
+
 // SpriteAnimation handles control and rendering of animations
 function SpriteAnimation(sprite, initFrame, FPS, TPF) {
     // Module constants and variables
@@ -231,6 +298,7 @@ function Food(sprite, FPS, selectedFrame, x, y) {
     // Module constants and variables
     const _this = this;
     _this.animation = new SpriteAnimation(sprite, selectedFrame, FPS, 0);
+    _this.bBox = new BoundingBox(x, y, sprite.frameWidth, sprite.image.height);
     _this.x = x;
     _this.y = y;
     _this.width = sprite.frameWidth;
@@ -250,7 +318,7 @@ function Food(sprite, FPS, selectedFrame, x, y) {
     }
     // Function that handles drawing the Object
     function render(ctx) {
-        _this.animation.render(ctx, _this.x, _this.y, _this.angle);
+        _this.animation.render(ctx, _this.x, _this.y, 0);
     }
     // Function that returns if the Food has been eaten
     function getEaten() {
@@ -280,6 +348,10 @@ function Food(sprite, FPS, selectedFrame, x, y) {
     function getCanDelete() {
         return _this.canDelete;
     }
+    // Function that returns the Food's bounding box
+    function getBoundingBox() {
+        return _this.bBox;
+    }
     // Functions returned by the module
     return {
         getX : getX,
@@ -290,7 +362,8 @@ function Food(sprite, FPS, selectedFrame, x, y) {
         setEaten : setEaten,
         getEaten : getEaten,
         getHeight : getHeight,
-        getCanDelete : getCanDelete
+        getCanDelete : getCanDelete,
+        getBoundingBox : getBoundingBox
     }
 }
 
@@ -298,31 +371,33 @@ function Food(sprite, FPS, selectedFrame, x, y) {
 function Bug(sprite, points, speed, FPS, x, y) {
     // Module constants and variables
     const _this = this;
-    _this.points = points;
-    _this.speed = speed;
+    _this.animation = new SpriteAnimation(sprite, -1, FPS, 10 / speed);
+    _this.bBox = new BoundingBox(x, y, sprite.frameWidth, sprite.image.height);
     _this.x = x;
     _this.y = y;
     _this.defaultX = x;
     _this.defaultY = y;
     _this.width = sprite.frameWidth;
     _this.height = sprite.image.height;
-    _this.animation = new SpriteAnimation(sprite, -1, FPS, 10 / speed);
+    _this.points = points;
+    _this.speed = speed;
     _this.angle = 0;
+    _this.moveToX = 0;
+    _this.moveToY = 0;
     _this.isDead = false;
     _this.canDelete = false;
-    _this.foodPos = [];
     // Function that handles updating the Bug's state
     function update(foodObjects) {
         // Update the Bug if it is alive
         if (!_this.isDead) {
-            // Find the nearest Food from the Bug's current position
-            findNearestFood(foodObjects);
+            // Set the direction for the Bug to move in
+            setMovement(foodObjects);
             // Handle collision with Food
             handleFoodCollision(foodObjects);
             // Update the Bug's animation
             _this.animation.updateFrame();
-            // Move the Bug to the nearest Food's position
-            moveToPoint(_this.foodPos[0], _this.foodPos[1]);
+            // Update the bounding box
+            _this.bBox.update(_this.x, _this.y);
         } else {
             // Fade the Bug within 2 seconds
             _this.animation.reduceOpacity(2);
@@ -338,21 +413,17 @@ function Bug(sprite, points, speed, FPS, x, y) {
     }
     // Function that returns if the mouse is hovering over the Bug
     function isMouseHovering(mouseX, mouseY) {
-        return (
-            mouseX > _this.x && mouseX < (_this.x + _this.width)
-        ) && (
-            mouseY > _this.y && mouseY < (_this.y + _this.height)
-        );
+        return _this.bBox.getMouseOverlap(mouseX, mouseY);
     }
     // Function that moves the Bug's position to a specific target point
-    function moveToPoint(targetX, targetY) {
+    function moveToPoint(x, y) {
         // Calculate the distance to the target point
-        var distX = targetX - _this.x - (_this.width / 2);
-        var distY = targetY - _this.y - (_this.height / 2);
+        var distX = x - _this.x - (_this.width / 2);
+        var distY = y - _this.y - (_this.height / 2);
         // Calculate the hypotenuse
-        var hypotenuse = Math.sqrt((distX * distX) + (distY * distY));
-        distX /= hypotenuse;
-        distY /= hypotenuse;
+        var hyp = Math.sqrt(Math.pow(distX, 2) + Math.pow(distY, 2));
+        distX /= hyp;
+        distY /= hyp;
         // Move towards point
         _this.x += distX * _this.speed;
         _this.y += distY * _this.speed;
@@ -366,45 +437,46 @@ function Bug(sprite, points, speed, FPS, x, y) {
             // If Food has not been eaten
             if (!food.getEaten()) {
                 // Check if the Bug is colliding with a Food object
-                if (
-                    (_this.x < (food.getX() + food.getWidth()) &&
-                    (_this.x + _this.width) > food.getX()) &&
-                    (_this.y < (food.getY() + food.getHeight()) &&
-                    (_this.y + _this.height) > food.getY())
-                ) {
-                    // Set the Food's state to eaten
+                if (food.getBoundingBox().getOverlap(_this.bBox)) {
                     food.setEaten();
                 }
             }
         }
     }
-    // Function that finds and sets the nearest Food from the Bug's position
-    function findNearestFood(foodObjects) {
+    // Function that sets the direction of movement for the Bug
+    function setMovement(foodObjects) {
         var shortestDist = Number.MAX_VALUE;
         // If there is no avaliable Food to eat then move outside the table
         if (foodObjects.length == 1 && foodObjects[0].getEaten()) {
-            _this.foodPos = [_this.defaultX, _this.defaultY];
-        }
-        // Find the nearest Food object and obtain its position
-        for (var i = 0; i < foodObjects.length; i++) {
-            var food = foodObjects[i];
-            // If the Food has not been eaten
-            if (!food.getEaten()) {
-                // Calculate the distance between the Bug and Food
-                var foodX = food.getX() + (food.getWidth() / 2);
-                var foodY = food.getY() + (food.getHeight() / 2);
-                var distX = foodX - _this.x;
-                var distY = foodY - _this.y;
-                // Calculate the hypotenuse to find shortest distance to Food
-                var hypotenuse = Math.sqrt((distX * distX) + (distY * distY));
-                // If hypotenuse is shorter than current shortest distance
-                if (hypotenuse < shortestDist) {
-                    // Set Food target position to current Food's position
-                    _this.foodPos = [foodX, foodY];
-                    shortestDist = hypotenuse; // Update shortest distance
+            _this.moveToX = _this.defaultX;
+            _this.moveToY = _this.defaultY;
+        } else {
+            // Find the nearest Food from the Bug's current position
+            for (var i = 0; i < foodObjects.length; i++) {
+                var food = foodObjects[i];
+                // If the Food has not been eaten
+                if (!food.getEaten()) {
+                    // Calculate the distance between the Bug and Food
+                    var foodX = food.getX() + (food.getWidth() / 2);
+                    var foodY = food.getY() + (food.getHeight() / 2);
+                    var distX = foodX - _this.x;
+                    var distY = foodY - _this.y;
+                    // Calculate the hypotenuse to calculate shortest distance
+                    var hyp = Math.sqrt(
+                        Math.pow(distX, 2) + Math.pow(distY, 2)
+                    );
+                    // If hypotenuse is shorter than current shortest distance
+                    if (hyp < shortestDist) {
+                        // Set move to point to current Food's position
+                        _this.moveToX = foodX;
+                        _this.moveToY = foodY;
+                        shortestDist = hyp;
+                    }
                 }
             }
         }
+        // Move the Bug to a specific position
+        moveToPoint(_this.moveToX, _this.moveToY);
     }
     // Function that returns the Bug's delete flag
     function getCanDelete() {
@@ -429,7 +501,7 @@ function Bug(sprite, points, speed, FPS, x, y) {
         getDead : getDead,
         getPoints : getPoints,
         getCanDelete : getCanDelete,
-        isMouseHovering : isMouseHovering,
+        isMouseHovering : isMouseHovering
     }
 }
 
