@@ -5,6 +5,10 @@
     -moz-user-select: none;
     -webkit-user-select: none;
 }
+/* Styles for pointer cursor (hand) */
+.pointer-cursor {
+    cursor : pointer;
+}
 /* Styles for the game canvas */
 #game-canvas {
     margin: 0 auto;

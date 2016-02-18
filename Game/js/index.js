@@ -576,11 +576,11 @@ function TapTapBugGame() {
             var bug = _this.bugObjects[i];
             // If hovering over Bug change cursor to 'pointer' and break loop
             if (bug.isMouseHovering(_this.mouseX, _this.mouseY)) {
-                $('body').css('cursor', 'pointer');
+                $('body').addClass('pointer-cursor');
                 break;
             }
             // Change the cursor back to 'defualt' when not hovering
-            $('body').css('cursor', 'default');
+            $('body').removeClass('pointer-cursor');
         }
     }
     // Function that makes a specific amount of Food positioned randomly
@@ -907,18 +907,10 @@ function Setup() {
     function updateTime(time) {
         $(_this.ID_TIME_TEXT).text('Time: ' + time);
     }
-    // Function that saves the highscore to local storage
-    function saveScore(score) {
-        if (score > getScore()) {
-            window.localStorage.setItem(_this.WIN_LS_HIGHSCORE, score);
-        }
-    }
     // Function that handles events for when TapTapBugGame is finished
     function gameOverEvent(score, isWin) {
         // Stop the GameSystem
         _this.sys.stop();
-        // Save the highscore
-        saveScore(score);
         // Navigate to score page
         navScoreEvent();
         // Hide the game page section and show the retry button
@@ -927,6 +919,12 @@ function Setup() {
         // If user has won display win message, otherwise display lose message
         if (isWin) {
             $(_this.ID_WON_MSG).show();
+            // saves score to local storage if it's larger than previous score
+            if (score > getScore()) {
+                window.localStorage.setItem(_this.WIN_LS_HIGHSCORE, score);
+                // Update high score heading
+                $(_this.ID_HEADING_SCORE).text('New High Score: ' + score);
+            }
         } else {
             $(_this.ID_LOST_MSG).show();
         }
