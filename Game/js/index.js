@@ -894,9 +894,9 @@ function Setup() {
         _this.ttbGame.bindUpdateScoreTextFunc(updateScore);
         _this.ttbGame.bindUpdateTimeTextFunc(updateTime);
         _this.ttbGame.bindGameOverEventFunc(gameOverEvent);
-        _this.ttbGame.addBug('SPR_RED_BUG', 3, 2.5, 0.4);
-        _this.ttbGame.addBug('SPR_ORAN_BUG', 1, 1.5, 0.4);
-        _this.ttbGame.addBug('SPR_GREY_BUG', 5, 4, 0.2);
+        _this.ttbGame.addBug('SPR_RED_BUG', 3, 2.6, 0.3);
+        _this.ttbGame.addBug('SPR_ORAN_BUG', 1, 1.5, 0.5);
+        _this.ttbGame.addBug('SPR_GREY_BUG', 5, 4.1, 0.2);
         _this.sys.bindGame(_this.ttbGame);
     }
     // Function that updates the score text

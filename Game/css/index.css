@@ -1,5 +1,6 @@
 /* Style for all elements, prevents highlighting */
-* {
+#game-canvas,
+#infobar {
     -khtml-user-select: none;
     -o-user-select: none;
     -moz-user-select: none;
@@ -25,23 +26,29 @@
     height: auto;
     overflow: hidden;
 }
-/* Styles for the time remaining text */
-#time-text {
-    margin: 0;
-    padding-left: 10px;
-    padding-top: 10px;
-    float: left;
-}
-/* Styles for the current score text */
+/* Common styles for time remaining and current score texts */
+#time-text,
 #score-text {
     margin: 0;
-    padding-right: 10px;
     padding-top: 10px;
+    padding-bottom: 10px;
+}
+/* Specific styles for the time remaining text */
+#time-text {
+    padding-left: 15px;
+    float: left;
+}
+/* Specific styles for the current score text */
+#score-text {
+    padding-right: 15px;
     float: right;
 }
 /* Styles for the pause / resume button */
 #pause-resume-button img {
-    margin: 0;
-    padding-top: 5px;
-    padding-bottom: 5px;
+    position: absolute;
+    left: 0;
+    right: 0;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 6px;
 }
