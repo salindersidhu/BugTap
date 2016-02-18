@@ -60,7 +60,7 @@ function BoundingBox(x, y, width, height) {
     _this.width = width;
     _this.height = height;
     // Function returns true if this BoundingBox overlaps other BoundingBox
-    function getOverlap(other) {
+    function isOverlap(other) {
         return (
             _this.x <= other.getX() &&
             _this.y <= other.getY() &&
@@ -69,7 +69,7 @@ function BoundingBox(x, y, width, height) {
         );
     }
     // Function returns true if this BoundingBox intersects other BoundingBox
-    function getIntersect(other) {
+    function isIntersect(other) {
         return (
             _this.x <= (other.getX() + other.getWidth()) &&
             (_this.x + _this.width) >= other.getX() &&
@@ -78,7 +78,7 @@ function BoundingBox(x, y, width, height) {
         );
     }
     // Function returns true if BoundingBox intersects with the mouse cursor
-    function getMouseOverlap(mouseX, mouseY) {
+    function isOverlapMouse(mouseX, mouseY) {
         return (
             mouseX > _this.x && mouseX < (_this.x + _this.width) &&
             mouseY > _this.y && mouseY < (_this.y + _this.height)
@@ -112,9 +112,9 @@ function BoundingBox(x, y, width, height) {
         update : update,
         getWidth : getWidth,
         getHeight : getHeight,
-        getOverlap : getOverlap,
-        getIntersect : getIntersect,
-        getMouseOverlap : getMouseOverlap
+        isOverlap : isOverlap,
+        isIntersect : isIntersect,
+        isOverlapMouse : isOverlapMouse
     }
 }
 
@@ -255,15 +255,15 @@ function GameSystem(FPS, canvasID) {
         return _this.resMan;
     }
     // Function that toggles the GameSystem's state between paused or running
-    function togglePauseResume() {
+    function togglePause() {
         _this.isGamePaused = !_this.isGamePaused;
     }
     // Function that returns if the GameSystem is paused
-    function getPaused() {
+    function isPaused() {
         return _this.isGamePaused;
     }
     // Function that returns if the GameSystem has started
-    function getActive() {
+    function isActive() {
         return _this.isGameActive;
     }
     // Function that officially starts the GameSystem
@@ -286,9 +286,9 @@ function GameSystem(FPS, canvasID) {
         stop : stop,
         start : start,
         bindGame : bindGame,
-        getPaused : getPaused,
-        getActive : getActive,
-        togglePauseResume : togglePauseResume,
+        isPaused : isPaused,
+        isActive : isActive,
+        togglePause : togglePause,
         getResourceManager : getResourceManager
     }
 }
@@ -321,7 +321,7 @@ function Food(sprite, FPS, selectedFrame, x, y) {
         _this.animation.render(ctx, _this.x, _this.y, 0);
     }
     // Function that returns if the Food has been eaten
-    function getEaten() {
+    function isEaten() {
         return _this.isEaten;
     }
     // Function that sets the state of the Food to eaten
@@ -345,25 +345,25 @@ function Food(sprite, FPS, selectedFrame, x, y) {
         return _this.height;
     }
     // Function that returns the Food's delete flag
-    function getCanDelete() {
+    function canDelete() {
         return _this.canDelete;
     }
     // Function that returns the Food's bounding box
-    function getBoundingBox() {
+    function getBox() {
         return _this.bBox;
     }
     // Functions returned by the module
     return {
         getX : getX,
         getY : getY,
+        getBox : getBox,
         update : update,
         render : render,
+        isEaten : isEaten,
         getWidth : getWidth,
         setEaten : setEaten,
-        getEaten : getEaten,
         getHeight : getHeight,
-        getCanDelete : getCanDelete,
-        getBoundingBox : getBoundingBox
+        canDelete : canDelete
     }
 }
 
@@ -411,10 +411,6 @@ function Bug(sprite, points, speed, FPS, x, y) {
     function render(ctx) {
         _this.animation.render(ctx, _this.x, _this.y, _this.angle);
     }
-    // Function that returns if the mouse is hovering over the Bug
-    function isMouseHovering(mouseX, mouseY) {
-        return _this.bBox.getMouseOverlap(mouseX, mouseY);
-    }
     // Function that moves the Bug's position to a specific target point
     function moveToPoint(x, y) {
         // Calculate the distance to the target point
@@ -435,9 +431,9 @@ function Bug(sprite, points, speed, FPS, x, y) {
         for (var i = 0; i < foodObjects.length; i++) {
             var food = foodObjects[i];
             // If Food has not been eaten
-            if (!food.getEaten()) {
+            if (!food.isEaten()) {
                 // Check if the Bug is colliding with a Food object
-                if (food.getBoundingBox().getOverlap(_this.bBox)) {
+                if (food.getBox().isOverlap(_this.bBox)) {
                     food.setEaten();
                 }
             }
@@ -447,7 +443,7 @@ function Bug(sprite, points, speed, FPS, x, y) {
     function setMovement(foodObjects) {
         var shortestDist = Number.MAX_VALUE;
         // If there is no avaliable Food to eat then move outside the table
-        if (foodObjects.length == 1 && foodObjects[0].getEaten()) {
+        if (foodObjects.length == 1 && foodObjects[0].isEaten()) {
             _this.moveToX = _this.defaultX;
             _this.moveToY = _this.defaultY;
         } else {
@@ -455,7 +451,7 @@ function Bug(sprite, points, speed, FPS, x, y) {
             for (var i = 0; i < foodObjects.length; i++) {
                 var food = foodObjects[i];
                 // If the Food has not been eaten
-                if (!food.getEaten()) {
+                if (!food.isEaten()) {
                     // Calculate the distance between the Bug and Food
                     var foodX = food.getX() + (food.getWidth() / 2);
                     var foodY = food.getY() + (food.getHeight() / 2);
@@ -479,7 +475,7 @@ function Bug(sprite, points, speed, FPS, x, y) {
         moveToPoint(_this.moveToX, _this.moveToY);
     }
     // Function that returns the Bug's delete flag
-    function getCanDelete() {
+    function canDelete() {
         return _this.canDelete;
     }
     // Function that sets the state of the Bug to dead
@@ -487,21 +483,25 @@ function Bug(sprite, points, speed, FPS, x, y) {
         _this.isDead = true;
     }
     // Function that returns if the Bug has been killed
-    function getDead() {
+    function isDead() {
         return _this.isDead;
     }
     // Return the number of points the Bug is worth
     function getPoints() {
         return _this.points;
     }
+    // Function that returns the Bug's bounding box
+    function getBox() {
+        return _this.bBox;
+    }
     return {
+        getBox : getBox,
         update : update,
         render : render,
+        isDead : isDead,
         setDead : setDead,
-        getDead : getDead,
         getPoints : getPoints,
-        getCanDelete : getCanDelete,
-        isMouseHovering : isMouseHovering
+        canDelete : canDelete
     }
 }
 
@@ -591,7 +591,7 @@ function TapTapBugGame() {
             var food = _this.foodObjects[i];
             food.update();
             // Delete Food if it is flagged for removal
-            if (food.getCanDelete()) {
+            if (food.canDelete()) {
                 _this.foodObjects.splice(_this.foodObjects.indexOf(food), 1);
             }
         }
@@ -605,7 +605,7 @@ function TapTapBugGame() {
                 bug.setDead();
             }
             // Delete Bug if it is flagged for removal
-            if (bug.getCanDelete()) {
+            if (bug.canDelete()) {
                 _this.bugObjects.splice(_this.bugObjects.indexOf(bug), 1);
             }
         }
@@ -630,9 +630,9 @@ function TapTapBugGame() {
         for (var i = 0; i < _this.bugObjects.length; i++) {
             var bug = _this.bugObjects[i];
             // If mouse cursor is hovering over the Bug
-            if (bug.isMouseHovering(mouseX, mouseY)) {
+            if (bug.getBox().isOverlapMouse(_this.mouseX, _this.mouseY)) {
                 // Update score only once
-                if (!bug.getDead()) {
+                if (!bug.isDead()) {
                     // Update score and update corresponding DOM element
                     _this.score += bug.getPoints();
                     _this.updateScoreTextFunc(_this.score);
@@ -653,7 +653,7 @@ function TapTapBugGame() {
         for (var i = 0; i < _this.bugObjects.length; i++) {
             var bug = _this.bugObjects[i];
             // If hovering over Bug change cursor to 'pointer' and break loop
-            if (bug.isMouseHovering(_this.mouseX, _this.mouseY)) {
+            if (bug.getBox().isOverlapMouse(_this.mouseX, _this.mouseY)) {
                 $('body').addClass('pointer-cursor');
                 break;
             }
@@ -1010,7 +1010,7 @@ function Setup() {
     // Function that handles the events for the score navigation link
     function navScoreEvent() {
         // Call events if game is not running
-        if (!_this.sys.getActive()) {
+        if (!_this.sys.isActive()) {
             // Set score link item to active and home link item to inactive
             $(_this.ID_SCORE_LINK).addClass('active');
             $(_this.ID_HOME_LINK).removeClass('active');
@@ -1024,7 +1024,7 @@ function Setup() {
     // Function that handles the events for the home navigation link
     function navHomeEvent() {
         // Call events if game is not running
-        if (!_this.sys.getActive()) {
+        if (!_this.sys.isActive()) {
             // Set home link item to active and score link item to inactive
             $(_this.ID_HOME_LINK).addClass('active');
             $(_this.ID_SCORE_LINK).removeClass('active');
@@ -1053,9 +1053,9 @@ function Setup() {
     // Function that handles the events for the pause / resume button
     function pauseResumeButtonEvent() {
         // Pause the game if the game is running and resume if game is paused
-        _this.sys.togglePauseResume();
+        _this.sys.togglePause();
         // Change the image of the button depending on the state of the game
-        if (_this.sys.getPaused()) {
+        if (_this.sys.isPaused()) {
             $(_this.ID_BUTTON_PR + ' img').attr('src', _this.IMG_BUTTON_PLAY);
         } else {
             $(_this.ID_BUTTON_PR + ' img').attr('src', _this.IMG_BUTTON_PAUSE);
