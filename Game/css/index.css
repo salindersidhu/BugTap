@@ -1,4 +1,4 @@
-/* Style for all elements, prevents highlighting */
+/* Common styles for canvas and infobar prevent highlighting and selecting */
 #game-canvas,
 #infobar {
     -khtml-user-select: none;
