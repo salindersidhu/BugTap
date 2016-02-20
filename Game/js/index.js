@@ -68,15 +68,6 @@ function BoundingBox(x, y, width, height) {
             (_this.y + _this.height) >= (other.getY() + other.getHeight())
         );
     }
-    // Function returns true if this BoundingBox intersects other BoundingBox
-    function isIntersect(other) {
-        return (
-            _this.x <= (other.getX() + other.getWidth()) &&
-            (_this.x + _this.width) >= other.getX() &&
-            _this.y <= (other.getY() + other.getHeight()) &&
-            (_this.y + _this.height) >= other.getY()
-        );
-    }
     // Function returns true if BoundingBox intersects with the mouse cursor
     function isOverlapMouse(mouseX, mouseY) {
         return (
@@ -113,7 +104,6 @@ function BoundingBox(x, y, width, height) {
         getWidth : getWidth,
         getHeight : getHeight,
         isOverlap : isOverlap,
-        isIntersect : isIntersect,
         isOverlapMouse : isOverlapMouse
     }
 }
@@ -551,7 +541,6 @@ function TapTapBugGame() {
         // Set the game's background
         setBackground();
         // Reset the Bug make timer and init Bug make probability distribution
-        resetBugMakeTimer();
         setMakeBugProbability();
         // Reset game variables
         reset();
@@ -586,7 +575,7 @@ function TapTapBugGame() {
         // Update the canvas cursor when hovering over a Bug
         updateBugHoverCanvasCursor();
         // Update all of the Food
-        for (var i = 0; i < _this.foodObjects.length; i++) {
+        for (var i in _this.foodObjects) {
             // Obtain Food from foodObjects array and update it
             var food = _this.foodObjects[i];
             food.update();
@@ -596,7 +585,7 @@ function TapTapBugGame() {
             }
         }
         // Update all of the Bugs
-        for (var i = 0; i < _this.bugObjects.length; i++) {
+        for (var i in _this.bugObjects) {
             // Obtain Bug from bugObjects array and update it
             var bug = _this.bugObjects[i];
             bug.update(_this.foodObjects);
@@ -616,18 +605,18 @@ function TapTapBugGame() {
         _this.ctx.fillStyle = _this.bgPattern;
         _this.ctx.fillRect(0, 0, _this.canvas.width, _this.canvas.height);
         // Render all of the Food
-        for (var i = 0; i < _this.foodObjects.length; i++) {
+        for (var i in _this.foodObjects) {
             _this.foodObjects[i].render(_this.ctx);
         }
         // Render all of the Bugs
-        for (var i = 0; i < _this.bugObjects.length; i++) {
+        for (var i in _this.bugObjects) {
             _this.bugObjects[i].render(_this.ctx);
         }
     }
     // Function that handles all mouse click tasks for TapTapBugGame
     function mouseClickEvent(mouseX, mouseY) {
         // Handle mouse click on Bug objects
-        for (var i = 0; i < _this.bugObjects.length; i++) {
+        for (var i in _this.bugObjects) {
             var bug = _this.bugObjects[i];
             // If mouse cursor is hovering over the Bug
             if (bug.getBox().isOverlapMouse(_this.mouseX, _this.mouseY)) {
@@ -650,7 +639,7 @@ function TapTapBugGame() {
     }
     // Function that updates the canvas cursor when hovering over a Bug
     function updateBugHoverCanvasCursor() {
-        for (var i = 0; i < _this.bugObjects.length; i++) {
+        for (var i in _this.bugObjects) {
             var bug = _this.bugObjects[i];
             // If hovering over Bug change cursor to 'pointer' and break loop
             if (bug.getBox().isOverlapMouse(_this.mouseX, _this.mouseY)) {
@@ -664,62 +653,50 @@ function TapTapBugGame() {
     // Function that makes a specific amount of Food positioned randomly
     function makeFood() {
         var foodCount = 0;
-        var prevPos = [[]];
-        var prevFrames = [];
-        // Obtain the Food's Sprite
-        const foodSpr = _this.resMan.getSprite(_this.sprFoodID);
+        var usedFrames = [];
+        var usedPos = [];
+        // Obtain the Food's Sprite, frame width and height
+        const foodSprite = _this.resMan.getSprite(_this.sprFoodID);
+        const foodWidth = foodSprite.frameWidth;
+        const foodHeight = foodSprite.image.height;
+        const foodFrames = foodSprite.numFrames;
+        // Generate Food with specific frame index within a specific range
         while (foodCount < _this.foodAmount) {
-            // Condition the Sprite's bound variables to stay within the canvas
-            if ((_this.lowX + foodSpr.frameWidth) < 0) {
-                _this.lowX = 0;
-            }
-            if ((_this.highX + foodSpr.frameWidth) > _this.canvas.width) {
-                _this.highX -= (
-                    _this.highX + foodSpr.frameWidth
-                ) % _this.canvas.width;
-            }
-            if ((_this.lowY + foodSpr.image.height) < 0) {
-                _this.lowY = 0;
-            }
-            if ((_this.highY + foodSpr.image.height) > _this.canvas.height) {
-                _this.highY -= (
-                    _this.highY + foodSpr.image.height
-                ) % _this.canvas.height;
-            }
             // Generate random positions specified by the bound variables
-            const x = getRandomNumber(_this.lowX, _this.highX);
-            const y = getRandomNumber(_this.lowY, _this.highY);
+            var x = getRandomNumber(_this.lowX, _this.highX);
+            var y = getRandomNumber(_this.lowY, _this.highY);
             // Generate a random frame index for the Food's Sprite image
-            var randFrame = getRandomNumber(0, foodSpr.numFrames - 1);
+            var randFrame = getRandomNumber(0, foodFrames - 1);
             var isOverlap = false;
             // Ensure new position doesn't overlap with previous positions
-            for (var i = 0; i < prevPos.length; i++) {
-                // If there is overlap, set overlap to true
+            for (var i in usedPos) {
                 if (
-                    Math.abs(x - prevPos[i][0]) <= (
-                        foodSpr.frameWidth + _this.tolX
-                    ) && Math.abs(y - prevPos[i][1]) <= (
-                        foodSpr.image.height + _this.tolY
-                    )
+                    Math.abs(x - usedPos[i].x) <= (foodWidth + _this.tolX) &&
+                    Math.abs(y - usedPos[i].y) <= (foodHeight + _this.tolY)
                 ) {
                     isOverlap = true;
+                    break;
                 }
             }
-            // Ensure that a new frame index is generated for each Food
-            while(prevFrames.indexOf(randFrame) >= 0) {
-                // If all possible frame indicies are used, clear the array
-                if (prevFrames.length === foodSpr.numFrames) {
-                    prevFrames = [];
-                }
-                randFrame = getRandomNumber(0, foodSpr.numFrames - 1);
-            }
-            // If there is no overlap then create the Food
+            // Create Food if there is no overlap
             if (!isOverlap) {
+                // Ensure that a new frame index is generated for each Food
+                while(usedFrames.indexOf(randFrame) >= 0) {
+                    // Use existing index if all frame indicies are used
+                    if (usedFrames.length === foodSprite.numFrames) {
+                        randFrame = getRandomItem(usedFrames);
+                    } else {
+                        randFrame = getRandomNumber(0, foodFrames - 1);
+                    }
+                }
                 _this.foodObjects.push(
-                    new Food(foodSpr, _this.FPS, randFrame, x, y)
+                    new Food(foodSprite, _this.FPS, randFrame, x, y)
                 );
-                prevPos.push([x, y]);
-                prevFrames.push(randFrame);
+                usedPos.push({'x' : x, 'y' : y});
+                // Add new frame index to used list if
+                if (usedFrames.indexOf(randFrame) < 0) {
+                    usedFrames.push(randFrame);
+                }
                 foodCount += 1;
             }
         }
@@ -730,18 +707,21 @@ function TapTapBugGame() {
         // If Bug make timer has triggered
         if (_this.ticks > _this.bugMakeTime * _this.FPS) {
             // Reset the Bug make timer
-            resetBugMakeTimer();
+            _this.ticks = 0;
+            _this.bugMakeTime = getRandomItem(_this.bugMakeTimes);
             // Configure Bug using randomly generated attributes
-            var bugSpriteID = getRandomItem(_this.bugProbs);
-            var bugSprite = _this.resMan.getSprite(bugSpriteID);
-            var bugPoints = _this.bugDB[bugSpriteID]['points'];
-            var bugSpeed = _this.bugDB[bugSpriteID]['speed'];
-            var bugWidth = bugSprite.frameWidth;
-            var bugHeight = bugSprite.image.height;
-            var y = getRandomItem(
+            const bugSpriteID = getRandomItem(_this.bugProbs);
+            const bugSprite = _this.resMan.getSprite(bugSpriteID);
+            const bugPoints = _this.bugDB[bugSpriteID]['points'];
+            const bugSpeed = _this.bugDB[bugSpriteID]['speed'];
+            const bugWidth = bugSprite.frameWidth;
+            const bugHeight = bugSprite.image.height;
+            const y = getRandomItem(
                 [0 - bugHeight, _this.canvas.height + bugHeight]
             );
-            var x = getRandomNumber(bugHeight, _this.canvas.width - bugHeight);
+            const x = getRandomNumber(
+                bugHeight, _this.canvas.width - bugHeight
+            );
             // Create a new Bug using the above attributes
             _this.bugObjects.push(
                 new Bug(bugSprite, bugPoints, bugSpeed, _this.FPS, x, y)
@@ -769,25 +749,17 @@ function TapTapBugGame() {
         for (var key in _this.bugDB) {
             var factor = _this.bugDB[key]['weight'] * 10;
             // Append Bug ID equal to the weight of the Bug's probability
-            for (var i = 0; i < factor; i++) {
-                _this.bugProbs.push(key);
-            }
+            _this.bugProbs = _this.bugProbs.concat(Array(factor).fill(key));
         }
     }
     // Function that sets the background for the game
     function setBackground() {
         // Obtain the background Image from the ResourceManager
         const image = _this.resMan.getImage(_this.imgBackgroundID);
-        // Execute function when background Image has fully loaded
         image.onload = function() {
             // Create a pattern using the background Image
             _this.bgPattern = _this.ctx.createPattern(image, 'repeat');
         }
-    }
-    // Function that sets the bug make time variables to their default values
-    function resetBugMakeTimer() {
-        _this.ticks = 0;
-        _this.bugMakeTime = getRandomItem(_this.bugMakeTimes);
     }
     // Function that adds information about a new Bug to the Bug database
     function addBug(spriteID, points, speed, weight) {
