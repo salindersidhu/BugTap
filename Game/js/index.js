@@ -75,6 +75,15 @@ function BoundingBox(x, y, width, height) {
             mouseY > _this.y && mouseY < (_this.y + _this.height)
         );
     }
+    // Function returns true if this BoundingBox intersects other BoundingBox
+    function isIntersect(other) {
+        return (
+            _this.x <= (other.getX() + other.getWidth()) &&
+            (_this.x + _this.width) >= other.getX() &&
+            _this.y <= (other.getY() + other.getHeight()) &&
+            (_this.y + _this.height) >= other.getY()
+        );
+    }
     // Function that sets the value of the BoundingBox's x and y positions
     function update(x, y) {
         _this.x = x;
@@ -104,6 +113,7 @@ function BoundingBox(x, y, width, height) {
         getWidth : getWidth,
         getHeight : getHeight,
         isOverlap : isOverlap,
+        isIntersect : isIntersect,
         isOverlapMouse : isOverlapMouse
     }
 }
@@ -381,7 +391,7 @@ function Bug(sprite, points, speed, FPS, x, y) {
         // Update the Bug if it is alive
         if (!_this.isDead) {
             // Set the direction for the Bug to move in
-            setMovement(foodObjects);
+            moveToNearestFood(foodObjects);
             // Handle collision with Food
             handleFoodCollision(foodObjects);
             // Update the Bug's animation
@@ -429,8 +439,8 @@ function Bug(sprite, points, speed, FPS, x, y) {
             }
         }
     }
-    // Function that sets the direction of movement for the Bug
-    function setMovement(foodObjects) {
+    // Function that moves the Bug to the position of the nearest Food
+    function moveToNearestFood(foodObjects) {
         var shortestDist = Number.MAX_VALUE;
         // If there is no avaliable Food to eat then move outside the table
         if (foodObjects.length == 1 && foodObjects[0].isEaten()) {
