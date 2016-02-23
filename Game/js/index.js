@@ -1,3 +1,6 @@
+/* jslint browser: true, jquery: true, quotmark: single, maxlen: 80,
+eqeqeq: true, strict: true, forin: true */
+
 // Sprite stores attributes for a sprite sheet such as Image
 function Sprite() {
     'use strict';
@@ -342,7 +345,7 @@ function Food(sprite, selectedFrame, _x, _y) {
     'use strict';
     // Module constants and variables
     var animation = new SpriteAnimation(sprite, selectedFrame, 0);
-    var bBox = new BoundingBox(x, y, sprite.frameWidth, sprite.image.height);
+    var bBox = new BoundingBox(_x, _y, sprite.frameWidth, sprite.image.height);
     var x = _x;
     var y = _y;
     var varIsEaten = false;
@@ -389,6 +392,144 @@ function Food(sprite, selectedFrame, _x, _y) {
     };
 }
 
+// Bug handles all event management and rendering tasks for Bug
+function Bug(sprite, _points, _speed, _x, _y) {
+    'use strict';
+    // Module constants and variables
+    var animation = new SpriteAnimation(sprite, -1, 10 / _speed);
+    var bBox = new BoundingBox(_x, _y, sprite.frameWidth, sprite.image.height);
+    var points = _points;
+    var speed = _speed;
+    var x = _x;
+    var y = _y;
+    var defaultX = _x;
+    var defaultY = _y;
+    var width = sprite.frameWidth;
+    var height = sprite.image.height;
+    var angle = 0;
+    var moveToX = 0;
+    var moveToY = 0;
+    var varIsDead = false;
+    var varCanDelete = false;
+    // Function that handles updating the Bug's state
+    function update(FPS, foodObjects) {
+        // Update the Bug if it is alive
+        if (!varIsDead) {
+            // Set the direction for the Bug to move in
+            moveToNearestFood(foodObjects);
+            // Handle collision with Food
+            handleFoodCollision(foodObjects);
+            // Update the Bug's animation
+            animation.update(FPS);
+            // Update the bounding box
+            bBox.update(x, y);
+        } else {
+            // Fade the Bug within 2 seconds
+            animation.reduceOpacity(FPS, 2);
+            // Set the Bug delete flag to true once the Bug has faded
+            if (animation.getOpacity() === 0) {
+                varCanDelete = true;
+            }
+        }
+    }
+    // Function that handles drawing the Bug
+    function render(ctx) {
+        animation.render(ctx, x, y, angle);
+    }
+    // Function that moves the Bug's position to a specific target point
+    function moveToPoint(targetX, targetY) {
+        // Calculate the distance to the target point
+        var distX = targetX - x - (width / 2);
+        var distY = targetY - y - (height / 2);
+        // Calculate the hypotenuse
+        var hypotenuse = Math.sqrt(Math.pow(distX, 2) + Math.pow(distY, 2));
+        distX = distX / hypotenuse;
+        distY = distY / hypotenuse;
+        // Move towards point
+        x = x + (distX * speed);
+        y = y + (distY * speed);
+        // Update the Bug's angle depending on the movement direction
+        angle = Math.atan2(distY, distX);
+    }
+    // Function that moves the Bug to the position of the nearest Food
+    function moveToNearestFood(foodObjects) {
+        var shortestDistance = Number.MAX_VALUE;
+        // If there is no avaliable Food to eat then move outside the table
+        if (foodObjects.length === 1 && foodObjects[0].isEaten()) {
+            moveToX = defaultX;
+            moveToY = defaultY;
+        } else {
+            // Find the nearest Food from the Bug's current position
+            foodObjects.forEach(function (food) {
+                // If the Food has not been eaten
+                if (!food.isEaten()) {
+                    // Calculate the distance between the Bug and Food
+                    var foodBox = food.getBox();
+                    var foodX = foodBox.getX() + (foodBox.getWidth() / 2);
+                    var foodY = foodBox.getY() + (foodBox.getHeight() / 2);
+                    var distX = foodX - x;
+                    var distY = foodY - y;
+                    // Calculate the hypotenuse to calculate shortest distance
+                    var hypotenuse = Math.sqrt(
+                        Math.pow(distX, 2) + Math.pow(distY, 2)
+                    );
+                    // If hypotenuse is shorter than current shortest distance
+                    if (hypotenuse < shortestDistance) {
+                        // Set move to point to current Food's position
+                        moveToX = foodX;
+                        moveToY = foodY;
+                        shortestDistance = hypotenuse;
+                    }
+                }
+            });
+        }
+        // Move the Bug to a specific position
+        moveToPoint(moveToX, moveToY);
+    }
+    // Function that handles collision with Food and the current Bug
+    function handleFoodCollision(foodObjects) {
+        foodObjects.forEach(function (food) {
+            // If Food has not been eaten
+            if (!food.isEaten()) {
+                // Check if the Bug is colliding with a Food object
+                if (food.getBox().isOverlap(bBox)) {
+                    food.setEaten();
+                }
+            }
+        });
+    }
+    // Function that returns the Bug's delete flag
+    function canDelete() {
+        return varCanDelete;
+    }
+    // Function that sets the state of the Bug to dead
+    function setDead() {
+        varIsDead = true;
+    }
+    // Function that returns if the Bug has been killed
+    function isDead() {
+        return varIsDead;
+    }
+    // Return the number of points the Bug is worth
+    function getPoints() {
+        return points;
+    }
+    // Function that returns the Bug's bounding box
+    function getBox() {
+        return bBox;
+    }
+    // Functions returned by the module
+    return {
+        getBox: getBox,
+        update: update,
+        render: render,
+        isDead: isDead,
+        setDead: setDead,
+        getPoints: getPoints,
+        canDelete: canDelete
+    };
+}
+
 // TapTapBugGame handles event management and rendering tasks for TapTapBugGame
 function TapTapBugGame() {
     'use strict';
@@ -397,10 +538,8 @@ function TapTapBugGame() {
     var ctx = null;
     var canvas = null;
     var resourceManager = null;
-    var bgPattern = null;
     var isGamePaused = null;
     var isGameOver = null;
-    var sprFoodID = null;
     var mouseX = null;
     var mouseY = null;
     var score = null;
@@ -408,6 +547,7 @@ function TapTapBugGame() {
     var remainingTime = null;
     var defaultAllotedTime = null;
     var bgPattern = null;
+    var bugSpawnTime = null;
     var bugSpawnTimes = [];
     var bugSpwanProbs = [];
     var bugDB = {};
@@ -459,6 +599,7 @@ function TapTapBugGame() {
         // If game is not over update remaining time and spawn Bugs
         if (!isGameOver) {
             updateTime();
+            spawnBugs();
         }
         // Update the canvas cursor when hovering over a Bug
         updateCanvasCursor();
@@ -468,6 +609,15 @@ function TapTapBugGame() {
         gameObjects.FOOD.forEach(function (food) {
             food.update(FPS);
             updateDeleteObject('FOOD', food);
+        });
+        // Update all of the Bug objects
+        gameObjects.BUGS.forEach(function (bug) {
+            bug.update(FPS, gameObjects.FOOD);
+            updateDeleteObject('BUGS', bug);
+            // If the game is over then kill this Bug
+            if (isGameOver) {
+                bug.setDead();
+            }
         });
         // Update all of the Point objects
         gameObjects.POINTS.forEach(function (point) {
@@ -480,12 +630,39 @@ function TapTapBugGame() {
         // Render the Game's background
         ctx.fillStyle = bgPattern;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-        // Render all of the game objects
-        Object.keys(gameObjects).forEach(function (key) {
-            gameObjects[key].forEach(function (gameObj) {
-                gameObj.render(ctx);
-            });
+        // Render all of the Food objects
+        gameObjects.FOOD.forEach(function (food) {
+            food.render(ctx);
         });
+        // Render all of the Bug objects
+        gameObjects.BUGS.forEach(function (bug) {
+            bug.render(ctx);
+        });
+        // Render all of the PointUpText objects
+        gameObjects.POINTS.forEach(function (point) {
+            point.render(ctx);
+        });
+    }
+    // Function that spawns a random Bug from the Bug Database
+    function spawnBugs() {
+        timeTicks = timeTicks + 1;
+        // If Bug spawn timer has expired
+        if (timeTicks > bugSpawnTime * FPS) {
+            // Reset the Bug spawn timer
+            timeTicks = 0;
+            bugSpawnTime = getRandomItem(bugSpawnTimes);
+            // Configure the Bug using randomly chosen attributes
+            var spriteID = getRandomItem(bugSpwanProbs);
+            var points = bugDB[spriteID].POINTS;
+            var speed = bugDB[spriteID].SPEED;
+            var sprite = resourceManager.getSprite(spriteID);
+            var width = sprite.frameWidth;
+            var height = sprite.image.height;
+            var x = getRandomNumber(width, canvas.width - width);
+            var y = getRandomItem([0 - height, canvas.height + height]);
+            // Create a new Bug using the above attributes
+            gameObjects.BUGS.push(new Bug(sprite, points, speed, x, y));
+        }
     }
     // Function that spawns a specific amount of Food positioned randomly
     function spawnFood() {
@@ -501,6 +678,21 @@ function TapTapBugGame() {
         var foodWidth = foodSprite.frameWidth;
         var foodHeight = foodSprite.image.height;
         var foodFrames = foodSprite.numFrames;
+        // Nested function that checks if Food overlaps with previous Food
+        function checkFoodOverlap(position) {
+            if (
+                Math.abs(x - position.x) <= (
+                    foodWidth + foodSpawnSettings.SPREADX
+                ) &&
+                Math.abs(y - position.y) <= (
+                    foodHeight + foodSpawnSettings.SPREADY
+                )
+            ) {
+                // Break loop if position constraints are not met
+                isOverlap = true;
+                return isOverlap;
+            }
+        }
         // Generate Food with specific frame index within a specific range
         while (foodCount < foodSpawnSettings.AMOUNT) {
             // Generate random positions specified by the bound variables
@@ -516,20 +708,7 @@ function TapTapBugGame() {
             randFrame = getRandomNumber(0, foodFrames - 1);
             isOverlap = false;
             // Ensure new position doesn't overlap with previous positions
-            usedPos.forEach(function (position) {
-                if (
-                    Math.abs(x - position.x) <= (
-                        foodWidth + foodSpawnSettings.SPREADX
-                    ) &&
-                    Math.abs(y - position.y) <= (
-                        foodHeight + foodSpawnSettings.SPREADY
-                    )
-                ) {
-                    // Break loop if position constraints are not met
-                    isOverlap = true;
-                    return;
-                }
-            });
+            usedPos.some(checkFoodOverlap);
             // Create Food if there is no overlap
             if (!isOverlap) {
                 // Ensure that a new frame index is generated for each Food
@@ -575,11 +754,11 @@ function TapTapBugGame() {
     }
     // Function that updates the canvas cursor when hovering over a Bug
     function updateCanvasCursor() {
-        gameObjects.BUGS.forEach(function (bug) {
+        gameObjects.BUGS.some(function (bug) {
             // If hovering over Bug then change cursor to 'pointer' and break
             if (bug.getBox().isOverlapMouse(mouseX, mouseY)) {
                 $('body').addClass('pointer-cursor');
-                return;
+                return true;
             }
             // Change the cursor back to 'hovering' when hot hovering over Bug
             $('body').removeClass('pointer-cursor');
@@ -789,7 +968,7 @@ function Setup() {
         game.setFoodAmount(6);
         game.setFoodSpread(30, 30);
         game.setBugSpawnTimes([0.5, 0.9, 1.2]);
-        game.setFoodSpawnRange(10, 320, 125, 380);
+        game.setFoodSpawnRange(10, 320, 120, 380);
         game.setSpriteFoodID('SPR_FOOD');
         game.setBgImageID('IMG_BG');
         game.setUpdateScoreEvent(updateScore);
@@ -908,4 +1087,5 @@ function Setup() {
 }
 
 // Setup the game page and DOM element events
-window.onload = new Setup().init;
+var setup = new Setup();
+window.onload = setup.init;
