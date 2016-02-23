@@ -1,5 +1,5 @@
 /* jshint browser: true, jquery: true, quotmark: single, maxlen: 80,
-eqeqeq: true, strict: true, forin: true */
+eqeqeq: true, strict: true */
 
 // Sprite stores attributes for a sprite sheet such as Image
 function Sprite() {
@@ -560,10 +560,13 @@ function TapTapBugGame() {
     var bugDB = {};
     var resourceIDs = {'FOOD': null, 'BACKGROUND': null};
     var gameObjects = {'BUGS': [], 'FOOD': [], 'POINTS': []};
-    var eventFunctions = {'UPDATESCORE': null, 'UPDATETIME': null,
-            'GAMEOVER': null};
-    var foodSpawnSettings = {'AMOUNT': 0, 'STARTX': 0, 'ENDX': 0, 'STARTY': 0,
-            'ENDY': 0, 'SPREADX': 0, 'SPREADY': 0};
+    var eventFunctions = {
+        'UPDATESCORE': null, 'UPDATETIME': null, 'GAMEOVER': null
+    };
+    var foodSettings = {
+        'AMOUNT': 0, 'STARTX': 0, 'ENDX': 0, 'STARTY': 0, 'ENDY': 0,
+        'SPREADX': 0, 'SPREADY': 0, 'WINPOINTS': 0, 'LOSEPOINTS': 0
+    };
     // Function that initializes TapTapBugGame
     function init(_FPS, _resourceManager, _ctx, _canvas, _isGamePaused) {
         // Set game variables
@@ -686,36 +689,21 @@ function TapTapBugGame() {
         var foodHeight = foodSprite.image.height;
         var foodFrames = foodSprite.numFrames;
         // Nested function that checks if Food overlaps with previous Food
-        function checkFoodOverlap(position) {
-            if (
-                Math.abs(x - position.x) <= (
-                    foodWidth + foodSpawnSettings.SPREADX
-                ) &&
-                Math.abs(y - position.y) <= (
-                    foodHeight + foodSpawnSettings.SPREADY
-                )
-            ) {
-                // Break loop if position constraints are not met
-                isOverlap = true;
-                return isOverlap;
-            }
+        function checkFoodOverlap(pos) {
+            return (
+                Math.abs(x - pos.x) <= (foodWidth + foodSettings.SPREADX) &&
+                Math.abs(y - pos.y) <= (foodHeight + foodSettings.SPREADY)
+            );
         }
         // Generate Food with specific frame index within a specific range
-        while (foodCount < foodSpawnSettings.AMOUNT) {
+        while (foodCount < foodSettings.AMOUNT) {
             // Generate random positions specified by the bound variables
-            x = getRandomNumber(
-                foodSpawnSettings.STARTX,
-                foodSpawnSettings.ENDX
-            );
-            y = getRandomNumber(
-                foodSpawnSettings.STARTY,
-                foodSpawnSettings.ENDY
-            );
+            x = getRandomNumber(foodSettings.STARTX, foodSettings.ENDX);
+            y = getRandomNumber(foodSettings.STARTY, foodSettings.ENDY);
             // Generate a random frame index for the Food's Sprite image
             randFrame = getRandomNumber(0, foodFrames - 1);
-            isOverlap = false;
             // Ensure new position doesn't overlap with previous positions
-            usedPos.some(checkFoodOverlap);
+            isOverlap = usedPos.some(checkFoodOverlap);
             // Create Food if there is no overlap
             if (!isOverlap) {
                 // Ensure that a new frame index is generated for each Food
@@ -747,7 +735,7 @@ function TapTapBugGame() {
                 if (!bug.isDead()) {
                     score += bug.getPoints();
                     setScore(score);
-                    showPointsGained(bug);
+                    showPointsGained(bug.getPoints(), bug);
                 }
                 // Kill the Bug
                 bug.setDead();
@@ -760,17 +748,31 @@ function TapTapBugGame() {
         mouseX = _mouseX;
         mouseY = _mouseY;
     }
-    // Function that creates a new PointUpText to show the points gained
-    function showPointsGained(bug) {
+    // Function that shows points gained using PointUpText on a specific object
+    function showPointsGained(points, object) {
         gameObjects.POINTS.push(
             new PointUpText(
-                '+' + bug.getPoints(),
+                '+' + points,
                 'bold 30px Sans-serif',
-                '#b8e600',
+                '#B8E600',
                 1,
                 1.3,
-                bug.getBox().getX() + 5,
-                bug.getBox().getY() + bug.getBox().getHeight()
+                object.getBox().getX() + 5,
+                object.getBox().getY() + object.getBox().getHeight()
+            )
+        );
+    }
+    // Function that shows points lost using PointUpText on a specific object
+    function showPointsLost(points, object) {
+        gameObjects.POINTS.push(
+            new PointUpText(
+                '-' + points,
+                'bold 30px Sans-serif',
+                '#FF5050',
+                1,
+                1.3,
+                object.getBox().getX() + 5,
+                object.getBox().getY() + object.getBox().getHeight()
             )
         );
     }
@@ -816,8 +818,9 @@ function TapTapBugGame() {
     }
     // Function that adds new info about a Bug to the Bug database
     function addBugToDB(bugSpriteID, points, speed, weight) {
-        bugDB[bugSpriteID] = {'POINTS': points, 'SPEED': speed,
-                'WEIGHT': weight};
+        bugDB[bugSpriteID] = {
+            'POINTS': points, 'SPEED': speed, 'WEIGHT': weight
+        };
     }
     // Function that sets the amount of time alloted for the game
     function setAllotedTime(allotedTime) {
@@ -829,23 +832,32 @@ function TapTapBugGame() {
     }
     // Function that sets the range to spawn and position the Food
     function setFoodSpawnRange(startX, endX, startY, endY) {
-        foodSpawnSettings.STARTX = startX;
-        foodSpawnSettings.ENDX = endX;
-        foodSpawnSettings.STARTY = startY;
-        foodSpawnSettings.ENDY = endY;
+        foodSettings.STARTX = startX;
+        foodSettings.ENDX = endX;
+        foodSettings.STARTY = startY;
+        foodSettings.ENDY = endY;
     }
     // Function that sets the spread values for positioning Food apart
     function setFoodSpread(spreadX, spreadY) {
-        foodSpawnSettings.SPREADX = spreadX;
-        foodSpawnSettings.SPREADY = spreadY;
+        foodSettings.SPREADX = spreadX;
+        foodSettings.SPREADY = spreadY;
     }
     // Function that sets the amount of Food to make for the game
     function setFoodAmount(amountFood) {
-        foodSpawnSettings.AMOUNT = amountFood;
+        foodSettings.AMOUNT = amountFood;
+    }
+    // Function that sets the Food's win and lose points
+    function setFoodPoints(winPoints, losePoints) {
+        foodSettings.WINPOINTS = winPoints;
+        foodSettings.LOSEPOINTS = losePoints;
     }
     // Function that sets the score and calls the score update function
     function setScore(_score) {
         score = _score;
+        // Condition the score so it is non negative
+        if (score < 0) {
+            score = 0;
+        }
         eventFunctions.UPDATESCORE(score);
     }
     // Function that updates remaining time and calls the time update function
@@ -890,6 +902,7 @@ function TapTapBugGame() {
         addBugToDB: addBugToDB,
         setBgImageID: setBgImageID,
         setFoodAmount: setFoodAmount,
+        setFoodPoints: setFoodPoints,
         setFoodSpread: setFoodSpread,
         mouseMoveEvent: mouseMoveEvent,
         setAllotedTime: setAllotedTime,
@@ -938,8 +951,8 @@ function Setup() {
     var game = null;
     // Function that initializes tasks to setup the game page and DOM elements
     function init() {
-        // Initialize main objects required for the game
-        initGameObjects();
+        // Initialize all of the required components for the game
+        initGameComponents();
         // Initialize game resources
         initResources();
         // Bind unobtrusive event handlers
@@ -970,8 +983,8 @@ function Setup() {
             pauseResumeButtonEvent();
         });
     }
-    // Function that initializes all the main objects for the game
-    function initGameObjects() {
+    // Function that initializes all of the components for the game
+    function initGameComponents() {
         // Create new ResourceManager, GameSystem and TapTapBugGame objects
         game = new TapTapBugGame();
         sys = new GameSystem(FPS, ID_CANVAS);
@@ -986,16 +999,17 @@ function Setup() {
     }
     // Function that configures the games attributes
     function configGame() {
-        game.setAllotedTime(60);
         game.setFoodAmount(6);
+        game.setAllotedTime(60);
+        game.setFoodPoints(3, 5);
         game.setFoodSpread(30, 30);
         game.setBugSpawnTimes([0.5, 0.9, 1.2]);
         game.setFoodSpawnRange(10, 320, 120, 380);
-        game.setSpriteFoodID('SPR_FOOD');
         game.setBgImageID('IMG_BG');
-        game.setUpdateScoreEvent(updateScore);
+        game.setSpriteFoodID('SPR_FOOD');
         game.setUpdateTimeEvent(updateTime);
         game.setGameOverEvent(gameOverEvent);
+        game.setUpdateScoreEvent(updateScore);
         game.addBugToDB('SPR_R_BUG', 3, 2.5, 0.3);
         game.addBugToDB('SPR_O_BUG', 1, 1.5, 0.5);
         game.addBugToDB('SPR_G_BUG', 5, 4, 0.2);
