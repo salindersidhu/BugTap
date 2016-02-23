@@ -1,4 +1,4 @@
-/* jslint browser: true, jquery: true, quotmark: single, maxlen: 80,
+/* jshint browser: true, jquery: true, quotmark: single, maxlen: 80,
 eqeqeq: true, strict: true, forin: true */
 
 // Sprite stores attributes for a sprite sheet such as Image
@@ -321,8 +321,15 @@ function PointUpText(_text, _font, _colour, _upSpeed, _fadeSpeed, _x, _y) {
     function render(ctx) {
         // Save current state of the canvas
         ctx.save();
-        // Draw the point text on the canvas
+        // Configure the canvas opacity
+        ctx.globalAlpha = opacity;
+        // Set canvas font
         ctx.font = font;
+        // Draw a black outline around the text on the canvas
+        ctx.strokeStyle = 'black';
+        ctx.lineWidth = 6;
+        ctx.strokeText(text, x, y);
+        // Draw the point text on the canvas
         ctx.fillStyle = colour;
         ctx.fillText(text, x, y);
         // Restore the canvas to the previous state
@@ -736,10 +743,11 @@ function TapTapBugGame() {
         gameObjects.BUGS.forEach(function (bug) {
             // If mouse cursor is hovering over the Bug
             if (bug.getBox().isOverlapMouse(mouseX, mouseY)) {
-                // Update score only once
+                // If Bug is not dead update the score and display points
                 if (!bug.isDead()) {
                     score += bug.getPoints();
                     setScore(score);
+                    showPointsGained(bug);
                 }
                 // Kill the Bug
                 bug.setDead();
@@ -751,6 +759,20 @@ function TapTapBugGame() {
         // Store the mouse coordinates when the mouse has moved
         mouseX = _mouseX;
         mouseY = _mouseY;
+    }
+    // Function that creates a new PointUpText to show the points gained
+    function showPointsGained(bug) {
+        gameObjects.POINTS.push(
+            new PointUpText(
+                '+' + bug.getPoints(),
+                'bold 30px Sans-serif',
+                '#b8e600',
+                1,
+                1.3,
+                bug.getBox().getX() + 5,
+                bug.getBox().getY() + bug.getBox().getHeight()
+            )
+        );
     }
     // Function that updates the canvas cursor when hovering over a Bug
     function updateCanvasCursor() {
