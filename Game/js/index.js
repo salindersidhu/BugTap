@@ -207,12 +207,12 @@ function GameSystem(_FPS, _canvasID) {
         var canvas = $(canvasID).get(0);
         var ctx = canvas.getContext('2d');
         // Add event listener for mouse click events to the canvas
-        canvas.addEventListener('mousedown', function () {
-            mouseClickEvents(event, canvas);
+        canvas.addEventListener('mousedown', function (evt) {
+            mouseClickEvents(evt, canvas);
         }, false);
         // Add event listener for mouse move events to the canvas
-        canvas.addEventListener('mousemove', function () {
-            mouseMoveEvents(event, canvas);
+        canvas.addEventListener('mousemove', function (evt) {
+            mouseMoveEvents(evt, canvas);
         }, false);
         // Initialize the defined game module
         definedGame.init(FPS, resourceManager, ctx, canvas, isGamePaused);
@@ -229,23 +229,23 @@ function GameSystem(_FPS, _canvasID) {
         }
     }
     // Function that handles all of the mouse click events for GameSystem
-    function mouseClickEvents(event, canvas) {
+    function mouseClickEvents(evt, canvas) {
         // Process mouse click events if GameSystem is active and not paused
         if (isGameActive && !isGamePaused) {
             // Obtain the mouse coordinates relative to the canvas
-            var mouseX = event.pageX - canvas.offsetLeft;
-            var mouseY = event.pageY - canvas.offsetTop;
+            var mouseX = evt.pageX - canvas.offsetLeft;
+            var mouseY = evt.pageY - canvas.offsetTop;
             // Trigger defined game module's mouse click event
             definedGame.mouseClickEvent(mouseX, mouseY);
         }
     }
     // Function that handles all of the mouse move events for GameSystem
-    function mouseMoveEvents(event, canvas) {
+    function mouseMoveEvents(evt, canvas) {
         // Process mouse move events if GameSystem is active and not paused
         if (isGameActive && !isGamePaused) {
             // Obtain the mouse coordinates relative to the canvas
-            var mouseX = event.pageX - canvas.offsetLeft;
-            var mouseY = event.pageY - canvas.offsetTop;
+            var mouseX = evt.pageX - canvas.offsetLeft;
+            var mouseY = evt.pageY - canvas.offsetTop;
             // Trigger defined game module's mouse move event
             definedGame.mouseMoveEvent(mouseX, mouseY);
         }
