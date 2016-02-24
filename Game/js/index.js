@@ -422,10 +422,8 @@ function Bug(sprite, _points, _speed, _x, _y) {
     function update(FPS, foodObjects) {
         // Update the Bug if it is alive
         if (!varIsDead) {
-            // Set the direction for the Bug to move in
-            moveToNearestFood(foodObjects);
-            // Handle collision with Food
-            handleFoodCollision(foodObjects);
+            // Move the Bug to a specific target position
+            moveBugToFood(foodObjects);
             // Update the Bug's animation
             animation.update(FPS);
             // Update the bounding box
@@ -459,16 +457,17 @@ function Bug(sprite, _points, _speed, _x, _y) {
         angle = Math.atan2(distY, distX);
     }
     // Function that moves the Bug to the position of the nearest Food
-    function moveToNearestFood(foodObjects) {
+    function moveBugToFood(foodObjects) {
         var shortestDistance = Number.MAX_VALUE;
         // If there is no avaliable Food to eat then move outside the table
         if (foodObjects.length === 1 && foodObjects[0].isEaten()) {
+            // Set the Bug move coordinates to its spawning point
             moveToX = defaultX;
             moveToY = defaultY;
         } else {
-            // Find the nearest Food from the Bug's current position
+            // Find the nearest piece of Food from the Bug's current position
             foodObjects.forEach(function (food) {
-                // If the Food has not been eaten
+                // Ensure that the Food has not been eaten
                 if (!food.isEaten()) {
                     // Calculate the distance between the Bug and Food
                     var foodBox = food.getBox();
@@ -476,13 +475,13 @@ function Bug(sprite, _points, _speed, _x, _y) {
                     var foodY = foodBox.getY() + (foodBox.getHeight() / 2);
                     var distX = foodX - x;
                     var distY = foodY - y;
-                    // Calculate the hypotenuse to calculate shortest distance
+                    // Calculate the hypotenuse to find the shortest distance
                     var hypotenuse = Math.sqrt(
                         Math.pow(distX, 2) + Math.pow(distY, 2)
                     );
                     // If hypotenuse is shorter than current shortest distance
                     if (hypotenuse < shortestDistance) {
-                        // Set move to point to current Food's position
+                        // Set mouse move coordinates to Food's position
                         moveToX = foodX;
                         moveToY = foodY;
                         shortestDistance = hypotenuse;
@@ -492,18 +491,6 @@ function Bug(sprite, _points, _speed, _x, _y) {
         }
         // Move the Bug to a specific position
         moveToPoint(moveToX, moveToY);
-    }
-    // Function that handles collision with Food and the current Bug
-    function handleFoodCollision(foodObjects) {
-        foodObjects.forEach(function (food) {
-            // If Food has not been eaten
-            if (!food.isEaten()) {
-                // Check if the Bug is colliding with a Food object
-                if (food.getBox().isOverlap(bBox)) {
-                    food.setEaten();
-                }
-            }
-        });
     }
     // Function that returns the Bug's delete flag
     function canDelete() {
@@ -623,6 +610,20 @@ function TapTapBugGame() {
         // Update all of the Bug objects
         gameObjects.BUGS.forEach(function (bug) {
             bug.update(FPS, gameObjects.FOOD);
+            // Handle all collisions between Bugs and Food
+            gameObjects.FOOD.forEach(function (food) {
+                // Ensure that current Food has not been eaten
+                if (!food.isEaten()) {
+                    // Check if the Bug is colliding with a Food object
+                    if (food.getBox().isOverlap(bug.getBox())) {
+                        // Set Food to eaten and display points lost
+                        food.setEaten();
+                        score -= foodSettings.LOSEPOINTS;
+                        setScore(score);
+                        showPointsLost(foodSettings.LOSEPOINTS, food);
+                    }
+                }
+            });
             updateDeleteObject('BUGS', bug);
             // If the game is over then kill this Bug
             if (isGameOver) {
@@ -731,7 +732,7 @@ function TapTapBugGame() {
         gameObjects.BUGS.forEach(function (bug) {
             // If mouse cursor is hovering over the Bug
             if (bug.getBox().isOverlapMouse(mouseX, mouseY)) {
-                // If Bug is not dead update the score and display points
+                // If Bug is not dead update the score and display points won
                 if (!bug.isDead()) {
                     score += bug.getPoints();
                     setScore(score);
