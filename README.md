@@ -8,6 +8,7 @@ In this game, there are 6 pieces of food randomly positioned near the center of 
 ## Supports:
 - Chrome / Chromium 48+
 - Firefox 44+
+- Opera 35+
 - Safari 9+
 
 ## Game:

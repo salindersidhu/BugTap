@@ -1,3 +1,7 @@
+/* Styles for pointer cursor (hand) */
+.pointer-cursor {
+    cursor: pointer;
+}
 /* Common styles for canvas and infobar prevent highlighting and selecting */
 #game-canvas,
 #infobar {
@@ -5,10 +9,6 @@
     -o-user-select: none;
     -moz-user-select: none;
     -webkit-user-select: none;
-}
-/* Styles for pointer cursor (hand) */
-.pointer-cursor {
-    cursor : pointer;
 }
 /* Styles for the game canvas */
 #game-canvas {
