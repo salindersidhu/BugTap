@@ -1,195 +1,5 @@
-/* jshint browser: true, jquery: true, quotmark: single, maxlen: 80,
-eqeqeq: true, strict: true */
-
-// Sprite stores attributes for a sprite sheet such as Image
-function Sprite() {
-    'use strict';
-    // Object attributes
-    this.image = null;
-    this.numFrames = null;
-    this.frameWidth = null;
-}
-
-// ResourceManager handles creation and storage of game resources
-function ResourceManager() {
-    'use strict';
-    // Module constants and variables
-    var imageDict = {};
-    var spriteDict = {};
-    // Function that creates and returns a new Image
-    function makeImage(src, width, height) {
-        var image = new Image();
-        image.src = src;
-        image.width = width;
-        image.height = height;
-        return image;
-    }
-    // Function that creates and stores a new Image with a specific ID
-    function addImage(id, source, width, height) {
-        imageDict[id] = makeImage(source, width, height);
-    }
-    // Function that creates and stores a new Sprite with a specific ID
-    function addSprite(id, source, width, height, numFrames) {
-        var sprite = new Sprite();
-        sprite.image = makeImage(source, width, height);
-        sprite.numFrames = numFrames;
-        sprite.frameWidth = width / numFrames;
-        spriteDict[id] = sprite;
-    }
-    // Function that returns the Image corresponding to an ID
-    function getImage(id) {
-        return imageDict[id];
-    }
-    // Function that returns the Sprite corresponding to an ID
-    function getSprite(id) {
-        return spriteDict[id];
-    }
-    // Functions returned by the module
-    return {
-        addImage: addImage,
-        getImage: getImage,
-        addSprite: addSprite,
-        getSprite: getSprite
-    };
-}
-
-// BoundingBox provides an object an interface for collision detection
-function BoundingBox(_x, _y, _width, _height) {
-    'use strict';
-    // Module constants and variables
-    var x = _x;
-    var y = _y;
-    var width = _width;
-    var height = _height;
-    // Function returns true if this BoundingBox overlaps other BoundingBox
-    function isOverlap(other) {
-        return (
-            x <= other.getX() &&
-            y <= other.getY() &&
-            (x + width) >= (other.getX() + other.getWidth()) &&
-            (y + height) >= (other.getY() + other.getHeight())
-        );
-    }
-    // Function returns true if BoundingBox intersects with the mouse cursor
-    function isOverlapMouse(mouseX, mouseY) {
-        return (
-            mouseX > x && mouseX < (x + width) &&
-            mouseY > y && mouseY < (y + height)
-        );
-    }
-    // Function returns true if this BoundingBox intersects other BoundingBox
-    function isIntersect(other) {
-        return (
-            x <= (other.getX() + other.getWidth()) &&
-            (x + width) >= other.getX() &&
-            y <= (other.getY() + other.getHeight()) &&
-            (y + height) >= other.getY()
-        );
-    }
-    // Function that sets the value of the BoundingBox's x and y positions
-    function update(_x, _y) {
-        x = _x;
-        y = _y;
-    }
-    // Function that returns the BoundingBox's x position
-    function getX() {
-        return x;
-    }
-    // Function that returns the BoundingBox's y position
-    function getY() {
-        return y;
-    }
-    // Function that returns the width of the BoundingBox
-    function getWidth() {
-        return width;
-    }
-    // Function that returns the height of the BoundingBox
-    function getHeight() {
-        return height;
-    }
-    // Functions returned by the module
-    return {
-        getX: getX,
-        getY: getY,
-        update: update,
-        getWidth: getWidth,
-        getHeight: getHeight,
-        isOverlap: isOverlap,
-        isIntersect: isIntersect,
-        isOverlapMouse: isOverlapMouse
-    };
-}
-
-// SpriteAnimation handles control and rendering of animations
-function SpriteAnimation(sprite, initFrame, _TPF) {
-    'use strict';
-    // Module constants and variables
-    var TPF = _TPF;
-    var image = sprite.image;
-    var width = sprite.image.width;
-    var frameWidth = sprite.frameWidth;
-    var height = sprite.image.height;
-    var numFrames = sprite.numFrames;
-    var opacity = 1;
-    var frameIndex = initFrame;
-    var tickCounter = 0;
-    // Function that returns the opacity of the SpriteAnimation
-    function getOpacity() {
-        return opacity;
-    }
-    // Function that reduces the opacity of the SpriteAnimation
-    function reduceOpacity(FPS, fadeSpeed) {
-        opacity -= 1 / (FPS * fadeSpeed);
-        if (opacity < 0) {
-            opacity = 0;
-        }
-    }
-    // Function that updates the frame index of the SpriteAnimation
-    function update() {
-        tickCounter += 1;
-        // Update the frame index when the timer has triggered
-        if (tickCounter > TPF) {
-            tickCounter = 0;
-            // Update and reset the frame index at the end of the animation
-            frameIndex = (frameIndex + 1) % numFrames;
-        }
-    }
-    // Function that draws the SpriteAnimation
-    function render(ctx, x, y, angle) {
-        // Configure the translation points to center of image when rotating
-        var translateX = x + (width / (2 * numFrames));
-        var translateY = y + (height / 2);
-        // Save current state of the canvas
-        ctx.save();
-        // Configure the canvas opacity
-        ctx.globalAlpha = opacity;
-        // Translate and rotate canvas to draw the animated Sprite at an angle
-        ctx.translate(translateX, translateY);
-        ctx.rotate(angle);
-        ctx.translate(-translateX, -translateY);
-        // Draw the animated Sprite
-        ctx.drawImage(
-            image,
-            frameIndex * frameWidth,
-            0,
-            frameWidth,
-            height,
-            x,
-            y,
-            frameWidth,
-            height
-        );
-        // Restore the canvas to the previous state
-        ctx.restore();
-    }
-    // Functions returned by the module
-    return {
-        update: update,
-        render: render,
-        getOpacity: getOpacity,
-        reduceOpacity: reduceOpacity
-    };
-}
+/* jshint browser:true, jquery:true, quotmark:single, maxlen:80, eqeqeq:true,
+strict:true */
 
 // GameSystem handles the core Game event management and rendering tasks
 function GameSystem(_FPS, _canvasID) {
@@ -200,7 +10,7 @@ function GameSystem(_FPS, _canvasID) {
     var isGamePaused = false;
     var isGameActive = false;
     var definedGame = null;
-    var resourceManager = new ResourceManager();
+    var resourceManager = ResourceManager;
     // Function that initializes the GameSystem
     function init() {
         // Obtain the canvas and canvas context from the DOM
@@ -351,7 +161,7 @@ function PointUpText(_text, _font, _colour, _upSpeed, _fadeSpeed, _x, _y) {
 function Food(sprite, selectedFrame, _x, _y) {
     'use strict';
     // Module constants and variables
-    var animation = new SpriteAnimation(sprite, selectedFrame, 0);
+    var animation = new SpriteAnimation(sprite, 0, selectedFrame);
     var bBox = new BoundingBox(_x, _y, sprite.frameWidth, sprite.image.height);
     var x = _x;
     var y = _y;
@@ -403,7 +213,7 @@ function Food(sprite, selectedFrame, _x, _y) {
 function Bug(sprite, _points, _speed, _x, _y) {
     'use strict';
     // Module constants and variables
-    var animation = new SpriteAnimation(sprite, -1, 10 / _speed);
+    var animation = new SpriteAnimation(sprite, 10 / _speed, -1);
     var bBox = new BoundingBox(_x, _y, sprite.frameWidth, sprite.image.height);
     var points = _points;
     var speed = _speed;
@@ -552,7 +362,7 @@ function TapTapBugGame() {
     };
     var foodSettings = {
         'AMOUNT': 0, 'STARTX': 0, 'ENDX': 0, 'STARTY': 0, 'ENDY': 0,
-        'SPREADX': 0, 'SPREADY': 0, 'WINPOINTS': 0, 'LOSEPOINTS': 0
+        'SPREADX': 0, 'SPREADY': 0, 'POINTS': 0
     };
     // Function that initializes TapTapBugGame
     function init(_FPS, _resourceManager, _ctx, _canvas, _isGamePaused) {
@@ -606,6 +416,16 @@ function TapTapBugGame() {
         gameObjects.FOOD.forEach(function (food) {
             food.update(FPS);
             updateDeleteObject('FOOD', food);
+            // Award the player with points for any Food remaining
+            if (isGameOver & !food.isEaten()) {
+                Utils.once(function () {
+                    score += foodSettings.POINTS;
+                    setScore(score);
+                    showPointsGained(foodSettings.POINTS, food);
+                    food.setEaten();
+                    console.log("Working!");
+                }());
+            }
         });
         // Update all of the Bug objects
         gameObjects.BUGS.forEach(function (bug) {
@@ -618,9 +438,9 @@ function TapTapBugGame() {
                     if (food.getBox().isOverlap(bug.getBox())) {
                         // Set Food to eaten and display points lost
                         food.setEaten();
-                        score -= foodSettings.LOSEPOINTS;
+                        score -= foodSettings.POINTS;
                         setScore(score);
-                        showPointsLost(foodSettings.LOSEPOINTS, food);
+                        showPointsLost(foodSettings.POINTS, food);
                     }
                 }
             });
@@ -641,18 +461,11 @@ function TapTapBugGame() {
         // Render the Game's background
         ctx.fillStyle = bgPattern;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-        // Render all of the Food objects
-        gameObjects.FOOD.forEach(function (food) {
-            food.render(ctx);
-        });
-        // Render all of the Bug objects
-        gameObjects.BUGS.forEach(function (bug) {
-            bug.render(ctx);
-        });
-        // Render all of the PointUpText objects
-        gameObjects.POINTS.forEach(function (point) {
-            point.render(ctx);
-        });
+        // Render all of the game objects
+        gameObjects.FOOD.concat(gameObjects.BUGS).concat(gameObjects.POINTS)
+            .forEach(function (obj) {
+                obj.render(ctx);
+            });
     }
     // Function that spawns a random Bug from the Bug Database
     function spawnBugs() {
@@ -661,16 +474,16 @@ function TapTapBugGame() {
         if (timeTicks > bugSpawnTime * FPS) {
             // Reset the Bug spawn timer
             timeTicks = 0;
-            bugSpawnTime = getRandomItem(bugSpawnTimes);
+            bugSpawnTime = Utils.randomItem(bugSpawnTimes);
             // Configure the Bug using randomly chosen attributes
-            var spriteID = getRandomItem(bugSpwanProbs);
+            var spriteID = Utils.randomItem(bugSpwanProbs);
             var points = bugDB[spriteID].POINTS;
             var speed = bugDB[spriteID].SPEED;
             var sprite = resourceManager.getSprite(spriteID);
             var width = sprite.frameWidth;
             var height = sprite.image.height;
-            var x = getRandomNumber(width, canvas.width - width);
-            var y = getRandomItem([0 - height, canvas.height + height]);
+            var x = Utils.randomNumber(width, canvas.width - width);
+            var y = Utils.randomItem([0 - height, canvas.height + height]);
             // Create a new Bug using the above attributes
             gameObjects.BUGS.push(new Bug(sprite, points, speed, x, y));
         }
@@ -699,10 +512,10 @@ function TapTapBugGame() {
         // Generate Food with specific frame index within a specific range
         while (foodCount < foodSettings.AMOUNT) {
             // Generate random positions specified by the bound variables
-            x = getRandomNumber(foodSettings.STARTX, foodSettings.ENDX);
-            y = getRandomNumber(foodSettings.STARTY, foodSettings.ENDY);
+            x = Utils.randomNumber(foodSettings.STARTX, foodSettings.ENDX);
+            y = Utils.randomNumber(foodSettings.STARTY, foodSettings.ENDY);
             // Generate a random frame index for the Food's Sprite image
-            randFrame = getRandomNumber(0, foodFrames - 1);
+            randFrame = Utils.randomNumber(0, foodFrames - 1);
             // Ensure new position doesn't overlap with previous positions
             isOverlap = usedPos.some(checkFoodOverlap);
             // Create Food if there is no overlap
@@ -711,9 +524,9 @@ function TapTapBugGame() {
                 while (usedFrames.indexOf(randFrame) >= 0) {
                     // Use existing index if all frame indicies are used
                     if (usedFrames.length === foodSprite.numFrames) {
-                        randFrame = getRandomItem(usedFrames);
+                        randFrame = Utils.randomItem(usedFrames);
                     } else {
-                        randFrame = getRandomNumber(0, foodFrames - 1);
+                        randFrame = Utils.randomNumber(0, foodFrames - 1);
                     }
                 }
                 gameObjects.FOOD.push(new Food(foodSprite, randFrame, x, y));
@@ -731,7 +544,7 @@ function TapTapBugGame() {
         // Handle mouse clicks on Bug objects
         gameObjects.BUGS.forEach(function (bug) {
             // If mouse cursor is hovering over the Bug
-            if (bug.getBox().isOverlapMouse(mouseX, mouseY)) {
+            if (bug.getBox().isMouseOverlap(mouseX, mouseY)) {
                 // If Bug is not dead update the score and display points won
                 if (!bug.isDead()) {
                     score += bug.getPoints();
@@ -781,7 +594,7 @@ function TapTapBugGame() {
     function updateCanvasCursor() {
         gameObjects.BUGS.some(function (bug) {
             // If hovering over Bug then change cursor to 'pointer' and break
-            if (bug.getBox().isOverlapMouse(mouseX, mouseY)) {
+            if (bug.getBox().isMouseOverlap(mouseX, mouseY)) {
                 $('body').addClass('pointer-cursor');
                 return true;
             }
@@ -796,7 +609,8 @@ function TapTapBugGame() {
             isGameOver = true;
         }
         // If game is over and all Bugs are dead then call game over event
-        if (isGameOver && gameObjects.BUGS.length < 1) {
+        if (isGameOver && gameObjects.BUGS.length < 1 &&
+            gameObjects.POINTS.length < 1) {
             // If the timer expired then player has won
             if (remainingTime < 1) {
                 eventFunctions.GAMEOVER(score, true);
@@ -847,10 +661,9 @@ function TapTapBugGame() {
     function setFoodAmount(amountFood) {
         foodSettings.AMOUNT = amountFood;
     }
-    // Function that sets the Food's win and lose points
-    function setFoodPoints(winPoints, losePoints) {
-        foodSettings.WINPOINTS = winPoints;
-        foodSettings.LOSEPOINTS = losePoints;
+    // Function that sets the Food's points
+    function setFoodPoints(points) {
+        foodSettings.POINTS = points;
     }
     // Function that sets the score and calls the score update function
     function setScore(_score) {
@@ -885,14 +698,6 @@ function TapTapBugGame() {
     // Function that sets the background Image ID for the game
     function setBgImageID(bgImageID) {
         resourceIDs.BACKGROUND = bgImageID;
-    }
-    // Function that randomly returns an item from an array
-    function getRandomItem(array) {
-        return array[Math.floor(Math.random() * array.length)];
-    }
-    // Function that returns a random number between an inclusive range
-    function getRandomNumber(min, max) {
-        return Math.floor(Math.random() * (max - min + 1)) + min;
     }
     // Functions returned by the module
     return {
@@ -1002,7 +807,7 @@ function Setup() {
     function configGame() {
         game.setFoodAmount(6);
         game.setAllotedTime(60);
-        game.setFoodPoints(3, 5);
+        game.setFoodPoints(5);
         game.setFoodSpread(30, 30);
         game.setBugSpawnTimes([0.5, 0.9, 1.2]);
         game.setFoodSpawnRange(10, 320, 120, 380);
