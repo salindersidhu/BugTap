@@ -21,7 +21,7 @@ function Sprite() {
 }
 
 /**
-* The Utils module provides useful utility methods.
+* The Utils module provides useful utility functions.
 *
 * @author Salinder Sidhu
 * @module Utils
@@ -52,32 +52,47 @@ var Utils = (function () {
         return itemArray[Math.floor(Math.random() * itemArray.length)];
     }
     /**
-    * Wrapper that executes a method within a context extractly once.
+    * Return an array of objects that is randomly shuffled.
+    *
+    * @function shuffle
+    * @param {array} itemArray An array of objects.
+    * @return {array} An array of objects from itemArray shuffled.
+    */
+    function shuffle(itemArray) {
+        // Normalize itemArray to an empty array if it is undefined
+        itemArray = itemArray || [];
+        return itemArray.sort(function () {
+            return Math.random() - 0.5;
+        });
+    }
+    /**
+    * Wrapper that executes a function within a context extractly once.
     *
     * @function once
-    * @param {object} method The method to be called.
-    * @param {object} context The context of the method.
+    * @param {object} funct The function to be called.
+    * @param {object} context The context of the function.
     */
-    function once(method, context) {
+    function once(funct, context) {
         var result;
         return function() {
-            if (method) {
-                result = method.apply(context || this, arguments);
+            if (funct) {
+                result = funct.apply(context || this, arguments);
             }
             return result;
         };
     }
-    // Methods returned by the module
+    // Functions returned by the module
     return {
         once: once,
+        shuffle: shuffle,
         randomItem: randomItem,
         randomNumber: randomNumber
     };
 }());
 
 /**
-* The ResourceManager module handles creation, storage and management of game
-* resources.
+* The ResourceManager module provides functions for creation, storage and
+* management of game resources.
 *
 * @author Salinder Sidhu
 * @module ResourceManager
@@ -171,7 +186,7 @@ var ResourceManager = (function () {
         }
         throw new Error('Sprite with ID ' + id + ' does not exist!');
     }
-    // Methods returned by the module
+    // Functions returned by the module
     return {
         addImage: addImage,
         getImage: getImage,
@@ -181,7 +196,7 @@ var ResourceManager = (function () {
 }());
 
 /**
-* The BoundingBox module provides methods for calculating bounding box
+* The BoundingBox module provides functions for calculating bounding box
 * collision detection.
 *
 * @author Salinder Sidhu
@@ -247,8 +262,8 @@ function BoundingBox(initX, initY, boxWidth, boxHeight) {
     }
     /**
     * Update the local origin position of the BoundingBox to a new point. This
-    * method is usually called when an object (associated with the BoundingBox)
-    * changes its position.
+    * function is usually called when an object (associated with the
+    * BoundingBox) changes its position.
     *
     * @function update
     * @param {number} newX The new x coordinate of the BoundingBox's positon.
@@ -294,7 +309,7 @@ function BoundingBox(initX, initY, boxWidth, boxHeight) {
     function getHeight() {
         return height;
     }
-    // Methods returned by the module
+    // Functions returned by the module
     return {
         getX: getX,
         getY: getY,
@@ -308,7 +323,7 @@ function BoundingBox(initX, initY, boxWidth, boxHeight) {
 }
 
 /**
-* The SpriteAnimation module provides methods for creating and rendering an
+* The SpriteAnimation module provides functions for creating and rendering an
 * animated sprite.
 *
 * @author Salinder Sidhu
@@ -331,7 +346,7 @@ function SpriteAnimation(sprite, cyclesPerSecond, initFrame) {
     var opacity = 1;
     var cycleCounter = 0;
     /**
-    * Update the sprite animation frame by frame on each method call.
+    * Update the sprite animation frame by frame on each function call.
     *
     * @function update
     */
@@ -345,7 +360,7 @@ function SpriteAnimation(sprite, cyclesPerSecond, initFrame) {
         }
     }
     /**
-    * Render the animated sprite frame by frame on each method call.
+    * Render the animated sprite frame by frame on each function call.
     *
     * @function render
     * @param {object} ctx The 2D canvas context.
@@ -395,7 +410,7 @@ function SpriteAnimation(sprite, cyclesPerSecond, initFrame) {
     *
     * @function reduceOpacity
     * @param {number} FPS The game's frames per second.
-    * @param {number} fadespeed The speed of the fade out effect.
+    * @param {number} fadespeed The speed, in seconds, of the fade out effect.
     */
     function reduceOpacity(FPS, fadeSpeed) {
         opacity -= 1 / (FPS * fadeSpeed);
@@ -404,7 +419,7 @@ function SpriteAnimation(sprite, cyclesPerSecond, initFrame) {
             opacity = 0;
         }
     }
-    // Methods returned by the module
+    // Functions returned by the module
     return {
         update: update,
         render: render,
@@ -414,15 +429,16 @@ function SpriteAnimation(sprite, cyclesPerSecond, initFrame) {
 }
 
 /**
-* The FadingText module provides methods for creating and rendering fading
+* The FadingText module provides functions for creating and rendering fading
 * text with an outline.
 *
 * @author Salinder Sidhu
 * @module FadingText
-* @param {string} text
-* @param {string} font
-* @param {string} colour
-* @param {number} speed
+* @param {string} text The string value of the fading text.
+* @param {string} font The font and font styles of the fading text.
+* @param {string} colour The fill colour of the fading text.
+* @param {number} speed The speed, in seconds, of the fading effect for the
+* fading text.
 */
 function FadingText(text, font, colour, speed) {
     'use strict';
@@ -436,7 +452,7 @@ function FadingText(text, font, colour, speed) {
     var canDrawOutline = false;
     var opacity = 1;
     /**
-    * Update the text's fade effect frame by frame on each method call.
+    * Update the text's fade effect frame by frame on each function call.
     *
     * @function update
     * @param {number} FPS The game's frames per second.
@@ -450,7 +466,7 @@ function FadingText(text, font, colour, speed) {
         }
     }
     /**
-    * Render the fading text frame by frame on each method call.
+    * Render the fading text frame by frame on each function call.
     *
     * @function render
     * @param {object} ctx The 2D canvas context.
@@ -501,11 +517,162 @@ function FadingText(text, font, colour, speed) {
     function getOpacity() {
         return opacity;
     }
-    // Methods returned by the module
+    // Functions returned by the module
     return {
         update: update,
         render: render,
         setOutline: setOutline,
         getOpacity: getOpacity
+    };
+}
+
+/**
+* The GameSystem module provides functions for handling the core game events,
+* general game management and rendering tasks.
+*
+* @author Salinder Sidhu
+* @module GameSystem
+* @param {number} framesPerSecond The game's frames per second.
+* @param {string} canvasElementID The ID of the canvas DOM element.
+*/
+function GameSystem(framesPerSecond, canvasElementID) {
+    'use strict';
+    // Module constants and variables
+    var FPS = framesPerSecond;
+    var canvasID = canvasElementID;
+    var isGamePaused = false;
+    var isGameActive = false;
+    var connectedGame;
+    /**
+    * Initialize the GameSystem
+    *
+    * @function init
+    * @throws {Error} Cannot find a connected game.
+    */
+    function init() {
+        if (connectedGame) {
+            // Obtain the canvas and canvas 2D context from the DOM
+            var canvas = $(canvasID).get(0);
+            var ctx = canvas.getContext('2d');
+            // Add event listener for mouse click events to the canvas
+            canvas.addEventListener('mousedown', function (evt) {
+                runMouseEvent(evt, canvas, connectedGame.mouseClickEvent);
+            }, false);
+            // Add event listener for mouse release events to the canvas
+            canvas.addEventListener('mouseup', function (evt) {
+                runMouseEvent(evt, canvas, connectedGame.mouseReleaseEvent);
+            }, false);
+            // Add event listener for mouse move events to the canvas
+            canvas.addEventListener('mousemove', function (evt) {
+                runMouseEvent(evt, canvas, connectedGame.mouseMoveEvent);
+            }, false);
+            // Initialize the connected game module
+            connectedGame.init(FPS, ctx, canvas, isGamePaused);
+            // Execute the GameSystem main loop indefinitely
+            setInterval(mainLoop, 1000 / FPS);
+        } else {
+            throw new Error('Cannot initialize, no connected game was found!');
+        }
+    }
+    /**
+    * Main game system loop, continously updates and renders the connected
+    * game.
+    *
+    * @private
+    * @function mainLoop
+    */
+    function mainLoop() {
+        if (isGameActive && !isGamePaused) {
+            // Update the connected game
+            connectedGame.update();
+            // Render the connected game
+            connectedGame.render();
+        }
+    }
+    /**
+    * Run a mouse event function on the game canvas.
+    *
+    * @private
+    * @function triggerMouseEvent
+    * @param {object} evt The mouse event object.
+    * @param {object} canvas The canvas object.
+    */
+    function runMouseEvent(evt, canvas, mouseEvtFunct) {
+        // Process mouse event function if GameSystem is active and not paused
+        if (isGameActive && !isGamePaused) {
+            // Obtain the mouse coordinates relative to the canvas
+            var mouseX = evt.pageX - canvas.offsetLeft;
+            var mouseY = evt.pageY - canvas.offsetTop;
+            // Trigger the mouse event function on the mouse event
+            mouseEvtFunct(mouseX, mouseY);
+        }
+    }
+    /**
+    * Function that toggles the GameSystem's state between paused or running.
+    *
+    * @function togglePause
+    */
+    function togglePause() {
+        isGamePaused = !isGamePaused;
+    }
+    /**
+    * Return if the GameSystem is paused.
+    *
+    * @function isPaused
+    * @return {boolean} If the GameSystem is paused.
+    */
+    function isPaused() {
+        return isGamePaused;
+    }
+    /**
+    * Return if the GameSystem is active.
+    *
+    * @function isActive
+    * @return {boolean} If the GameSystem is active.
+    */
+    function isActive() {
+        return isGameActive;
+    }
+    /**
+    * Start the GameSystem and the connected game.
+    *
+    * @function start
+    * @throws {Error} Cannot find a connected game.
+    */
+    function start() {
+        if (connectedGame) {
+            // Reset the connected game module
+            connectedGame.reset();
+            isGameActive = true;
+        } else {
+            throw new Error('Cannot start, no connected game was found!');
+        }
+    }
+    /**
+    * Stop the GameSystem and the connected game.
+    *
+    * @function stop
+    */
+    function stop() {
+        isGameActive = false;
+    }
+    /**
+    * Connect a game module to the GameSystem.
+    *
+    * @function connectGame
+    * @param {object} game A game module.
+    */
+    function connectGame(game) {
+        connectedGame = game;
+    }
+    // Functions returned by the module
+    return {
+        init: init,
+        stop: stop,
+        start: start,
+        isPaused: isPaused,
+        isActive: isActive,
+        connectGame: connectGame,
+        togglePause: togglePause,
     };
 }

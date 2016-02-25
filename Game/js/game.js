@@ -1,107 +1,6 @@
 /* jshint browser:true, jquery:true, quotmark:single, maxlen:80, eqeqeq:true,
-strict:true */
-
-// GameSystem handles the core Game event management and rendering tasks
-function GameSystem(_FPS, _canvasID) {
-    'use strict';
-    // Module constants and variables
-    var FPS = _FPS;
-    var canvasID = _canvasID;
-    var isGamePaused = false;
-    var isGameActive = false;
-    var definedGame = null;
-    var resourceManager = ResourceManager;
-    // Function that initializes the GameSystem
-    function init() {
-        // Obtain the canvas and canvas context from the DOM
-        var canvas = $(canvasID).get(0);
-        var ctx = canvas.getContext('2d');
-        // Add event listener for mouse click events to the canvas
-        canvas.addEventListener('mousedown', function (evt) {
-            mouseClickEvents(evt, canvas);
-        }, false);
-        // Add event listener for mouse move events to the canvas
-        canvas.addEventListener('mousemove', function (evt) {
-            mouseMoveEvents(evt, canvas);
-        }, false);
-        // Initialize the defined game module
-        definedGame.init(FPS, resourceManager, ctx, canvas, isGamePaused);
-        // Execute the GameSystem event loop indefinitely
-        setInterval(gameSystemLoop, 1000 / FPS);
-    }
-    // Function that continuously updates and renders the GameSystem
-    function gameSystemLoop() {
-        if (isGameActive && !isGamePaused) {
-            // Update the bound game module
-            definedGame.update();
-            // Render the defined game module
-            definedGame.render();
-        }
-    }
-    // Function that handles all of the mouse click events for GameSystem
-    function mouseClickEvents(evt, canvas) {
-        // Process mouse click events if GameSystem is active and not paused
-        if (isGameActive && !isGamePaused) {
-            // Obtain the mouse coordinates relative to the canvas
-            var mouseX = evt.pageX - canvas.offsetLeft;
-            var mouseY = evt.pageY - canvas.offsetTop;
-            // Trigger defined game module's mouse click event
-            definedGame.mouseClickEvent(mouseX, mouseY);
-        }
-    }
-    // Function that handles all of the mouse move events for GameSystem
-    function mouseMoveEvents(evt, canvas) {
-        // Process mouse move events if GameSystem is active and not paused
-        if (isGameActive && !isGamePaused) {
-            // Obtain the mouse coordinates relative to the canvas
-            var mouseX = evt.pageX - canvas.offsetLeft;
-            var mouseY = evt.pageY - canvas.offsetTop;
-            // Trigger defined game module's mouse move event
-            definedGame.mouseMoveEvent(mouseX, mouseY);
-        }
-    }
-    // Function that returns the GameSystem's ResourceManager
-    function getResourceManager() {
-        return resourceManager;
-    }
-    // Function that toggles the GameSystem's state between paused or running
-    function togglePause() {
-        isGamePaused = !isGamePaused;
-    }
-    // Function that returns if the GameSystem is paused
-    function isPaused() {
-        return isGamePaused;
-    }
-    // Function that returns if the GameSystem has started
-    function isActive() {
-        return isGameActive;
-    }
-    // Function that officially starts the GameSystem
-    function start() {
-        // Reset the defined game module
-        definedGame.reset();
-        isGameActive = true;
-    }
-    // Function that officially stops the GameSystem
-    function stop() {
-        isGameActive = false;
-    }
-    // Function that binds a defined game module to the GameSystem
-    function bindGame(game) {
-        definedGame = game;
-    }
-    // Functions returned by the module
-    return {
-        init: init,
-        stop: stop,
-        start: start,
-        bindGame: bindGame,
-        isPaused: isPaused,
-        isActive: isActive,
-        togglePause: togglePause,
-        getResourceManager: getResourceManager
-    };
-}
+strict:true, unused:true, undef:true */
+/* global Utils, ResourceManager, BoundingBox, SpriteAnimation, GameSystem */
 
 // PointUpText draws text which scrolls upwards and fades out
 function PointUpText(_text, _font, _colour, _upSpeed, _fadeSpeed, _x, _y) {
@@ -341,7 +240,6 @@ function TapTapBugGame() {
     var FPS = null;
     var ctx = null;
     var canvas = null;
-    var resourceManager = null;
     var isGamePaused = null;
     var isGameOver = null;
     var mouseX = null;
@@ -365,15 +263,14 @@ function TapTapBugGame() {
         'SPREADX': 0, 'SPREADY': 0, 'POINTS': 0
     };
     // Function that initializes TapTapBugGame
-    function init(_FPS, _resourceManager, _ctx, _canvas, _isGamePaused) {
+    function init(_FPS, _ctx, _canvas, _isGamePaused) {
         // Set game variables
         FPS = _FPS;
-        resourceManager = _resourceManager;
         ctx = _ctx;
         canvas = _canvas;
         isGamePaused = _isGamePaused;
         // Set the game's background
-        var bgImage = resourceManager.getImage(resourceIDs.BACKGROUND);
+        var bgImage = ResourceManager.getImage(resourceIDs.BACKGROUND);
         bgImage.onload = function () {
             // Create a pattern using the background Image
             bgPattern = ctx.createPattern(bgImage, 'repeat');
@@ -423,7 +320,6 @@ function TapTapBugGame() {
                     setScore(score);
                     showPointsGained(foodSettings.POINTS, food);
                     food.setEaten();
-                    console.log("Working!");
                 }());
             }
         });
@@ -479,7 +375,7 @@ function TapTapBugGame() {
             var spriteID = Utils.randomItem(bugSpwanProbs);
             var points = bugDB[spriteID].POINTS;
             var speed = bugDB[spriteID].SPEED;
-            var sprite = resourceManager.getSprite(spriteID);
+            var sprite = ResourceManager.getSprite(spriteID);
             var width = sprite.frameWidth;
             var height = sprite.image.height;
             var x = Utils.randomNumber(width, canvas.width - width);
@@ -498,7 +394,7 @@ function TapTapBugGame() {
         var x = null;
         var y = null;
         // Obtain the Food's Sprite, frame width, height and number of frames
-        var foodSprite = resourceManager.getSprite(resourceIDs.FOOD);
+        var foodSprite = ResourceManager.getSprite(resourceIDs.FOOD);
         var foodWidth = foodSprite.frameWidth;
         var foodHeight = foodSprite.image.height;
         var foodFrames = foodSprite.numFrames;
@@ -539,6 +435,7 @@ function TapTapBugGame() {
             }
         }
     }
+    function mouseReleaseEvent(mouseX, mouseY){}
     // Function that handles all mouse click tasks for TapTapBugGame
     function mouseClickEvent(mouseX, mouseY) {
         // Handle mouse clicks on Bug objects
@@ -716,6 +613,7 @@ function TapTapBugGame() {
         setSpriteFoodID: setSpriteFoodID,
         setBugSpawnTimes: setBugSpawnTimes,
         setGameOverEvent: setGameOverEvent,
+        mouseReleaseEvent: mouseReleaseEvent,
         setFoodSpawnRange: setFoodSpawnRange,
         setUpdateTimeEvent: setUpdateTimeEvent,
         setUpdateScoreEvent: setUpdateScoreEvent
@@ -797,11 +695,11 @@ function Setup() {
     }
     // Function that adds all of the game resources using the ResourceManager
     function initResources() {
-        sys.getResourceManager().addImage('IMG_BG', IMG_BG, 387, 600);
-        sys.getResourceManager().addSprite('SPR_FOOD', SPR_FOOD, 896, 56, 16);
-        sys.getResourceManager().addSprite('SPR_R_BUG', SPR_R_BUG, 90, 50, 2);
-        sys.getResourceManager().addSprite('SPR_O_BUG', SPR_O_BUG, 90, 50, 2);
-        sys.getResourceManager().addSprite('SPR_G_BUG', SPR_G_BUG, 90, 50, 2);
+        ResourceManager.addImage('IMG_BG', IMG_BG, 387, 600);
+        ResourceManager.addSprite('SPR_FOOD', SPR_FOOD, 896, 56, 16);
+        ResourceManager.addSprite('SPR_R_BUG', SPR_R_BUG, 90, 50, 2);
+        ResourceManager.addSprite('SPR_O_BUG', SPR_O_BUG, 90, 50, 2);
+        ResourceManager.addSprite('SPR_G_BUG', SPR_G_BUG, 90, 50, 2);
     }
     // Function that configures the games attributes
     function configGame() {
@@ -819,7 +717,7 @@ function Setup() {
         game.addBugToDB('SPR_R_BUG', 3, 2.5, 0.3);
         game.addBugToDB('SPR_O_BUG', 1, 1.5, 0.5);
         game.addBugToDB('SPR_G_BUG', 5, 4, 0.2);
-        sys.bindGame(game);
+        sys.connectGame(game);
     }
     // Function that updates the score text
     function updateScore(score) {
