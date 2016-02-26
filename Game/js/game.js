@@ -280,7 +280,7 @@ function TapTapBugGame() {
         setScore(0);
         spawnFood();
     }
-    var awardPoints = Gamework.Utils.once(function (food) {
+    var awardPoints = Gamework.Utils.once(function () {
         gameObjects.FOOD.forEach(function (food) {
             score += foodSettings.POINTS;
             setScore(score);

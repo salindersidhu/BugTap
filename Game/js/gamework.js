@@ -382,7 +382,7 @@ var Gamework = (function () {
         */
         function render(ctx, x, y, angle) {
             // Configure the translation point to sprite's center when rotating
-            var translateX = x + (_this.width / (2 * _this.numFrames));
+            var translateX = x + (_this.frameWidth / 2);
             var translateY = y + (_this.height / 2);
             // Save current state of the canvas prior to rendering
             ctx.save();
@@ -481,10 +481,12 @@ var Gamework = (function () {
         function render(ctx, x, y, angle) {
             // Save current state of the canvas
             ctx.save();
+            // Translate and rotate canvas to draw the text at an angle
+            ctx.translate(x, y);
+            ctx.rotate(angle);
+            ctx.translate(-x, -y);
             // Configure the canvas opacity
             ctx.globalAlpha = _this.opacity;
-            // Rotate canvas to draw the text at an angle
-            ctx.rotate(angle);
             // Set canvas font
             ctx.font = _this.font;
             // Draw the text outline if can draw outline flag is true
