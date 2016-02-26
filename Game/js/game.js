@@ -1,6 +1,6 @@
 /*jshint browser:true, jquery:true, quotmark:single, maxlen:80, eqeqeq:true,
 strict:true, unused:true, undef:true*/
-/*jslint browser:true, this:true*/
+/*jslint browser:true, this:true, maxlen:80*/
 /*global $, window, Gamework*/
 
 // PointUpText draws text which scrolls upwards and fades out

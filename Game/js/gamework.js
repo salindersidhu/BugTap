@@ -1,6 +1,6 @@
 /*jshint browser:true, jquery:true, quotmark:single, maxlen:80, eqeqeq:true,
 strict:true, unused:false, undef:true*/
-/*jslint browser:true, this:true*/
+/*jslint browser:true, this:true, maxlen:80*/
 /*global $*/
 
 /**
@@ -16,7 +16,7 @@ var Gamework = (function () {
     * Sprite represents a sprite sheet image. A single image consisting of
     * multiple images that together form an animation.
     *
-    * @memberof Gameworks
+    * @memberof Gamework
     * @function Sprite
     * @param {string} Sprite.image The Sprite sheet image.
     * @param {number} Sprite.numFrames The number of frames on the sprite sheet
@@ -208,31 +208,35 @@ var Gamework = (function () {
     *
     * @author Salinder Sidhu
     * @module BoundingBox
-    * @param {number} initX The BoundingBox's initial x position coordinate.
-    * @param {number} initY The BoundingBox's initial y position coordinate.
-    * @param {number} boxWidth The BoundingBox's width.
-    * @param {number} boxHeight The BoundingBox's height.
+    * @param {number} x The BoundingBox's initial x position coordinate.
+    * @param {number} y The BoundingBox's initial y position coordinate.
+    * @param {number} width The BoundingBox's width.
+    * @param {number} height The BoundingBox's height.
     */
-    function BoundingBox(initX, initY, boxWidth, boxHeight) {
+    function BoundingBox(x, y, width, height) {
         // Module constants and variables
-        var x = initX;
-        var y = initY;
-        var width = boxWidth;
-        var height = boxHeight;
+        var _this = this; // Reference to the module's local scope
+        _this.x = x;
+        _this.y = y;
+        _this.width = width;
+        _this.height = height;
         /**
         * Return true if this BoundingBox completly overlaps another
         * BoundingBox, otherwise return false.
         *
         * @function isOverlap
         * @param {object} otherBox A BoundingBox object.
-        * @return {boolean} If this BoundingBox and other BoundingBox overlap.
+        * @return {boolean}
         */
         function isOverlap(otherBox) {
             return (
-                x <= otherBox.getX() &&
-                y <= otherBox.getY() &&
-                (x + width) >= (otherBox.getX() + otherBox.getWidth()) &&
-                (y + height) >= (otherBox.getY() + otherBox.getHeight())
+                _this.x <= otherBox.getX() &&
+                _this.y <= otherBox.getY() &&
+                (_this.x + _this.width) >= (
+                    otherBox.getX() + otherBox.getWidth()
+                ) && (_this.y + _this.height >= (
+                    otherBox.getY() + otherBox.getHeight()
+                ))
             );
         }
         /**
@@ -241,15 +245,14 @@ var Gamework = (function () {
         *
         * @function isIntersect
         * @param {object} otherBox A BoundingBox object.
-        * @return {boolean} If this BoundingBox and other BoundingBox
-        * intersect.
+        * @return {boolean}
         */
         function isIntersect(otherBox) {
             return (
-                x <= (otherBox.getX() + otherBox.getWidth()) &&
-                (x + width) >= otherBox.getX() &&
-                y <= (otherBox.getY() + otherBox.getHeight()) &&
-                (y + height) >= otherBox.getY()
+                _this.x <= (otherBox.getX() + otherBox.getWidth()) &&
+                (_this.x + _this.width) >= otherBox.getX() &&
+                _this.y <= (otherBox.getY() + otherBox.getHeight()) &&
+                (_this.y + _this.height) >= otherBox.getY()
             );
         }
         /**
@@ -259,12 +262,12 @@ var Gamework = (function () {
         * @function isMouseOverlap
         * @param {number} mouseX The x coordinate of the mouse.
         * @param {number} mouseY The y coordinate of the mouse.
-        * @return {boolean} If this BoundingBox and the mouse cursor intersect.
+        * @return {boolean}
         */
         function isMouseOverlap(mouseX, mouseY) {
             return (
-                mouseX > x && mouseX < (x + width) &&
-                mouseY > y && mouseY < (y + height)
+                mouseX > _this.x && mouseX < (_this.x + _this.width) &&
+                mouseY > _this.y && mouseY < (_this.y + _this.height)
             );
         }
         /**
@@ -273,14 +276,12 @@ var Gamework = (function () {
         * BoundingBox) changes its position.
         *
         * @function update
-        * @param {number} newX The new x coordinate of the BoundingBox's
-        * positon.
-        * @param {number} newY The new y coordinate of the BoundingBox's
-        * positon.
+        * @param {number} x The new x coordinate of the BoundingBox's positon.
+        * @param {number} y The new y coordinate of the BoundingBox's positon.
         */
-        function update(newX, newY) {
-            x = newX;
-            y = newY;
+        function update(x, y) {
+            _this.x = x;
+            _this.y = y;
         }
         /**
         * Return the x coordinate of the BoundingBox's position.
@@ -289,7 +290,7 @@ var Gamework = (function () {
         * @return {number} BoundingBox's x coordinate.
         */
         function getX() {
-            return x;
+            return _this.x;
         }
         /**
         * Return the y coordinate of the BoundingBox's position.
@@ -298,7 +299,7 @@ var Gamework = (function () {
         * @return {number} BoundingBox's y coordinate.
         */
         function getY() {
-            return y;
+            return _this.y;
         }
         /**
         * Return the width of the BoundingBox.
@@ -307,7 +308,7 @@ var Gamework = (function () {
         * @return {number} BoundingBox's width.
         */
         function getWidth() {
-            return width;
+            return _this.width;
         }
         /**
         * Return the height of the BoundingBox.
@@ -316,7 +317,7 @@ var Gamework = (function () {
         * @return {number} BoundingBox's height.
         */
         function getHeight() {
-            return height;
+            return _this.height;
         }
         // Functions returned by the module
         return {
@@ -337,24 +338,24 @@ var Gamework = (function () {
     * @author Salinder Sidhu
     * @module SpriteAnimation
     * @param {object} sprite The Sprite object of the sprite animation.
-    * @param {number} cyclesPerSecond The number of frame update cycles per
-    * second.
+    * @param {number} CPS The number of frame update cycles per second.
     * @param {number} [initFrame] - The initial animation starting frame.
     */
-    function SpriteAnimation(sprite, cyclesPerSecond, initFrame) {
+    function SpriteAnimation(sprite, CPS, initFrame) {
         // Module constants and variables
-        var CPS = cyclesPerSecond;
-        var image = sprite.image;
-        var width = sprite.image.width;
-        var height = sprite.image.height;
-        var numFrames = sprite.numFrames;
-        var frameWidth = sprite.frameWidth;
-        var frameIndex = initFrame;
-        var opacity = 1;
-        var cycleCounter = 0;
+        var _this = this; // Reference to the module's local scope
+        _this.CPS = CPS;
+        _this.image = sprite.image;
+        _this.frameIndex = initFrame;
+        _this.width = sprite.image.width;
+        _this.height = sprite.image.height;
+        _this.numFrames = sprite.numFrames;
+        _this.frameWidth = sprite.frameWidth;
+        _this.opacity = 1;
+        _this.cycleCounter = 0;
         // Condition frameIndex to take a default value of -1 if undefined
         if (initFrame === undefined) {
-            frameIndex = -1;
+            _this.frameIndex = -1;
         }
         /**
         * Update the sprite animation frame by frame on each function call.
@@ -362,12 +363,12 @@ var Gamework = (function () {
         * @function update
         */
         function update() {
-            cycleCounter += 1;
+            _this.cycleCounter += 1;
             // Update the frame index when the cycle counter has triggered
-            if (cycleCounter > CPS) {
-                cycleCounter = 0;
+            if (_this.cycleCounter > _this.CPS) {
+                _this.cycleCounter = 0;
                 // Update and reset the frame index at the end of the animation
-                frameIndex = (frameIndex + 1) % numFrames;
+                _this.frameIndex = (_this.frameIndex + 1) % _this.numFrames;
             }
         }
         /**
@@ -381,28 +382,20 @@ var Gamework = (function () {
         */
         function render(ctx, x, y, angle) {
             // Configure the translation point to sprite's center when rotating
-            var translateX = x + (width / (2 * numFrames));
-            var translateY = y + (height / 2);
+            var translateX = x + (_this.width / (2 * _this.numFrames));
+            var translateY = y + (_this.height / 2);
             // Save current state of the canvas prior to rendering
             ctx.save();
             // Configure the canvas opacity
-            ctx.globalAlpha = opacity;
+            ctx.globalAlpha = _this.opacity;
             // Translate and rotate canvas to draw the animated Sprite angled
             ctx.translate(translateX, translateY);
             ctx.rotate(angle);
             ctx.translate(-translateX, -translateY);
             // Draw the animated Sprite
-            ctx.drawImage(
-                image,
-                frameIndex * frameWidth,
-                0,
-                frameWidth,
-                height,
-                x,
-                y,
-                frameWidth,
-                height
-            );
+            ctx.drawImage(_this.image, _this.frameIndex * _this.frameWidth, 0,
+                    _this.frameWidth, _this.height, x, y, _this.frameWidth,
+                    _this.height);
             // Restore the canvas state prior to rendering
             ctx.restore();
         }
@@ -413,7 +406,7 @@ var Gamework = (function () {
         * @return {number} The opacity of the sprite animation.
         */
         function getOpacity() {
-            return opacity;
+            return _this.opacity;
         }
         /**
         * Reduce the opacity of the sprite animation. This generates a fade out
@@ -425,10 +418,10 @@ var Gamework = (function () {
         * effect.
         */
         function reduceOpacity(FPS, fadeSpeed) {
-            opacity -= 1 / (FPS * fadeSpeed);
+            _this.opacity -= 1 / (FPS * fadeSpeed);
             // Condition the opacity so it is non-negative
-            if (opacity < 0) {
-                opacity = 0;
+            if (_this.opacity < 0) {
+                _this.opacity = 0;
             }
         }
         // Functions returned by the module
@@ -453,14 +446,15 @@ var Gamework = (function () {
     */
     function FadingText(text, font, colour, speed) {
         // Module constants and variables
-        var fadeText = text;
-        var fontStyle = font;
-        var textColour = colour;
-        var fadeSpeed = speed;
-        var outlineWidth = null;
-        var outlineColour = null;
-        var canDrawOutline = false;
-        var opacity = 1;
+        var _this = this; // Reference to the module's local scope
+        _this.text = text;
+        _this.font = font;
+        _this.speed = speed;
+        _this.colour = colour;
+        _this.opacity = 1;
+        _this.outlineWidth = null;
+        _this.outlineColour = null;
+        _this.canDrawOutline = false;
         /**
         * Update the text's fade effect frame by frame on each function call.
         *
@@ -469,10 +463,10 @@ var Gamework = (function () {
         */
         function update(FPS) {
             // Reduce opacity
-            opacity -= 1 / (FPS * fadeSpeed);
+            _this.opacity -= 1 / (FPS * _this.speed);
             // Condition the opacity so it is non-negative
-            if (opacity < 0) {
-                opacity = 0;
+            if (_this.opacity < 0) {
+                _this.opacity = 0;
             }
         }
         /**
@@ -488,20 +482,20 @@ var Gamework = (function () {
             // Save current state of the canvas
             ctx.save();
             // Configure the canvas opacity
-            ctx.globalAlpha = opacity;
+            ctx.globalAlpha = _this.opacity;
             // Rotate canvas to draw the text at an angle
             ctx.rotate(angle);
             // Set canvas font
-            ctx.font = fontStyle;
+            ctx.font = _this.font;
             // Draw the text outline if can draw outline flag is true
-            if (canDrawOutline) {
-                ctx.strokeStyle = outlineColour;
-                ctx.lineWidth = outlineWidth;
-                ctx.strokeText(fadeText, x, y);
+            if (_this.canDrawOutline) {
+                ctx.strokeStyle = _this.outlineColour;
+                ctx.lineWidth = _this.outlineWidth;
+                ctx.strokeText(_this.text, x, y);
             }
             // Draw the actual text
-            ctx.fillStyle = textColour;
-            ctx.fillText(fadeText, x, y);
+            ctx.fillStyle = _this.colour;
+            ctx.fillText(_this.text, x, y);
             // Restore the canvas state prior to rendering
             ctx.restore();
         }
@@ -514,9 +508,9 @@ var Gamework = (function () {
         * @param {number} width The width of the text's outline.
         */
         function setOutline(colour, width) {
-            outlineColour = colour;
-            outlineWidth = width;
-            canDrawOutline = true;
+            _this.outlineColour = colour;
+            _this.outlineWidth = width;
+            _this.canDrawOutline = true;
         }
         /**
         * Return the opacity of the fading text.
@@ -525,7 +519,7 @@ var Gamework = (function () {
         * @return {number} The opacity of the fading text.
         */
         function getOpacity() {
-            return opacity;
+            return _this.opacity;
         }
         // Functions returned by the module
         return {
@@ -541,16 +535,17 @@ var Gamework = (function () {
     *
     * @author Salinder Sidhu
     * @module GameSystem
-    * @param {number} framesPerSecond The game's frames per second.
-    * @param {string} canvasElementID The ID of the canvas DOM element.
+    * @param {number} FPS The game's frames per second.
+    * @param {string} canvasID The ID of the canvas DOM element.
     */
-    function GameSystem(framesPerSecond, canvasElementID) {
+    function GameSystem(FPS, canvasID) {
         // Module constants and variables
-        var FPS = framesPerSecond;
-        var canvasID = canvasElementID;
-        var isGamePaused = false;
-        var isGameActive = false;
-        var connectedGame;
+        var _this = this; // Reference to the module's local scope
+        _this.FPS = FPS;
+        _this.canvasID = canvasID;
+        _this.isGamePaused = false;
+        _this.isGameActive = false;
+        _this.connectedGame = null;
         /**
         * Trigger a mouse event function on the game canvas.
         *
@@ -561,7 +556,7 @@ var Gamework = (function () {
         */
         function triggerMouseEvent(evt, canvas, mouseEvtFunct) {
             // Trigger mouse event if GameSystem is active and not paused
-            if (isGameActive && !isGamePaused) {
+            if (_this.isGameActive && !_this.isGamePaused) {
                 // Obtain the mouse coordinates relative to the canvas
                 var mouseX = evt.pageX - canvas.offsetLeft;
                 var mouseY = evt.pageY - canvas.offsetTop;
@@ -577,11 +572,11 @@ var Gamework = (function () {
         * @function mainLoop
         */
         function mainLoop() {
-            if (isGameActive && !isGamePaused) {
+            if (_this.isGameActive && !_this.isGamePaused) {
                 // Update the connected game
-                connectedGame.update();
+                _this.connectedGame.update();
                 // Render the connected game
-                connectedGame.render();
+                _this.connectedGame.render();
             }
         }
         /**
@@ -591,22 +586,23 @@ var Gamework = (function () {
         * @throws {Error} Cannot find a connected game.
         */
         function init() {
-            if (connectedGame) {
+            if (_this.connectedGame) {
                 // Obtain the canvas and canvas 2D context from the DOM
                 var canvas = $(canvasID).get(0);
                 var ctx = canvas.getContext('2d');
                 // Add event listener for mouse click events to the canvas
                 canvas.addEventListener('mousedown', function (evt) {
                     triggerMouseEvent(evt, canvas,
-                            connectedGame.mouseClickEvent);
+                            _this.connectedGame.mouseClickEvent);
                 }, false);
                 // Add event listener for mouse move events to the canvas
                 canvas.addEventListener('mousemove', function (evt) {
                     triggerMouseEvent(evt, canvas,
-                            connectedGame.mouseMoveEvent);
+                            _this.connectedGame.mouseMoveEvent);
                 }, false);
                 // Initialize the connected game module
-                connectedGame.init(FPS, ctx, canvas, isGamePaused);
+                _this.connectedGame.init(_this.FPS, ctx, canvas,
+                        _this.isGamePaused);
                 // Execute the GameSystem main loop indefinitely
                 setInterval(mainLoop, 1000 / FPS);
             } else {
@@ -622,25 +618,25 @@ var Gamework = (function () {
         * @function togglePause
         */
         function togglePause() {
-            isGamePaused = !isGamePaused;
+            _this.isGamePaused = !_this.isGamePaused;
         }
         /**
         * Return if the GameSystem is paused.
         *
         * @function isPaused
-        * @return {boolean} If the GameSystem is paused.
+        * @return {boolean}
         */
         function isPaused() {
-            return isGamePaused;
+            return _this.isGamePaused;
         }
         /**
         * Return if the GameSystem is active.
         *
         * @function isActive
-        * @return {boolean} If the GameSystem is active.
+        * @return {boolean}
         */
         function isActive() {
-            return isGameActive;
+            return _this.isGameActive;
         }
         /**
         * Start the GameSystem and the connected game.
@@ -649,10 +645,10 @@ var Gamework = (function () {
         * @throws {Error} Cannot find a connected game.
         */
         function start() {
-            if (connectedGame) {
+            if (_this.connectedGame) {
                 // Reset the connected game module
-                connectedGame.reset();
-                isGameActive = true;
+                _this.connectedGame.reset();
+                _this.isGameActive = true;
             } else {
                 throw new Error('Cannot start, no connected game was found!');
             }
@@ -663,7 +659,7 @@ var Gamework = (function () {
         * @function stop
         */
         function stop() {
-            isGameActive = false;
+            _this.isGameActive = false;
         }
         /**
         * Connect a game module to the GameSystem.
@@ -672,7 +668,7 @@ var Gamework = (function () {
         * @param {object} game A game module.
         */
         function connectGame(game) {
-            connectedGame = game;
+            _this.connectedGame = game;
         }
         // Functions returned by the module
         return {
