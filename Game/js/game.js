@@ -1,48 +1,31 @@
-/* jshint browser:true, jquery:true, quotmark:single, maxlen:80, eqeqeq:true,
-strict:true, unused:true, undef:true */
-/* global Utils, ResourceManager, BoundingBox, SpriteAnimation, GameSystem */
+/*jshint browser:true, jquery:true, quotmark:single, maxlen:80, eqeqeq:true,
+strict:true, unused:true, undef:true*/
+/*jslint browser:true, this:true*/
+/*global $, window, Gamework*/
 
 // PointUpText draws text which scrolls upwards and fades out
-function PointUpText(_text, _font, _colour, _upSpeed, _fadeSpeed, _x, _y) {
+function PointUpText(text, font, colour, moveSpeed, fadeSpeed, textX, textY) {
     'use strict';
     // Module constants and variables
-    var text = _text;
-    var font = _font;
-    var colour = _colour;
-    var upSpeed = _upSpeed;
-    var fadeSpeed = _fadeSpeed;
-    var x = _x;
-    var y = _y;
-    var opacity = 1;
+    var x = textX;
+    var y = textY;
+    var speed = moveSpeed;
     var varCanDelete = false;
-    // Function that updates the PointUpText's opacity and movement
+    var fadingText = new Gamework.FadingText(text, font, colour, fadeSpeed);
+    fadingText.setOutline('black', 6);
+    // Function that updates the PointUpText
     function update(FPS) {
         // Move the PointUpText upwards
-        y -= upSpeed;
-        // Reduce opacity until 0, then set delete flag to true
-        opacity -= 1 / (FPS * fadeSpeed);
-        if (opacity < 0) {
-            opacity = 0;
+        y -= speed;
+        fadingText.update(FPS);
+        // If text jas faded then set delete flag to true
+        if (fadingText.getOpacity() === 0) {
             varCanDelete = true;
         }
     }
-    // Function that draws the PointUpText
+    // Function that renders the PointUpText
     function render(ctx) {
-        // Save current state of the canvas
-        ctx.save();
-        // Configure the canvas opacity
-        ctx.globalAlpha = opacity;
-        // Set canvas font
-        ctx.font = font;
-        // Draw a black outline around the text on the canvas
-        ctx.strokeStyle = 'black';
-        ctx.lineWidth = 6;
-        ctx.strokeText(text, x, y);
-        // Draw the point text on the canvas
-        ctx.fillStyle = colour;
-        ctx.fillText(text, x, y);
-        // Restore the canvas to the previous state
-        ctx.restore();
+        fadingText.render(ctx, x, y, 0);
     }
     // Function that returns true if object can be deleted, false otherwise
     function canDelete() {
@@ -57,15 +40,16 @@ function PointUpText(_text, _font, _colour, _upSpeed, _fadeSpeed, _x, _y) {
 }
 
 // Food handles event management and rendering tasks for Food
-function Food(sprite, selectedFrame, _x, _y) {
+function Food(sprite, selectedFrame, foodX, foodY) {
     'use strict';
     // Module constants and variables
-    var animation = new SpriteAnimation(sprite, 0, selectedFrame);
-    var bBox = new BoundingBox(_x, _y, sprite.frameWidth, sprite.image.height);
-    var x = _x;
-    var y = _y;
+    var x = foodX;
+    var y = foodY;
     var varIsEaten = false;
     var varCanDelete = false;
+    var animation = new Gamework.SpriteAnimation(sprite, 0, selectedFrame);
+    var bBox = new Gamework.BoundingBox(foodX, foodY, sprite.frameWidth,
+            sprite.image.height);
     // Function that handles updating the Food's state
     function update(FPS) {
         // If Food has been eaten then fade it out within half a second
@@ -109,17 +93,15 @@ function Food(sprite, selectedFrame, _x, _y) {
 }
 
 // Bug handles all event management and rendering tasks for Bug
-function Bug(sprite, _points, _speed, _x, _y) {
+function Bug(sprite, bugPoints, bugSpeed, bugX, bugY) {
     'use strict';
     // Module constants and variables
-    var animation = new SpriteAnimation(sprite, 10 / _speed, -1);
-    var bBox = new BoundingBox(_x, _y, sprite.frameWidth, sprite.image.height);
-    var points = _points;
-    var speed = _speed;
-    var x = _x;
-    var y = _y;
-    var defaultX = _x;
-    var defaultY = _y;
+    var points = bugPoints;
+    var speed = bugSpeed;
+    var x = bugX;
+    var y = bugY;
+    var defaultX = bugX;
+    var defaultY = bugY;
     var width = sprite.frameWidth;
     var height = sprite.image.height;
     var angle = 0;
@@ -127,6 +109,9 @@ function Bug(sprite, _points, _speed, _x, _y) {
     var moveToY = 0;
     var varIsDead = false;
     var varCanDelete = false;
+    var animation = new Gamework.SpriteAnimation(sprite, 10 / bugSpeed);
+    var bBox = new Gamework.BoundingBox(bugX, bugY, sprite.frameWidth,
+            sprite.image.height);
     // Function that handles updating the Bug's state
     function update(FPS, foodObjects) {
         // Update the Bug if it is alive
@@ -255,25 +240,22 @@ function TapTapBugGame() {
     var bugDB = {};
     var resourceIDs = {'FOOD': null, 'BACKGROUND': null};
     var gameObjects = {'BUGS': [], 'FOOD': [], 'POINTS': []};
-    var eventFunctions = {
-        'UPDATESCORE': null, 'UPDATETIME': null, 'GAMEOVER': null
-    };
-    var foodSettings = {
-        'AMOUNT': 0, 'STARTX': 0, 'ENDX': 0, 'STARTY': 0, 'ENDY': 0,
-        'SPREADX': 0, 'SPREADY': 0, 'POINTS': 0
-    };
+    var eventFunctions = {'UPDATESCORE': null, 'UPDATETIME': null,
+            'GAMEOVER': null};
+    var foodSettings = {'AMOUNT': 0, 'STARTX': 0, 'ENDX': 0, 'STARTY': 0,
+            'ENDY': 0, 'SPREADX': 0, 'SPREADY': 0, 'POINTS': 0};
     // Function that initializes TapTapBugGame
-    function init(_FPS, _ctx, _canvas, _isGamePaused) {
+    function init(framesPerSecond, canvasContext, gameCanvas, gamePaused) {
         // Set game variables
-        FPS = _FPS;
-        ctx = _ctx;
-        canvas = _canvas;
-        isGamePaused = _isGamePaused;
+        FPS = framesPerSecond;
+        ctx = canvasContext;
+        canvas = gameCanvas;
+        isGamePaused = gamePaused;
         // Set the game's background
-        var bgImage = ResourceManager.getImage(resourceIDs.BACKGROUND);
-        bgImage.onload = function () {
+        var bgImg = Gamework.ResourceManager.getImage(resourceIDs.BACKGROUND);
+        bgImg.onload = function () {
             // Create a pattern using the background Image
-            bgPattern = ctx.createPattern(bgImage, 'repeat');
+            bgPattern = ctx.createPattern(bgImg, 'repeat');
         };
         // Set the Bug spawn probability distribution
         Object.keys(bugDB).forEach(function (key) {
@@ -298,6 +280,13 @@ function TapTapBugGame() {
         setScore(0);
         spawnFood();
     }
+    var awardPoints = Gamework.Utils.once(function (food) {
+        gameObjects.FOOD.forEach(function (food) {
+            score += foodSettings.POINTS;
+            setScore(score);
+            showPointsGained(foodSettings.POINTS, food);
+        });
+    });
     // Function that handle all update tasks for TapTapBugGame
     function update() {
         // If game is not over update remaining time and spawn Bugs
@@ -313,15 +302,6 @@ function TapTapBugGame() {
         gameObjects.FOOD.forEach(function (food) {
             food.update(FPS);
             updateDeleteObject('FOOD', food);
-            // Award the player with points for any Food remaining
-            if (isGameOver & !food.isEaten()) {
-                Utils.once(function () {
-                    score += foodSettings.POINTS;
-                    setScore(score);
-                    showPointsGained(foodSettings.POINTS, food);
-                    food.setEaten();
-                }());
-            }
         });
         // Update all of the Bug objects
         gameObjects.BUGS.forEach(function (bug) {
@@ -370,16 +350,18 @@ function TapTapBugGame() {
         if (timeTicks > bugSpawnTime * FPS) {
             // Reset the Bug spawn timer
             timeTicks = 0;
-            bugSpawnTime = Utils.randomItem(bugSpawnTimes);
+            bugSpawnTime = Gamework.Utils.randomItem(bugSpawnTimes);
             // Configure the Bug using randomly chosen attributes
-            var spriteID = Utils.randomItem(bugSpwanProbs);
+            var spriteID = Gamework.Utils.randomItem(bugSpwanProbs);
             var points = bugDB[spriteID].POINTS;
             var speed = bugDB[spriteID].SPEED;
-            var sprite = ResourceManager.getSprite(spriteID);
+            var sprite = Gamework.ResourceManager.getSprite(spriteID);
             var width = sprite.frameWidth;
             var height = sprite.image.height;
-            var x = Utils.randomNumber(width, canvas.width - width);
-            var y = Utils.randomItem([0 - height, canvas.height + height]);
+            var x = Gamework.Utils.randomNumber(width, canvas.width - width);
+            var y = Gamework.Utils.randomItem(
+                [0 - height, canvas.height + height]
+            );
             // Create a new Bug using the above attributes
             gameObjects.BUGS.push(new Bug(sprite, points, speed, x, y));
         }
@@ -394,7 +376,7 @@ function TapTapBugGame() {
         var x = null;
         var y = null;
         // Obtain the Food's Sprite, frame width, height and number of frames
-        var foodSprite = ResourceManager.getSprite(resourceIDs.FOOD);
+        var foodSprite = Gamework.ResourceManager.getSprite(resourceIDs.FOOD);
         var foodWidth = foodSprite.frameWidth;
         var foodHeight = foodSprite.image.height;
         var foodFrames = foodSprite.numFrames;
@@ -408,10 +390,16 @@ function TapTapBugGame() {
         // Generate Food with specific frame index within a specific range
         while (foodCount < foodSettings.AMOUNT) {
             // Generate random positions specified by the bound variables
-            x = Utils.randomNumber(foodSettings.STARTX, foodSettings.ENDX);
-            y = Utils.randomNumber(foodSettings.STARTY, foodSettings.ENDY);
+            x = Gamework.Utils.randomNumber(
+                foodSettings.STARTX,
+                foodSettings.ENDX
+            );
+            y = Gamework.Utils.randomNumber(
+                foodSettings.STARTY,
+                foodSettings.ENDY
+            );
             // Generate a random frame index for the Food's Sprite image
-            randFrame = Utils.randomNumber(0, foodFrames - 1);
+            randFrame = Gamework.Utils.randomNumber(0, foodFrames - 1);
             // Ensure new position doesn't overlap with previous positions
             isOverlap = usedPos.some(checkFoodOverlap);
             // Create Food if there is no overlap
@@ -420,9 +408,12 @@ function TapTapBugGame() {
                 while (usedFrames.indexOf(randFrame) >= 0) {
                     // Use existing index if all frame indicies are used
                     if (usedFrames.length === foodSprite.numFrames) {
-                        randFrame = Utils.randomItem(usedFrames);
+                        randFrame = Gamework.Utils.randomItem(usedFrames);
                     } else {
-                        randFrame = Utils.randomNumber(0, foodFrames - 1);
+                        randFrame = Gamework.Utils.randomNumber(
+                            0,
+                            foodFrames - 1
+                        );
                     }
                 }
                 gameObjects.FOOD.push(new Food(foodSprite, randFrame, x, y));
@@ -435,7 +426,6 @@ function TapTapBugGame() {
             }
         }
     }
-    function mouseReleaseEvent(mouseX, mouseY){}
     // Function that handles all mouse click tasks for TapTapBugGame
     function mouseClickEvent(mouseX, mouseY) {
         // Handle mouse clicks on Bug objects
@@ -462,29 +452,19 @@ function TapTapBugGame() {
     // Function that shows points gained using PointUpText on a specific object
     function showPointsGained(points, object) {
         gameObjects.POINTS.push(
-            new PointUpText(
-                '+' + points,
-                'bold 30px Sans-serif',
-                '#B8E600',
-                1,
-                1.3,
-                object.getBox().getX() + 5,
-                object.getBox().getY() + object.getBox().getHeight()
-            )
+            new PointUpText('+' + points, 'bold 30px Sans-serif', '#B8E600', 1,
+                    1.3,
+                    object.getBox().getX() + 5,
+                    object.getBox().getY() + object.getBox().getHeight())
         );
     }
     // Function that shows points lost using PointUpText on a specific object
     function showPointsLost(points, object) {
         gameObjects.POINTS.push(
-            new PointUpText(
-                '-' + points,
-                'bold 30px Sans-serif',
-                '#FF5050',
-                1,
-                1.3,
-                object.getBox().getX() + 5,
-                object.getBox().getY() + object.getBox().getHeight()
-            )
+            new PointUpText('-' + points, 'bold 30px Sans-serif', '#FF5050', 1,
+                    1.3,
+                    object.getBox().getX() + 5,
+                    object.getBox().getY() + object.getBox().getHeight())
         );
     }
     // Function that updates the canvas cursor when hovering over a Bug
@@ -504,10 +484,12 @@ function TapTapBugGame() {
         // Game is over when the timer expires or all of the Food is eaten
         if (remainingTime < 1 || gameObjects.FOOD.length < 1) {
             isGameOver = true;
+            awardPoints();
         }
         // If game is over and all Bugs are dead then call game over event
-        if (isGameOver && gameObjects.BUGS.length < 1 &&
-            gameObjects.POINTS.length < 1) {
+        if (isGameOver &&
+                gameObjects.BUGS.length < 1 &&
+                gameObjects.POINTS.length < 1) {
             // If the timer expired then player has won
             if (remainingTime < 1) {
                 eventFunctions.GAMEOVER(score, true);
@@ -530,9 +512,8 @@ function TapTapBugGame() {
     }
     // Function that adds new info about a Bug to the Bug database
     function addBugToDB(bugSpriteID, points, speed, weight) {
-        bugDB[bugSpriteID] = {
-            'POINTS': points, 'SPEED': speed, 'WEIGHT': weight
-        };
+        bugDB[bugSpriteID] = {'POINTS': points, 'SPEED': speed,
+                'WEIGHT': weight};
     }
     // Function that sets the amount of time alloted for the game
     function setAllotedTime(allotedTime) {
@@ -613,47 +594,46 @@ function TapTapBugGame() {
         setSpriteFoodID: setSpriteFoodID,
         setBugSpawnTimes: setBugSpawnTimes,
         setGameOverEvent: setGameOverEvent,
-        mouseReleaseEvent: mouseReleaseEvent,
         setFoodSpawnRange: setFoodSpawnRange,
         setUpdateTimeEvent: setUpdateTimeEvent,
         setUpdateScoreEvent: setUpdateScoreEvent
     };
 }
 
-// Setup handles the config of the game page and behaviour of DOM elements
-function Setup() {
+// Setup configures the game page and the behaviour of DOM elements
+var Setup = (function () {
     'use strict';
     // Module constants and variables
     var FPS = 60;
-    var WIN_LS_HIGHSCORE = 'taptapbug_highscore';
+    var LOCAL_STORAGE_HIGHSCORE = 'highscore';
     // DOM element IDs
     var ID_CANVAS = '#game-canvas';
-    var ID_SCORE_LINK = '#score-link';
-    var ID_HOME_LINK = '#home-link';
+    var ID_TAB_HOME = '#home-link';
+    var ID_TEXT_TIME = '#time-text';
+    var ID_TAB_SCORE = '#score-link';
+    var ID_TEXT_SCORE = '#score-text';
+    var ID_BUTTON_PLAY = '#play-button';
     var ID_BUTTON_CLEAR = '#clear-button';
     var ID_BUTTON_RETRY = '#retry-button';
-    var ID_BUTTON_PLAY = '#play-button';
-    var ID_BUTTON_PAUSE_RESUME = '#pause-resume-button';
+    var ID_BUTTON_PAUSE = '#pause-button';
+    var ID_SECTION_HOME = '#home-section';
+    var ID_SECTION_GAME = '#game-section';
     var ID_HEADING_SCORE = '#score-heading';
-    var ID_SCORE_SECTION = '#score-section';
-    var ID_HOME_SECTION = '#home-section';
-    var ID_GAME_SECTION = '#game-section';
-    var ID_SCORE_TEXT = '#score-text';
-    var ID_TIME_TEXT = '#time-text';
-    var ID_LOST_MSG = '#game-lose-message';
-    var ID_WON_MSG = '#game-won-message';
-    // Resource element IDs
-    var IMG_BUTTON_PLAY = 'assets/button_play.png';
-    var IMG_BUTTON_PAUSE = 'assets/button_pause.png';
-    var IMG_BG = 'assets/background_table.png';
+    var ID_SECTION_SCORE = '#score-section';
+    var ID_MESSAGE_WON = '#game-won-message';
+    var ID_MESSAGE_LOST = '#game-lose-message';
+    // Resource path IDs
     var SPR_FOOD = 'assets/food_sprite.png';
-    var SPR_R_BUG = 'assets/red_bug_sprite.png';
-    var SPR_O_BUG = 'assets/orange_bug_sprite.png';
-    var SPR_G_BUG = 'assets/grey_bug_sprite.png';
+    var SPR_BUG_RED = 'assets/red_bug_sprite.png';
+    var IMG_BUTTON_PLAY = 'assets/button_play.png';
+    var SPR_BUG_GREY = 'assets/grey_bug_sprite.png';
+    var IMG_BUTTON_PAUSE = 'assets/button_pause.png';
+    var IMG_BACKGROUND = 'assets/background_table.png';
+    var SPR_BUG_ORANGE = 'assets/orange_bug_sprite.png';
     // Instance variables
-    var sys = null;
-    var game = null;
-    // Function that initializes tasks to setup the game page and DOM elements
+    var game;
+    var system;
+    // Function that initializes setup of the game page and DOM elements
     function init() {
         // Initialize all of the required components for the game
         initGameComponents();
@@ -664,14 +644,14 @@ function Setup() {
         // Configure TapTapBugGame
         configGame();
         // Initialize GameSystem
-        sys.init();
+        system.init();
     }
-    // Function that binds event functions to specific links and buttons
+    // Funtion that binds event functions to specific links and buttons
     function bindEventHandlers() {
-        $(ID_SCORE_LINK).click(function () {
+        $(ID_TAB_SCORE).click(function () {
             navScoreEvent();
         });
-        $(ID_HOME_LINK).click(function () {
+        $(ID_TAB_HOME).click(function () {
             navHomeEvent();
         });
         $(ID_BUTTON_RETRY).click(function () {
@@ -683,7 +663,7 @@ function Setup() {
         $(ID_BUTTON_PLAY).click(function () {
             playGameButtonEvent();
         });
-        $(ID_BUTTON_PAUSE_RESUME).click(function () {
+        $(ID_BUTTON_PAUSE).click(function () {
             pauseResumeButtonEvent();
         });
     }
@@ -691,15 +671,19 @@ function Setup() {
     function initGameComponents() {
         // Create new ResourceManager, GameSystem and TapTapBugGame objects
         game = new TapTapBugGame();
-        sys = new GameSystem(FPS, ID_CANVAS);
+        system = new Gamework.GameSystem(FPS, ID_CANVAS);
     }
     // Function that adds all of the game resources using the ResourceManager
     function initResources() {
-        ResourceManager.addImage('IMG_BG', IMG_BG, 387, 600);
-        ResourceManager.addSprite('SPR_FOOD', SPR_FOOD, 896, 56, 16);
-        ResourceManager.addSprite('SPR_R_BUG', SPR_R_BUG, 90, 50, 2);
-        ResourceManager.addSprite('SPR_O_BUG', SPR_O_BUG, 90, 50, 2);
-        ResourceManager.addSprite('SPR_G_BUG', SPR_G_BUG, 90, 50, 2);
+        Gamework.ResourceManager.addImage('IMG_BACKGROUND', IMG_BACKGROUND,
+                387, 600);
+        Gamework.ResourceManager.addSprite('SPR_FOOD', SPR_FOOD, 896, 56, 16);
+        Gamework.ResourceManager.addSprite('SPR_BUG_RED', SPR_BUG_RED, 90, 50,
+                2);
+        Gamework.ResourceManager.addSprite('SPR_BUG_ORANGE', SPR_BUG_ORANGE,
+                90, 50, 2);
+        Gamework.ResourceManager.addSprite('SPR_BUG_GREY', SPR_BUG_GREY, 90,
+                50, 2);
     }
     // Function that configures the games attributes
     function configGame() {
@@ -709,56 +693,56 @@ function Setup() {
         game.setFoodSpread(30, 30);
         game.setBugSpawnTimes([0.5, 0.9, 1.2]);
         game.setFoodSpawnRange(10, 320, 120, 380);
-        game.setBgImageID('IMG_BG');
+        game.setBgImageID('IMG_BACKGROUND');
         game.setSpriteFoodID('SPR_FOOD');
         game.setUpdateTimeEvent(updateTime);
         game.setGameOverEvent(gameOverEvent);
         game.setUpdateScoreEvent(updateScore);
-        game.addBugToDB('SPR_R_BUG', 3, 2.5, 0.3);
-        game.addBugToDB('SPR_O_BUG', 1, 1.5, 0.5);
-        game.addBugToDB('SPR_G_BUG', 5, 4, 0.2);
-        sys.connectGame(game);
+        game.addBugToDB('SPR_BUG_RED', 3, 2.5, 0.3);
+        game.addBugToDB('SPR_BUG_ORANGE', 1, 1.5, 0.5);
+        game.addBugToDB('SPR_BUG_GREY', 5, 4, 0.2);
+        system.connectGame(game);
     }
     // Function that updates the score text
     function updateScore(score) {
-        $(ID_SCORE_TEXT).text('Score: ' + score);
+        $(ID_TEXT_SCORE).text('Score: ' + score);
     }
     // Function that updates the time text
     function updateTime(time) {
-        $(ID_TIME_TEXT).text('Time: ' + time);
+        $(ID_TEXT_TIME).text('Time: ' + time);
     }
     // Function that handles events for when TapTapBugGame is finished
     function gameOverEvent(score, isWin) {
         // Stop the GameSystem
-        sys.stop();
+        system.stop();
         // Navigate to score page
         navScoreEvent();
         // Hide the game page section and show the retry button
-        $(ID_GAME_SECTION).hide();
+        $(ID_SECTION_GAME).hide();
         $(ID_BUTTON_RETRY).show();
         // If user has won display win message, otherwise display lose message
         if (isWin) {
-            $(ID_WON_MSG).show();
+            $(ID_MESSAGE_WON).show();
             // saves score to local storage if it's larger than previous score
             if (score > getScore()) {
-                window.localStorage.setItem(WIN_LS_HIGHSCORE, score);
+                window.localStorage.setItem(LOCAL_STORAGE_HIGHSCORE, score);
                 // Update high score heading
                 $(ID_HEADING_SCORE).text('New High Score: ' + score);
             }
         } else {
-            $(ID_LOST_MSG).show();
+            $(ID_MESSAGE_LOST).show();
         }
     }
     // Function that handles the events for the score navigation link
     function navScoreEvent() {
         // Call events if game is not running
-        if (!sys.isActive()) {
+        if (!system.isActive()) {
             // Set score link item to active and home link item to inactive
-            $(ID_SCORE_LINK).addClass('active');
-            $(ID_HOME_LINK).removeClass('active');
+            $(ID_TAB_SCORE).addClass('active');
+            $(ID_TAB_HOME).removeClass('active');
             // Hide the home page section and show the score page section
-            $(ID_HOME_SECTION).hide();
-            $(ID_SCORE_SECTION).show();
+            $(ID_SECTION_HOME).hide();
+            $(ID_SECTION_SCORE).show();
             // Refresh displayed score
             refreshScore();
         }
@@ -766,16 +750,16 @@ function Setup() {
     // Function that handles the events for the home navigation link
     function navHomeEvent() {
         // Call events if game is not running
-        if (!sys.isActive()) {
+        if (!system.isActive()) {
             // Set home link item to active and score link item to inactive
-            $(ID_HOME_LINK).addClass('active');
-            $(ID_SCORE_LINK).removeClass('active');
+            $(ID_TAB_HOME).addClass('active');
+            $(ID_TAB_SCORE).removeClass('active');
             // Hide the score page section and show the home page section
-            $(ID_SCORE_SECTION).hide();
-            $(ID_HOME_SECTION).show();
+            $(ID_SECTION_SCORE).hide();
+            $(ID_SECTION_HOME).show();
             // Hide the win and lose messages and the retry button
-            $(ID_WON_MSG).hide();
-            $(ID_LOST_MSG).hide();
+            $(ID_MESSAGE_WON).hide();
+            $(ID_MESSAGE_LOST).hide();
             $(ID_BUTTON_RETRY).hide();
         }
     }
@@ -787,25 +771,25 @@ function Setup() {
     // Function that handles the events for the play game button
     function playGameButtonEvent() {
         // Hide the home page section and show the game page section
-        $(ID_HOME_SECTION).hide();
-        $(ID_GAME_SECTION).show();
+        $(ID_SECTION_HOME).hide();
+        $(ID_SECTION_GAME).show();
         // Start the GameSystem
-        sys.start();
+        system.start();
     }
     // Function that handles the events for the pause / resume button
     function pauseResumeButtonEvent() {
         // Pause the game if the game is running and resume if game is paused
-        sys.togglePause();
+        system.togglePause();
         // Change the image of the button depending on the state of the game
-        if (sys.isPaused()) {
-            $(ID_BUTTON_PAUSE_RESUME + ' img').attr('src', IMG_BUTTON_PLAY);
+        if (system.isPaused()) {
+            $(ID_BUTTON_PAUSE + ' img').attr('src', IMG_BUTTON_PLAY);
         } else {
-            $(ID_BUTTON_PAUSE_RESUME + ' img').attr('src', IMG_BUTTON_PAUSE);
+            $(ID_BUTTON_PAUSE + ' img').attr('src', IMG_BUTTON_PAUSE);
         }
     }
     // Function that handles the events for the clear score button
     function clearScoreButtonEvent() {
-        window.localStorage.removeItem(WIN_LS_HIGHSCORE);
+        window.localStorage.removeItem(LOCAL_STORAGE_HIGHSCORE);
         // Refresh displayed score
         refreshScore();
     }
@@ -817,15 +801,14 @@ function Setup() {
     // Function that return the highscore entry from local storage
     function getScore() {
         // Obtain the score, use 0 if score does not exist
-        var rawScore = window.localStorage.getItem(WIN_LS_HIGHSCORE);
+        var rawScore = window.localStorage.getItem(LOCAL_STORAGE_HIGHSCORE);
         return rawScore || 0;
     }
     // Functions returned by the module
     return {
         init: init
     };
-}
+}());
 
-// Setup the game page and DOM element events
-var setup = new Setup();
-window.onload = setup.init;
+// Trigger the game setup when the browser window loads
+window.onload = Setup.init;
