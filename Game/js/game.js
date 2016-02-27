@@ -4,160 +4,119 @@ strict:true, unused:true, undef:true*/
 /*global $, window, Gamework*/
 
 // PointUpText draws text which scrolls upwards and fades out
-function PointUpText(text, font, colour, moveSpeed, fadeSpeed, textX, textY) {
+function PointUpText(text, font, colour, moveSpeed, fadeSpeed, x, y) {
     'use strict';
-    // Module constants and variables
-    var x = textX;
-    var y = textY;
-    var speed = moveSpeed;
-    var varCanDelete = false;
-    var fadingText = new Gamework.FadingText(text, font, colour, fadeSpeed);
-    fadingText.setOutline('black', 6);
+    // Module constnts and variables
+    var superModule = new Gamework.GameObject();
+    var _this = this;
+    _this.x = x;
+    _this.y = y;
+    _this.moveSpeed = moveSpeed;
+    _this.fadingText = new Gamework.FadingText(text, font, colour, fadeSpeed);
+    _this.fadingText.setOutline('black', 6);
     // Function that updates the PointUpText
-    function update(FPS) {
-        // Move the PointUpText upwards
-        y -= speed;
-        fadingText.update(FPS);
-        // If text jas faded then set delete flag to true
-        if (fadingText.getOpacity() === 0) {
-            varCanDelete = true;
+    superModule.update = function (FPS) {
+        // Move the PointUpText upwards (towards the top of the screen)
+        _this.y -= _this.moveSpeed;
+        _this.fadingText.update(FPS);
+        // If the text has faded then set delete flag to true
+        if (_this.fadingText.getOpacity() === 0) {
+            superModule.flagToDelete();
         }
-    }
-    // Function that renders the PointUpText
-    function render(ctx) {
-        fadingText.render(ctx, x, y, 0);
-    }
-    // Function that returns true if object can be deleted, false otherwise
-    function canDelete() {
-        return varCanDelete;
-    }
-    // Functions returned by the module
-    return {
-        update: update,
-        render: render,
-        canDelete: canDelete
     };
+    // Function that renders the PointUpText
+    superModule.render = function (ctx) {
+        _this.fadingText.render(ctx, _this.x, _this.y, 0);
+    };
+    // Function returned by the module
+    return superModule;
 }
 
 // Food handles event management and rendering tasks for Food
-function Food(sprite, selectedFrame, foodX, foodY) {
+function Food(sprite, selectedFrame, x, y) {
     'use strict';
     // Module constants and variables
-    var x = foodX;
-    var y = foodY;
-    var varIsEaten = false;
-    var varCanDelete = false;
-    var animation = new Gamework.SpriteAnimation(sprite, 0, selectedFrame);
-    var bBox = new Gamework.BoundingBox(foodX, foodY, sprite.frameWidth,
+    var superModule = new Gamework.GameObject();
+    var _this = this;
+    _this.x = x;
+    _this.y = y;
+    _this.isEaten = false;
+    _this.animation = new Gamework.SpriteAnimation(sprite, 0, selectedFrame);
+    _this.bBox = new Gamework.BoundingBox(x, y, sprite.frameWidth,
             sprite.image.height);
     // Function that handles updating the Food's state
-    function update(FPS) {
+    superModule.update = function (FPS) {
         // If Food has been eaten then fade it out within half a second
-        if (varIsEaten) {
-            animation.reduceOpacity(FPS, 0.5);
-            // Set the Food delete flag to true once the Food has faded
-            if (animation.getOpacity() === 0) {
-                varCanDelete = true;
+        if (_this.isEaten) {
+            _this.animation.reduceOpacity(FPS, 0.5);
+            // Set the Food delete flag once the Food has faded
+            if (_this.animation.getOpacity() === 0) {
+                superModule.flagToDelete();
             }
         }
-    }
-    // Function that handles drawing the Object
-    function render(ctx) {
-        animation.render(ctx, x, y, 0);
-    }
-    // Function that returns if the Food has been eaten
-    function isEaten() {
-        return varIsEaten;
-    }
-    // Function that sets the state of the Food to eaten
-    function setEaten() {
-        varIsEaten = true;
-    }
-    // Function that returns true if Food can be deleted, false otherwise
-    function canDelete() {
-        return varCanDelete;
-    }
-    // Function that returns the Food's bounding box
-    function getBox() {
-        return bBox;
-    }
-    // Functions returned by the module
-    return {
-        getBox: getBox,
-        update: update,
-        render: render,
-        isEaten: isEaten,
-        setEaten: setEaten,
-        canDelete: canDelete
     };
+    // Function that handles drawing the Object
+    superModule.render = function (ctx) {
+        _this.animation.render(ctx, _this.x, _this.y, 0);
+    };
+    // Function that returns if the Food has been eaten
+    superModule.isEaten = function () {
+        return _this.isEaten;
+    };
+    // Function that sets the state of the Food to eaten
+    superModule.setEaten = function () {
+        _this.isEaten = true;
+    };
+    // Function that returns the Food's bounding box
+    superModule.getBox = function () {
+        return _this.bBox;
+    };
+    // Function returned by the module
+    return superModule;
 }
 
 // Bug handles all event management and rendering tasks for Bug
-function Bug(sprite, bugPoints, bugSpeed, bugX, bugY) {
+function Bug(sprite, points, speed, x, y) {
     'use strict';
     // Module constants and variables
-    var points = bugPoints;
-    var speed = bugSpeed;
-    var x = bugX;
-    var y = bugY;
-    var defaultX = bugX;
-    var defaultY = bugY;
-    var width = sprite.frameWidth;
-    var height = sprite.image.height;
-    var angle = 0;
-    var moveToX = 0;
-    var moveToY = 0;
-    var varIsDead = false;
-    var varCanDelete = false;
-    var animation = new Gamework.SpriteAnimation(sprite, 10 / bugSpeed);
-    var bBox = new Gamework.BoundingBox(bugX, bugY, sprite.frameWidth,
+    var superModule = new Gamework.GameObject();
+    var _this = this;
+    _this.x = x;
+    _this.y = y;
+    _this.angle = 0;
+    _this.moveToX = 0;
+    _this.moveToY = 0;
+    _this.speed = speed;
+    _this.isDead = false;
+    _this.points = points;
+    _this.width = sprite.frameWidth;
+    _this.height = sprite.image.height;
+    _this.animation = new Gamework.SpriteAnimation(sprite, 10 / speed);
+    _this.bBox = new Gamework.BoundingBox(x, y, sprite.frameWidth,
             sprite.image.height);
-    // Function that handles updating the Bug's state
-    function update(FPS, foodObjects) {
-        // Update the Bug if it is alive
-        if (!varIsDead) {
-            // Move the Bug to a specific target position
-            moveBugToFood(foodObjects);
-            // Update the Bug's animation
-            animation.update(FPS);
-            // Update the bounding box
-            bBox.update(x, y);
-        } else {
-            // Fade the Bug within 2 seconds
-            animation.reduceOpacity(FPS, 2);
-            // Set the Bug delete flag to true once the Bug has faded
-            if (animation.getOpacity() === 0) {
-                varCanDelete = true;
-            }
-        }
-    }
-    // Function that handles drawing the Bug
-    function render(ctx) {
-        animation.render(ctx, x, y, angle);
-    }
     // Function that moves the Bug's position to a specific target point
     function moveToPoint(targetX, targetY) {
         // Calculate the distance to the target point
-        var distX = targetX - x - (width / 2);
-        var distY = targetY - y - (height / 2);
+        var distX = targetX - _this.x - (_this.width / 2);
+        var distY = targetY - _this.y - (_this.height / 2);
         // Calculate the hypotenuse
         var hypotenuse = Math.sqrt(Math.pow(distX, 2) + Math.pow(distY, 2));
-        distX = distX / hypotenuse;
-        distY = distY / hypotenuse;
+        distX /= hypotenuse;
+        distY /= hypotenuse;
         // Move towards point
-        x = x + (distX * speed);
-        y = y + (distY * speed);
+        _this.x += distX * speed;
+        _this.y += distY * speed;
         // Update the Bug's angle depending on the movement direction
-        angle = Math.atan2(distY, distX);
+        _this.angle = Math.atan2(distY, distX);
     }
     // Function that moves the Bug to the position of the nearest Food
     function moveBugToFood(foodObjects) {
         var shortestDistance = Number.MAX_VALUE;
         // If there is no avaliable Food to eat then move outside the table
         if (foodObjects.length === 1 && foodObjects[0].isEaten()) {
-            // Set the Bug move coordinates to its spawning point
-            moveToX = defaultX;
-            moveToY = defaultY;
+            // Set the Bug move coordinates to the initial instance coordinates
+            _this.moveToX = x;
+            _this.moveToY = y;
         } else {
             // Find the nearest piece of Food from the Bug's current position
             foodObjects.forEach(function (food) {
@@ -176,46 +135,57 @@ function Bug(sprite, bugPoints, bugSpeed, bugX, bugY) {
                     // If hypotenuse is shorter than current shortest distance
                     if (hypotenuse < shortestDistance) {
                         // Set mouse move coordinates to Food's position
-                        moveToX = foodX;
-                        moveToY = foodY;
+                        _this.moveToX = foodX;
+                        _this.moveToY = foodY;
                         shortestDistance = hypotenuse;
                     }
                 }
             });
         }
         // Move the Bug to a specific position
-        moveToPoint(moveToX, moveToY);
+        moveToPoint(_this.moveToX, _this.moveToY);
     }
-    // Function that returns the Bug's delete flag
-    function canDelete() {
-        return varCanDelete;
-    }
-    // Function that sets the state of the Bug to dead
-    function setDead() {
-        varIsDead = true;
-    }
-    // Function that returns if the Bug has been killed
-    function isDead() {
-        return varIsDead;
-    }
-    // Return the number of points the Bug is worth
-    function getPoints() {
-        return points;
-    }
-    // Function that returns the Bug's bounding box
-    function getBox() {
-        return bBox;
-    }
-    // Functions returned by the module
-    return {
-        getBox: getBox,
-        update: update,
-        render: render,
-        isDead: isDead,
-        setDead: setDead,
-        getPoints: getPoints,
-        canDelete: canDelete
+    // Function that handles updating the Bug's state
+    superModule.update = function (FPS, foodObjects) {
+        // Update the Bug if it is alive
+        if (!_this.isDead) {
+            // Move the Bug to a specific target position
+            moveBugToFood(foodObjects);
+            // Update the Bug's animation
+            _this.animation.update(FPS);
+            // Update the bounding box position
+            _this.bBox.update(_this.x, _this.y);
+        } else {
+            // Fade the Bug within 2 seconds
+            _this.animation.reduceOpacity(FPS, 2);
+            // Set the Bug delete flag once the Bug has faded
+            if (_this.animation.getOpacity() === 0) {
+                superModule.flagToDelete();
+            }
+        }
     };
+    // Function that handles drawing the Bug
+    superModule.render = function (ctx) {
+        _this.animation.render(ctx, _this.x, _this.y, _this.angle);
+    };
+    // Function that returns the Food's bounding box
+    superModule.getBox = function () {
+        return _this.bBox;
+    };
+    // Function that sets the state of the Bug to dead
+    superModule.setDead = function () {
+        _this.isDead = true;
+    };
+    // Function that returns if the Bug has been killed
+    superModule.isDead = function () {
+        return _this.isDead;
+    };
+    // Return the number of points the Bug is worth
+    superModule.getPoints = function () {
+        return _this.points;
+    };
+    // Function returned by the module
+    return superModule;
 }
 
 // TapTapBugGame handles event management and rendering tasks for TapTapBugGame

@@ -4,8 +4,8 @@ strict:true, unused:false, undef:true*/
 /*global $*/
 
 /**
-* Gameworks is a 2D game development framework used to develop 2D games in
-* JavaScript on the HTML5 canvas.
+* Gamework is a 2D game development module based framework used to develop 2D
+* games in JavaScript on the HTML5 canvas.
 *
 * @author Salinder Sidhu
 * @namespace Gamework
@@ -532,6 +532,73 @@ var Gamework = (function () {
         };
     }
     /**
+    * The GameObject module acts as an abstract object to build objects for a
+    * game with abstract methods for updating and rendering the objects.
+    *
+    * @abstract
+    * @author Salinder Sidhu
+    * @module GameObject
+    */
+    function GameObject() {
+        // Module constants and variables
+        var _this = this;
+        _this.canDelete = false;
+        /**
+        * Abstract function that updates the GameObject. This function needs to
+        * be overriden.
+        *
+        * @abstract
+        * @function update
+        */
+        function update() {
+            throw new Error('Cannot call abstract function!');
+        }
+        /**
+        * Abstract function that renders the GameObject. This function needs to
+        * be overriden.
+        *
+        * @abstract
+        * @function render
+        */
+        function render() {
+            throw new Error('Cannot call abstract function!');
+        }
+        /**
+        * Return true if the GameObject can be deleted, false otherwise.
+        *
+        * @function canDelete
+        * @return {boolean}
+        */
+        function canDelete() {
+            return _this.canDelete;
+        }
+        /**
+        * Flag the GameObject to be deleted.
+        *
+        * @function flagToDelete
+        */
+        function flagToDelete() {
+            _this.canDelete = true;
+        }
+        /**
+        * Return the GameObject's collision BoundingBox.
+        *
+        * @function getBox
+        * @return {object} GameObject's BoundingBox.
+        */
+        function getBox() {
+            return _this.boundingBox;
+        }
+        // Functions returned by the module
+        return {
+            update: update,
+            render: render,
+            getBox: getBox,
+            canDelete: canDelete,
+            flagToDelete: flagToDelete
+        };
+    }
+    /**
     * The GameSystem module provides functions for handling the core game
     * events, general game management and rendering tasks.
     *
@@ -687,6 +754,7 @@ var Gamework = (function () {
     return {
         Utils: Utils,
         Sprite: Sprite,
+        GameObject: GameObject,
         GameSystem: GameSystem,
         FadingText: FadingText,
         BoundingBox: BoundingBox,
