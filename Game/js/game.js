@@ -1,18 +1,18 @@
 /*jshint browser:true, jquery:true, quotmark:single, maxlen:80, eqeqeq:true,
 strict:true, unused:true, undef:true*/
 /*jslint browser:true, this:true, maxlen:80*/
-/*global $, window, Gamework*/
+/*global $, window, GW*/
 
 // PointUpText draws text which scrolls upwards and fades out
 function PointUpText(text, font, colour, moveSpeed, fadeSpeed, x, y) {
     'use strict';
     // Module constnts and variables
-    var superModule = new Gamework.GameObject();
+    var superModule = new GW.GameObject();
     var _this = this;
     _this.x = x;
     _this.y = y;
     _this.moveSpeed = moveSpeed;
-    _this.fadingText = new Gamework.FadingText(text, font, colour, fadeSpeed);
+    _this.fadingText = new GW.FadingText(text, font, colour, fadeSpeed);
     _this.fadingText.setOutline('black', 6);
     // Function that updates the PointUpText
     superModule.update = function (FPS) {
@@ -36,13 +36,13 @@ function PointUpText(text, font, colour, moveSpeed, fadeSpeed, x, y) {
 function Food(sprite, selectedFrame, x, y) {
     'use strict';
     // Module constants and variables
-    var superModule = new Gamework.GameObject();
+    var superModule = new GW.GameObject();
     var _this = this;
     _this.x = x;
     _this.y = y;
     _this.isEaten = false;
-    _this.animation = new Gamework.SpriteAnimation(sprite, 0, selectedFrame);
-    _this.bBox = new Gamework.BoundingBox(x, y, sprite.frameWidth,
+    _this.animation = new GW.SpriteAnimation(sprite, 0, selectedFrame);
+    _this.bBox = new GW.BoundingBox(x, y, sprite.frameWidth,
             sprite.image.height);
     // Function that handles updating the Food's state
     superModule.update = function (FPS) {
@@ -79,7 +79,7 @@ function Food(sprite, selectedFrame, x, y) {
 function Bug(sprite, points, speed, x, y) {
     'use strict';
     // Module constants and variables
-    var superModule = new Gamework.GameObject();
+    var superModule = new GW.GameObject();
     var _this = this;
     _this.x = x;
     _this.y = y;
@@ -91,8 +91,8 @@ function Bug(sprite, points, speed, x, y) {
     _this.points = points;
     _this.width = sprite.frameWidth;
     _this.height = sprite.image.height;
-    _this.animation = new Gamework.SpriteAnimation(sprite, 10 / speed);
-    _this.bBox = new Gamework.BoundingBox(x, y, sprite.frameWidth,
+    _this.animation = new GW.SpriteAnimation(sprite, 10 / speed);
+    _this.bBox = new GW.BoundingBox(x, y, sprite.frameWidth,
             sprite.image.height);
     // Function that moves the Bug's position to a specific target point
     function moveToPoint(targetX, targetY) {
@@ -222,7 +222,7 @@ function TapTapBugGame() {
         canvas = gameCanvas;
         isGamePaused = gamePaused;
         // Set the game's background
-        var bgImg = Gamework.ResourceManager.getImage(resourceIDs.BACKGROUND);
+        var bgImg = GW.ResourceManager.getImage(resourceIDs.BACKGROUND);
         bgImg.onload = function () {
             // Create a pattern using the background Image
             bgPattern = ctx.createPattern(bgImg, 'repeat');
@@ -250,7 +250,7 @@ function TapTapBugGame() {
         setScore(0);
         spawnFood();
     }
-    var awardPoints = Gamework.Utils.once(function () {
+    var awardPoints = GW.Utils.once(function () {
         gameObjects.FOOD.forEach(function (food) {
             score += foodSettings.POINTS;
             setScore(score);
@@ -320,18 +320,16 @@ function TapTapBugGame() {
         if (timeTicks > bugSpawnTime * FPS) {
             // Reset the Bug spawn timer
             timeTicks = 0;
-            bugSpawnTime = Gamework.Utils.randomItem(bugSpawnTimes);
+            bugSpawnTime = GW.Utils.randomItem(bugSpawnTimes);
             // Configure the Bug using randomly chosen attributes
-            var spriteID = Gamework.Utils.randomItem(bugSpwanProbs);
+            var spriteID = GW.Utils.randomItem(bugSpwanProbs);
             var points = bugDB[spriteID].POINTS;
             var speed = bugDB[spriteID].SPEED;
-            var sprite = Gamework.ResourceManager.getSprite(spriteID);
+            var sprite = GW.ResourceManager.getSprite(spriteID);
             var width = sprite.frameWidth;
             var height = sprite.image.height;
-            var x = Gamework.Utils.randomNumber(width, canvas.width - width);
-            var y = Gamework.Utils.randomItem(
-                [0 - height, canvas.height + height]
-            );
+            var x = GW.Utils.randomNumber(width, canvas.width - width);
+            var y = GW.Utils.randomItem([0 - height, canvas.height + height]);
             // Create a new Bug using the above attributes
             gameObjects.BUGS.push(new Bug(sprite, points, speed, x, y));
         }
@@ -346,7 +344,7 @@ function TapTapBugGame() {
         var x = null;
         var y = null;
         // Obtain the Food's Sprite, frame width, height and number of frames
-        var foodSprite = Gamework.ResourceManager.getSprite(resourceIDs.FOOD);
+        var foodSprite = GW.ResourceManager.getSprite(resourceIDs.FOOD);
         var foodWidth = foodSprite.frameWidth;
         var foodHeight = foodSprite.image.height;
         var foodFrames = foodSprite.numFrames;
@@ -360,16 +358,10 @@ function TapTapBugGame() {
         // Generate Food with specific frame index within a specific range
         while (foodCount < foodSettings.AMOUNT) {
             // Generate random positions specified by the bound variables
-            x = Gamework.Utils.randomNumber(
-                foodSettings.STARTX,
-                foodSettings.ENDX
-            );
-            y = Gamework.Utils.randomNumber(
-                foodSettings.STARTY,
-                foodSettings.ENDY
-            );
+            x = GW.Utils.randomNumber(foodSettings.STARTX, foodSettings.ENDX);
+            y = GW.Utils.randomNumber(foodSettings.STARTY, foodSettings.ENDY);
             // Generate a random frame index for the Food's Sprite image
-            randFrame = Gamework.Utils.randomNumber(0, foodFrames - 1);
+            randFrame = GW.Utils.randomNumber(0, foodFrames - 1);
             // Ensure new position doesn't overlap with previous positions
             isOverlap = usedPos.some(checkFoodOverlap);
             // Create Food if there is no overlap
@@ -378,12 +370,9 @@ function TapTapBugGame() {
                 while (usedFrames.indexOf(randFrame) >= 0) {
                     // Use existing index if all frame indicies are used
                     if (usedFrames.length === foodSprite.numFrames) {
-                        randFrame = Gamework.Utils.randomItem(usedFrames);
+                        randFrame = GW.Utils.randomItem(usedFrames);
                     } else {
-                        randFrame = Gamework.Utils.randomNumber(
-                            0,
-                            foodFrames - 1
-                        );
+                        randFrame = GW.Utils.randomNumber(0, foodFrames - 1);
                     }
                 }
                 gameObjects.FOOD.push(new Food(foodSprite, randFrame, x, y));
@@ -641,19 +630,17 @@ var Setup = (function () {
     function initGameComponents() {
         // Create new ResourceManager, GameSystem and TapTapBugGame objects
         game = new TapTapBugGame();
-        system = new Gamework.GameSystem(FPS, ID_CANVAS);
+        system = new GW.GameSystem(FPS, ID_CANVAS);
     }
     // Function that adds all of the game resources using the ResourceManager
     function initResources() {
-        Gamework.ResourceManager.addImage('IMG_BACKGROUND', IMG_BACKGROUND,
-                387, 600);
-        Gamework.ResourceManager.addSprite('SPR_FOOD', SPR_FOOD, 896, 56, 16);
-        Gamework.ResourceManager.addSprite('SPR_BUG_RED', SPR_BUG_RED, 90, 50,
+        GW.ResourceManager.addImage('IMG_BACKGROUND', IMG_BACKGROUND, 387,
+                600);
+        GW.ResourceManager.addSprite('SPR_FOOD', SPR_FOOD, 896, 56, 16);
+        GW.ResourceManager.addSprite('SPR_BUG_RED', SPR_BUG_RED, 90, 50, 2);
+        GW.ResourceManager.addSprite('SPR_BUG_ORANGE', SPR_BUG_ORANGE, 90, 50,
                 2);
-        Gamework.ResourceManager.addSprite('SPR_BUG_ORANGE', SPR_BUG_ORANGE,
-                90, 50, 2);
-        Gamework.ResourceManager.addSprite('SPR_BUG_GREY', SPR_BUG_GREY, 90,
-                50, 2);
+        GW.ResourceManager.addSprite('SPR_BUG_GREY', SPR_BUG_GREY, 90, 50, 2);
     }
     // Function that configures the games attributes
     function configGame() {

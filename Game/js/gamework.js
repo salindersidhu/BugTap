@@ -10,7 +10,7 @@ strict:true, unused:false, undef:true*/
 * @author Salinder Sidhu
 * @namespace Gamework
 */
-var Gamework = (function () {
+var GW = (function () {
     'use strict';
     /**
     * Sprite represents a sprite sheet image. A single image consisting of
@@ -532,8 +532,8 @@ var Gamework = (function () {
         };
     }
     /**
-    * The GameObject module acts as an abstract object to build objects for a
-    * game with abstract methods for updating and rendering the objects.
+    * The GameObject module acts as an abstract object used to build objects
+    * for a game with abstract methods for updating and rendering the objects.
     *
     * @abstract
     * @author Salinder Sidhu
@@ -542,6 +542,7 @@ var Gamework = (function () {
     function GameObject() {
         // Module constants and variables
         var _this = this;
+        _this.drawPriority = 0;
         _this.canDelete = false;
         /**
         * Abstract function that updates the GameObject. This function needs to
@@ -584,10 +585,29 @@ var Gamework = (function () {
         * Return the GameObject's collision BoundingBox.
         *
         * @function getBox
-        * @return {object} GameObject's BoundingBox.
+        * @return {object} The GameObject's BoundingBox.
         */
         function getBox() {
             return _this.boundingBox;
+        }
+        /**
+        * Return the GameObject's draw priority value.
+        *
+        * @function getDrawPriority
+        * @return {number} The GameObject's draw priority value.
+        */
+        function getDrawPriority() {
+            return _this.drawPriority;
+        }
+        /**
+        * Set the value of the GameObject's draw priority.
+        *
+        * @function setDrawPriority
+        * @param {number} drawPriority The new value of the GameObject's draw
+        * priority.
+        */
+        function setDrawPriority(drawPriority) {
+            _this.drawPriority = drawPriority;
         }
         // Functions returned by the module
         return {
@@ -595,7 +615,9 @@ var Gamework = (function () {
             render: render,
             getBox: getBox,
             canDelete: canDelete,
-            flagToDelete: flagToDelete
+            flagToDelete: flagToDelete,
+            getDrawPriority: getDrawPriority,
+            setDrawPriority: setDrawPriority
         };
     }
     /**
@@ -750,8 +772,143 @@ var Gamework = (function () {
             togglePause: togglePause
         };
     }
-    // Modules returned by the framework
+    /**
+    * The Game module acts as an abstract module used to build a Game object
+    * that manages the control, update and rendering of the game.
+    *
+    * @abstract
+    * @author Salinder Sidhu
+    * @module Game
+    */
+    function Game(ctx, canvas, FPS) {
+        // Module constants and variables
+        var _this = this;
+        _this.ctx = ctx;
+        _this.FPS = FPS;
+        _this.canvas = canvas;
+        _this.gameObjects = {};
+        _this.customUpdate = null;
+        _this.customRender = null;
+        /**
+        * Abstract function that initializes the Game. This function needs to
+        * be overriden.
+        *
+        * @abstract
+        * @function init
+        */
+        function init() {
+            throw new Error('Cannot call abstract function!');
+        }
+        /**
+        * Abstract function that resets the Game. This function needs to be
+        * overriden.
+        *
+        * @abstract
+        * @function reset
+        */
+        function reset() {
+            throw new Error('Cannot call abstract function!');
+        }
+        /**
+        * Delete a conrete GameObject from the Game if it is flaged for
+        * removal.
+        *
+        * @private
+        * @function handleDelete
+        * @param {object} gameObject The concrete GameObject.
+        * @param {string} type The concrete GameObject's type.
+        */
+        function handleDelete(gameObject, type) {
+            if (gameObject.canDelete()) {
+                _this.gameObjects[type].splice(
+                    _this.gameObjects[type].indexof(gameObject),
+                    1
+                );
+            }
+        }
+        /**
+        * Update the game and call the custom update function if a custom
+        * update function is connected to the game.
+        *
+        * @function update
+        */
+        function update() {
+            // Call the custom update function if it is defined
+            if (_this.customUpdate) {
+                _this.customUpdate();
+            }
+            // Update all of the GameObjects and handle GameObject deletion
+            Object.keys(_this.gameObjects).forEach(function (type) {
+                _this.gameObjects[type].forEach(function (obj) {
+                    obj.update(FPS);
+                    handleDelete(obj, type);
+                });
+            });
+        }
+        /**
+        * Render the game and call the custom render function if a custom
+        * render function is connected to the Game.
+        *
+        * @function render
+        */
+        function render() {
+            // Clear the canvas prior to rendering
+            _this.ctx.clearRect(0, 0, _this.canvas.width, _this.canvas.height);
+            // Call the custom render function if it is defined
+            if (_this.customRender) {
+                _this.customRender();
+            }
+            // Render all of the GameObjects in order of their render priority
+            $.map(_this.gameObjects, function (value) {
+                return value;
+            }).sort(function (gameObjA, gameObjB) {
+                return gameObjA.getDrawPriority() - gameObjB.getDrawPriority();
+            }).forEach(function (obj) {
+                obj.render(_this.ctx);
+            });
+        }
+        /**
+        * Add a concrete GameObject with a specific type to the Game.
+        *
+        * @function addGameObject
+        * @param {object} gameObject The concrete GameObject.
+        * @param {string} type The concrete GameObject's type.
+        */
+        function addGameObject(gameObject, type) {
+            _this.gameObjects[type].push(gameObject);
+        }
+        /**
+        * Connect a custom update function to the Game.
+        *
+        * @function connectCustomUpdate
+        * @param {function} customUpdate The custom update function.
+        */
+        function connectCustomUpdate(customUpdate) {
+            _this.customUpdate = customUpdate;
+        }
+        /**
+        * Connect a custom render function to the Game.
+        *
+        * @function connectCustomRender
+        * @param {function} customRender The custom render function.
+        */
+        function connectCustomRender(customRender) {
+            _this.customRender = customRender;
+        }
+        // Functions returned by the module
+        return {
+            init: init,
+            reset: reset,
+            update: update,
+            render: render,
+            addGameObject: addGameObject,
+            connectCustomRender: connectCustomRender,
+            connectCustomUpdate: connectCustomUpdate
+        };
+    }
+    // Modules returned by GameWork
     return {
+        Game: Game,
         Utils: Utils,
         Sprite: Sprite,
         GameObject: GameObject,
