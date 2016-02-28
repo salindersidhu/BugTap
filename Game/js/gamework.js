@@ -548,6 +548,7 @@ var GW = (function () {
         *
         * @abstract
         * @function update
+        * @throws {Error} Abstract function.
         */
         function update() {
             throw new Error('Cannot call abstract function!');
@@ -558,6 +559,7 @@ var GW = (function () {
         *
         * @abstract
         * @function render
+        * @throws {Error} Abstract function.
         */
         function render() {
             throw new Error('Cannot call abstract function!');
@@ -804,6 +806,7 @@ var GW = (function () {
     * The Game module acts as an abstract module used to build a Game object
     * that manages the control, update and rendering of the game.
     *
+    * @abstract
     * @author Salinder Sidhu
     * @module Game
     */
@@ -826,7 +829,7 @@ var GW = (function () {
             _this.canvas = canvas;
             // Call the custom init function if it is defined
             if (_this.customInit) {
-                _this.customInit();
+                _this.customInit(_this.ctx);
             }
         }
         /**
@@ -836,14 +839,14 @@ var GW = (function () {
         * @function reset
         */
         function reset() {
-            // Call the custom reset function if it is defined
-            if (_this.customReset) {
-                _this.customReset();
-            }
             // Clear all the GameObjects
             Object.keys(_this.gameObjects).forEach(function (type) {
                 _this.gameObjects[type] = [];
             });
+            // Call the custom reset function if it is defined
+            if (_this.customReset) {
+                _this.customReset();
+            }
         }
         /**
         * Delete a conrete GameObject from the Game if it is flaged for
@@ -892,7 +895,7 @@ var GW = (function () {
             _this.ctx.clearRect(0, 0, _this.canvas.width, _this.canvas.height);
             // Call the custom render function if it is defined
             if (_this.customRender) {
-                _this.customRender();
+                _this.customRender(_this.ctx, _this.canvas);
             }
             // Render all of the GameObjects in order of their render priority
             $.map(_this.gameObjects, function (value) {
@@ -949,6 +952,39 @@ var GW = (function () {
         function connectCustomRender(customRender) {
             _this.customRender = customRender;
         }
+        /**
+        * Abstract function that defines the Game's mouse click event. This
+        * function needs to be overriden.
+        *
+        * @abstract
+        * @function mouseClickEvent
+        * @throws {Error} Abstract function.
+        */
+        function mouseClickEvent() {
+            throw new Error('Cannot call abstract function!');
+        }
+        /**
+        * Abstract function that defines the Game's mouse release event. This
+        * function needs to be overriden.
+        *
+        * @abstract
+        * @function mouseReleaseEvent
+        * @throws {Error} Abstract function.
+        */
+        function mouseReleaseEvent() {
+            throw new Error('Cannot call abstract function!');
+        }
+        /**
+        * Abstract function that defines the Game's mouse movement event. This
+        * function needs to be overriden.
+        *
+        * @abstract
+        * @function mouseMoveEvent
+        * @throws {Error} Abstract function.
+        */
+        function mouseMoveEvent() {
+            throw new Error('Cannot call abstract function!');
+        }
         // Functions returned by the module
         return {
             init: init,
@@ -956,6 +992,9 @@ var GW = (function () {
             update: update,
             render: render,
             addGameObject: addGameObject,
+            mouseMoveEvent: mouseMoveEvent,
+            mouseClickEvent: mouseClickEvent,
+            mouseReleaseEvent: mouseReleaseEvent,
             connectCustomInit: connectCustomInit,
             connectCustomReset: connectCustomReset,
             connectCustomRender: connectCustomRender,
