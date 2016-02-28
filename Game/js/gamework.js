@@ -670,10 +670,13 @@ var GW = (function () {
         * @function init
         * @param {number} FPS The game's frames per second.
         * @param {string} canvasID The ID of the canvas DOM element.
+        * @param {object} game The Game module to connect to the System.
         * @throws {Error} Cannot find a connected game.
         */
-        function init(FPS, canvasID) {
-            if (connectedGame) {
+        function init(FPS, canvasID, game) {
+            if (game) {
+                // Bind the game to the System
+                connectedGame = game;
                 // Obtain the canvas and canvas 2D context from the DOM
                 canvas = $(canvasID).get(0);
                 var ctx = canvas.getContext('2d');
@@ -683,7 +686,7 @@ var GW = (function () {
                 setInterval(mainLoop, 1000 / FPS);
             } else {
                 throw new Error(
-                    'Cannot initialize, no connected game was found!'
+                    'Cannot initialize system, no connected game was found!'
                 );
             }
         }
@@ -726,7 +729,9 @@ var GW = (function () {
                 connectedGame.reset();
                 isGameActive = true;
             } else {
-                throw new Error('Cannot start, no connected game was found!');
+                throw new Error(
+                    'Cannot start system, no connected game was found!'
+                );
             }
         }
         /**
@@ -736,15 +741,6 @@ var GW = (function () {
         */
         function stop() {
             isGameActive = false;
-        }
-        /**
-        * Connect a game module to the System.
-        *
-        * @function connectGame
-        * @param {object} game A game module.
-        */
-        function connectGame(game) {
-            connectedGame = game;
         }
         /**
         * Enable the use of mouse click events in the Game.
@@ -797,7 +793,6 @@ var GW = (function () {
             start: start,
             isPaused: isPaused,
             isActive: isActive,
-            connectGame: connectGame,
             togglePause: togglePause,
             enableMouseMove: enableMouseMove,
             enableMouseClick: enableMouseClick,

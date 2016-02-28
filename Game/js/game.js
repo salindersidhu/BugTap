@@ -562,9 +562,6 @@ function TapTapBugGame() {
 // Setup configures the game page and the behaviour of DOM elements
 var Setup = (function () {
     'use strict';
-    // Module constants and variables
-    var FPS = 60;
-    var LOCAL_STORAGE_HIGHSCORE = 'highscore';
     // DOM element IDs
     var ID_CANVAS = '#game-canvas';
     var ID_TAB_HOME = '#home-link';
@@ -583,82 +580,22 @@ var Setup = (function () {
     var ID_MESSAGE_LOST = '#game-lose-message';
     // Resource path IDs
     var SPR_FOOD = 'assets/food_sprite.png';
-    var SPR_BUG_RED = 'assets/red_bug_sprite.png';
+    var IMG_BG = 'assets/background_table.png';
+    var SPR_BUG_R = 'assets/red_bug_sprite.png';
+    var SPR_BUG_G = 'assets/grey_bug_sprite.png';
+    var SPR_BUG_O = 'assets/orange_bug_sprite.png';
     var IMG_BUTTON_PLAY = 'assets/button_play.png';
-    var SPR_BUG_GREY = 'assets/grey_bug_sprite.png';
     var IMG_BUTTON_PAUSE = 'assets/button_pause.png';
-    var IMG_BACKGROUND = 'assets/background_table.png';
-    var SPR_BUG_ORANGE = 'assets/orange_bug_sprite.png';
     // Instance variables
-    var game;
-    // Function that initializes setup of the game page and DOM elements
-    function init() {
-        // Initialize all of the required components for the game
-        initGameComponents();
-        // Initialize game resources
-        initResources();
-        // Bind unobtrusive event handlers
-        bindEventHandlers();
-        // Configure TapTapBugGame
-        configGame();
-        // Initialize the System
-        GW.System.init(FPS, ID_CANVAS);
-        GW.System.enableMouseMove();
-        GW.System.enableMouseClick();
-    }
-    // Funtion that binds event functions to specific links and buttons
-    function bindEventHandlers() {
-        $(ID_TAB_SCORE).click(function () {
-            navScoreEvent();
-        });
-        $(ID_TAB_HOME).click(function () {
-            navHomeEvent();
-        });
-        $(ID_BUTTON_RETRY).click(function () {
-            retryButtonEvent();
-        });
-        $(ID_BUTTON_CLEAR).click(function () {
-            clearScoreButtonEvent();
-        });
-        $(ID_BUTTON_PLAY).click(function () {
-            playGameButtonEvent();
-        });
-        $(ID_BUTTON_PAUSE).click(function () {
-            pauseResumeButtonEvent();
-        });
-    }
-    // Function that initializes all of the components for the game
-    function initGameComponents() {
-        // Create new ResourceManager, GameSystem and TapTapBugGame objects
-        game = new TapTapBugGame();
-    }
+    var LOCAL_STORAGE_HIGHSCORE = 'highscore';
+    var definedGame;
     // Function that adds all of the game resources using the ResourceManager
     function initResources() {
-        GW.ResourceManager.addImage('IMG_BACKGROUND', IMG_BACKGROUND, 387,
-                600);
+        GW.ResourceManager.addImage('IMG_BACKGROUND', IMG_BG, 387, 600);
         GW.ResourceManager.addSprite('SPR_FOOD', SPR_FOOD, 896, 56, 16);
-        GW.ResourceManager.addSprite('SPR_BUG_RED', SPR_BUG_RED, 90, 50, 2);
-        GW.ResourceManager.addSprite('SPR_BUG_ORANGE', SPR_BUG_ORANGE, 90, 50,
-                2);
-        GW.ResourceManager.addSprite('SPR_BUG_GREY', SPR_BUG_GREY, 90, 50, 2);
-    }
-    // Function that configures the games attributes
-    function configGame() {
-        game.setFoodAmount(6);
-        game.setAllotedTime(60);
-        game.setFoodPoints(5);
-        game.setFoodSpread(30, 30);
-        game.setBugSpawnTimes([0.5, 0.9, 1.2]);
-        game.setFoodSpawnRange(10, 320, 120, 380);
-        game.setBgImageID('IMG_BACKGROUND');
-        game.setSpriteFoodID('SPR_FOOD');
-        game.setUpdateTimeEvent(updateTime);
-        game.setGameOverEvent(gameOverEvent);
-        game.setUpdateScoreEvent(updateScore);
-        game.addBugToDB('SPR_BUG_RED', 3, 2.5, 0.3);
-        game.addBugToDB('SPR_BUG_ORANGE', 1, 1.5, 0.5);
-        game.addBugToDB('SPR_BUG_GREY', 5, 4, 0.2);
-        GW.System.connectGame(game);
+        GW.ResourceManager.addSprite('SPR_BUG_RED', SPR_BUG_R, 90, 50, 2);
+        GW.ResourceManager.addSprite('SPR_BUG_ORANGE', SPR_BUG_O, 90, 50, 2);
+        GW.ResourceManager.addSprite('SPR_BUG_GREY', SPR_BUG_G, 90, 50, 2);
     }
     // Function that updates the score text
     function updateScore(score) {
@@ -667,6 +604,77 @@ var Setup = (function () {
     // Function that updates the time text
     function updateTime(time) {
         $(ID_TEXT_TIME).text('Time: ' + time);
+    }
+    // Function that handles the events for the home navigation link
+    function navHomeEvent() {
+        // Call events if game is not running
+        if (!GW.System.isActive()) {
+            // Set home link item to active and score link item to inactive
+            $(ID_TAB_HOME).addClass('active');
+            $(ID_TAB_SCORE).removeClass('active');
+            // Hide the score page section and show the home page section
+            $(ID_SECTION_SCORE).hide();
+            $(ID_SECTION_HOME).show();
+            // Hide the win and lose messages and the retry button
+            $(ID_MESSAGE_WON).hide();
+            $(ID_MESSAGE_LOST).hide();
+            $(ID_BUTTON_RETRY).hide();
+        }
+    }
+    // Function that handles the events for the play game button
+    function playGameButtonEvent() {
+        // Hide the home page section and show the game page section
+        $(ID_SECTION_HOME).hide();
+        $(ID_SECTION_GAME).show();
+        // Start the GameSystem
+        GW.System.start();
+    }
+    // Function that handles the events for the retry button
+    function retryButtonEvent() {
+        navHomeEvent();
+        playGameButtonEvent();
+    }
+    // Function that handles the events for the pause / resume button
+    function pauseResumeButtonEvent() {
+        // Pause the game if the game is running and resume if game is paused
+        GW.System.togglePause();
+        // Change the image of the button depending on the state of the game
+        if (GW.System.isPaused()) {
+            $(ID_BUTTON_PAUSE + ' img').attr('src', IMG_BUTTON_PLAY);
+        } else {
+            $(ID_BUTTON_PAUSE + ' img').attr('src', IMG_BUTTON_PAUSE);
+        }
+    }
+    // Function that return the highscore entry from local storage
+    function getScore() {
+        // Obtain the score, use 0 if score does not exist
+        var rawScore = window.localStorage.getItem(LOCAL_STORAGE_HIGHSCORE);
+        return rawScore || 0;
+    }
+    // Function that updates the score heading with score from local storage
+    function refreshScore() {
+        // Obtain the highScore from local storage and use 0 as default value
+        $(ID_HEADING_SCORE).text('High Score: ' + getScore());
+    }
+    // Function that handles the events for the clear score button
+    function clearScoreButtonEvent() {
+        window.localStorage.removeItem(LOCAL_STORAGE_HIGHSCORE);
+        // Refresh displayed score
+        refreshScore();
+    }
+    // Function that handles the events for the score navigation link
+    function navScoreEvent() {
+        // Call events if game is not running
+        if (!GW.System.isActive()) {
+            // Set score link item to active and home link item to inactive
+            $(ID_TAB_SCORE).addClass('active');
+            $(ID_TAB_HOME).removeClass('active');
+            // Hide the home page section and show the score page section
+            $(ID_SECTION_HOME).hide();
+            $(ID_SECTION_SCORE).show();
+            // Refresh displayed score
+            refreshScore();
+        }
     }
     // Function that handles events for when TapTapBugGame is finished
     function gameOverEvent(score, isWin) {
@@ -690,76 +698,57 @@ var Setup = (function () {
             $(ID_MESSAGE_LOST).show();
         }
     }
-    // Function that handles the events for the score navigation link
-    function navScoreEvent() {
-        // Call events if game is not running
-        if (!GW.System.isActive()) {
-            // Set score link item to active and home link item to inactive
-            $(ID_TAB_SCORE).addClass('active');
-            $(ID_TAB_HOME).removeClass('active');
-            // Hide the home page section and show the score page section
-            $(ID_SECTION_HOME).hide();
-            $(ID_SECTION_SCORE).show();
-            // Refresh displayed score
-            refreshScore();
-        }
+    // Function that creates and configures TapTapBugGame's attributes
+    function createConfigureGame() {
+        definedGame = new TapTapBugGame();
+        definedGame.setFoodAmount(6);
+        definedGame.setAllotedTime(60);
+        definedGame.setFoodPoints(5);
+        definedGame.setFoodSpread(30, 30);
+        definedGame.setBugSpawnTimes([0.5, 0.9, 1.2]);
+        definedGame.setFoodSpawnRange(10, 320, 120, 380);
+        definedGame.setBgImageID('IMG_BACKGROUND');
+        definedGame.setSpriteFoodID('SPR_FOOD');
+        definedGame.setUpdateTimeEvent(updateTime);
+        definedGame.setGameOverEvent(gameOverEvent);
+        definedGame.setUpdateScoreEvent(updateScore);
+        definedGame.addBugToDB('SPR_BUG_RED', 3, 2.5, 0.3);
+        definedGame.addBugToDB('SPR_BUG_ORANGE', 1, 1.5, 0.5);
+        definedGame.addBugToDB('SPR_BUG_GREY', 5, 4, 0.2);
     }
-    // Function that handles the events for the home navigation link
-    function navHomeEvent() {
-        // Call events if game is not running
-        if (!GW.System.isActive()) {
-            // Set home link item to active and score link item to inactive
-            $(ID_TAB_HOME).addClass('active');
-            $(ID_TAB_SCORE).removeClass('active');
-            // Hide the score page section and show the home page section
-            $(ID_SECTION_SCORE).hide();
-            $(ID_SECTION_HOME).show();
-            // Hide the win and lose messages and the retry button
-            $(ID_MESSAGE_WON).hide();
-            $(ID_MESSAGE_LOST).hide();
-            $(ID_BUTTON_RETRY).hide();
-        }
+    // Funtion that binds event functions to specific links and buttons
+    function bindEventHandlers() {
+        $(ID_TAB_SCORE).click(function () {
+            navScoreEvent();
+        });
+        $(ID_TAB_HOME).click(function () {
+            navHomeEvent();
+        });
+        $(ID_BUTTON_RETRY).click(function () {
+            retryButtonEvent();
+        });
+        $(ID_BUTTON_CLEAR).click(function () {
+            clearScoreButtonEvent();
+        });
+        $(ID_BUTTON_PLAY).click(function () {
+            playGameButtonEvent();
+        });
+        $(ID_BUTTON_PAUSE).click(function () {
+            pauseResumeButtonEvent();
+        });
     }
-    // Function that handles the events for the retry button
-    function retryButtonEvent() {
-        navHomeEvent();
-        playGameButtonEvent();
-    }
-    // Function that handles the events for the play game button
-    function playGameButtonEvent() {
-        // Hide the home page section and show the game page section
-        $(ID_SECTION_HOME).hide();
-        $(ID_SECTION_GAME).show();
-        // Start the GameSystem
-        GW.System.start();
-    }
-    // Function that handles the events for the pause / resume button
-    function pauseResumeButtonEvent() {
-        // Pause the game if the game is running and resume if game is paused
-        GW.System.togglePause();
-        // Change the image of the button depending on the state of the game
-        if (GW.System.isPaused()) {
-            $(ID_BUTTON_PAUSE + ' img').attr('src', IMG_BUTTON_PLAY);
-        } else {
-            $(ID_BUTTON_PAUSE + ' img').attr('src', IMG_BUTTON_PAUSE);
-        }
-    }
-    // Function that handles the events for the clear score button
-    function clearScoreButtonEvent() {
-        window.localStorage.removeItem(LOCAL_STORAGE_HIGHSCORE);
-        // Refresh displayed score
-        refreshScore();
-    }
-    // Function that updates the score heading with score from local storage
-    function refreshScore() {
-        // Obtain the highScore from local storage and use 0 as default value
-        $(ID_HEADING_SCORE).text('High Score: ' + getScore());
-    }
-    // Function that return the highscore entry from local storage
-    function getScore() {
-        // Obtain the score, use 0 if score does not exist
-        var rawScore = window.localStorage.getItem(LOCAL_STORAGE_HIGHSCORE);
-        return rawScore || 0;
+    // Function that initializes setup of the game page and DOM elements
+    function init() {
+        // Initialize game resources
+        initResources();
+        // Bind unobtrusive event handlers
+        bindEventHandlers();
+        // Create and configure TapTapBugGame instance
+        createConfigureGame();
+        // Initalize and configure the Gamework system with TapTapBugGame
+        GW.System.init(60, ID_CANVAS, definedGame);
+        GW.System.enableMouseMove();
+        GW.System.enableMouseClick();
     }
     // Functions returned by the module
     return {
