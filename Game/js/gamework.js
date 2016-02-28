@@ -1,7 +1,7 @@
 /*jshint browser:true, jquery:true, quotmark:single, maxlen:80, eqeqeq:true,
 strict:true, unused:false, undef:true*/
 /*jslint browser:true, this:true, maxlen:80*/
-/*global $*/
+/*global $, window*/
 
 /**
 * Gamework is a 2D game development module based framework used to develop 2D
@@ -779,14 +779,38 @@ var GW = (function () {
             }, false);
         }
         /**
+        * Enable the use of keyboard press events in the Game.
+        *
+        * @function enableKeyPress
+        */
+        function enableKeyPress() {
+            // Add event listener for keyboard press events to the canvas
+            window.addEventListener('keydown', function (evt) {
+                connectedGame.keyPressEvent(evt);
+            }, false);
+        }
+        /**
+        * Enable the use of keyboard release events in the Game.
+        *
+        * @function enableKeyRelease
+        */
+        function enableKeyRelease() {
+            // Add event listener for keyboard release events to the canvas
+            window.addEventListener('keyup', function (evt) {
+                connectedGame.keyReleaseEvent(evt);
+            }, false);
+        }
+        /**
         * Enable all mouse and keyboard events in the Game.
         *
         * @function enableAllControls
         */
         function enableAllControls() {
-            enableMouseClick();
-            enableMouseRelease();
+            enableKeyPress();
             enableMouseMove();
+            enableMouseClick();
+            enableKeyRelease();
+            enableMouseRelease();
         }
         // Functions returned by the module
         return {
@@ -796,7 +820,9 @@ var GW = (function () {
             isPaused: isPaused,
             isActive: isActive,
             togglePause: togglePause,
+            enableKeyPress: enableKeyPress,
             enableMouseMove: enableMouseMove,
+            enableKeyRelease: enableKeyRelease,
             enableMouseClick: enableMouseClick,
             enableAllControls: enableAllControls,
             enableMouseRelease: enableMouseRelease
@@ -1002,6 +1028,28 @@ var GW = (function () {
         function mouseMoveEvent() {
             throw new Error('Cannot call abstract function!');
         }
+        /**
+        * Abstract function that defines the Game's keyboard press event. This
+        * function needs to be overriden.
+        *
+        * @abstract
+        * @function keyPressEvent
+        * @throws {Error} Abstract function.
+        */
+        function keyPressEvent() {
+            throw new Error('Cannot call abstract function!');
+        }
+        /**
+        * Abstract function that defines the Game's keyboard release event.
+        * This function needs to be overriden.
+        *
+        * @abstract
+        * @function keyReleaseEvent
+        * @throws {Error} Abstract function.
+        */
+        function keyReleaseEvent() {
+            throw new Error('Cannot call abstract function!');
+        }
         // Functions returned by the module
         return {
             init: init,
@@ -1009,9 +1057,11 @@ var GW = (function () {
             update: update,
             render: render,
             addGameObject: addGameObject,
+            keyPressEvent: keyPressEvent,
             mouseMoveEvent: mouseMoveEvent,
             getGameObjects: getGameObjects,
             mouseClickEvent: mouseClickEvent,
+            keyReleaseEvent: keyReleaseEvent,
             mouseReleaseEvent: mouseReleaseEvent,
             connectCustomInit: connectCustomInit,
             connectCustomReset: connectCustomReset,
