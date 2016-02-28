@@ -452,8 +452,6 @@ var GW = (function () {
         _this.speed = speed;
         _this.colour = colour;
         _this.opacity = 1;
-        _this.outlineWidth = null;
-        _this.outlineColour = null;
         _this.canDrawOutline = false;
         /**
         * Update the text's fade effect frame by frame on each function call.
@@ -621,22 +619,18 @@ var GW = (function () {
         };
     }
     /**
-    * The GameSystem module provides functions for handling the core game
-    * events, general game management and rendering tasks.
+    * The System module provides functions for handling the core game events,
+    * general game management and rendering tasks.
     *
     * @author Salinder Sidhu
-    * @module GameSystem
-    * @param {number} FPS The game's frames per second.
-    * @param {string} canvasID The ID of the canvas DOM element.
+    * @module System
     */
-    function GameSystem(FPS, canvasID) {
+    var System = (function () {
         // Module constants and variables
-        var _this = this; // Reference to the module's local scope
-        _this.FPS = FPS;
-        _this.canvasID = canvasID;
-        _this.isGamePaused = false;
-        _this.isGameActive = false;
-        _this.connectedGame = null;
+        var canvas = null;
+        var isGamePaused = false;
+        var isGameActive = false;
+        var connectedGame = null;
         /**
         * Trigger a mouse event function on the game canvas.
         *
@@ -646,8 +640,8 @@ var GW = (function () {
         * @param {object} canvas The canvas object.
         */
         function triggerMouseEvent(evt, canvas, mouseEvtFunct) {
-            // Trigger mouse event if GameSystem is active and not paused
-            if (_this.isGameActive && !_this.isGamePaused) {
+            // Trigger mouse event if System is active and not paused
+            if (isGameActive && !isGamePaused) {
                 // Obtain the mouse coordinates relative to the canvas
                 var mouseX = evt.pageX - canvas.offsetLeft;
                 var mouseY = evt.pageY - canvas.offsetTop;
@@ -663,38 +657,29 @@ var GW = (function () {
         * @function mainLoop
         */
         function mainLoop() {
-            if (_this.isGameActive && !_this.isGamePaused) {
+            if (isGameActive && !isGamePaused) {
                 // Update the connected game
-                _this.connectedGame.update();
+                connectedGame.update();
                 // Render the connected game
-                _this.connectedGame.render();
+                connectedGame.render();
             }
         }
         /**
-        * Initialize the GameSystem
+        * Initialize the System.
         *
         * @function init
+        * @param {number} FPS The game's frames per second.
+        * @param {string} canvasID The ID of the canvas DOM element.
         * @throws {Error} Cannot find a connected game.
         */
-        function init() {
-            if (_this.connectedGame) {
+        function init(FPS, canvasID) {
+            if (connectedGame) {
                 // Obtain the canvas and canvas 2D context from the DOM
-                var canvas = $(canvasID).get(0);
+                canvas = $(canvasID).get(0);
                 var ctx = canvas.getContext('2d');
-                // Add event listener for mouse click events to the canvas
-                canvas.addEventListener('mousedown', function (evt) {
-                    triggerMouseEvent(evt, canvas,
-                            _this.connectedGame.mouseClickEvent);
-                }, false);
-                // Add event listener for mouse move events to the canvas
-                canvas.addEventListener('mousemove', function (evt) {
-                    triggerMouseEvent(evt, canvas,
-                            _this.connectedGame.mouseMoveEvent);
-                }, false);
                 // Initialize the connected game module
-                _this.connectedGame.init(_this.FPS, ctx, canvas,
-                        _this.isGamePaused);
-                // Execute the GameSystem main loop indefinitely
+                connectedGame.init(FPS, ctx, canvas);
+                // Execute the System main loop indefinitely
                 setInterval(mainLoop, 1000 / FPS);
             } else {
                 throw new Error(
@@ -703,63 +688,107 @@ var GW = (function () {
             }
         }
         /**
-        * Function that toggles the GameSystem's state between paused or
+        * Function that toggles the System's state between paused or
         * running.
         *
         * @function togglePause
         */
         function togglePause() {
-            _this.isGamePaused = !_this.isGamePaused;
+            isGamePaused = !isGamePaused;
         }
         /**
-        * Return if the GameSystem is paused.
+        * Return if the System is paused.
         *
         * @function isPaused
         * @return {boolean}
         */
         function isPaused() {
-            return _this.isGamePaused;
+            return isGamePaused;
         }
         /**
-        * Return if the GameSystem is active.
+        * Return if the System is active.
         *
         * @function isActive
         * @return {boolean}
         */
         function isActive() {
-            return _this.isGameActive;
+            return isGameActive;
         }
         /**
-        * Start the GameSystem and the connected game.
+        * Start the System and the connected game.
         *
         * @function start
         * @throws {Error} Cannot find a connected game.
         */
         function start() {
-            if (_this.connectedGame) {
+            if (connectedGame) {
                 // Reset the connected game module
-                _this.connectedGame.reset();
-                _this.isGameActive = true;
+                connectedGame.reset();
+                isGameActive = true;
             } else {
                 throw new Error('Cannot start, no connected game was found!');
             }
         }
         /**
-        * Stop the GameSystem and the connected game.
+        * Stop the System and the connected game.
         *
         * @function stop
         */
         function stop() {
-            _this.isGameActive = false;
+            isGameActive = false;
         }
         /**
-        * Connect a game module to the GameSystem.
+        * Connect a game module to the System.
         *
         * @function connectGame
         * @param {object} game A game module.
         */
         function connectGame(game) {
-            _this.connectedGame = game;
+            connectedGame = game;
+        }
+        /**
+        * Enable the use of mouse click events in the Game.
+        *
+        * @function enableMouseClick
+        */
+        function enableMouseClick() {
+            // Add event listener for mouse click events to the canvas
+            canvas.addEventListener('mousedown', function (evt) {
+                triggerMouseEvent(evt, canvas, connectedGame.mouseClickEvent);
+            }, false);
+        }
+        /**
+        * Enable the use of mouse release events in the Game.
+        *
+        * @function enableMouseRelease
+        */
+        function enableMouseRelease() {
+            // Add event listener for mouse release events to the canvas
+            canvas.addEventListener('mouseup', function (evt) {
+                triggerMouseEvent(evt, canvas,
+                        connectedGame.mouseReleaseEvent);
+            }, false);
+        }
+        /**
+        * Enable the use of mouse move events in the Game.
+        *
+        * @function enableMouseMove
+        */
+        function enableMouseMove() {
+            // Add event listener for mouse move events to the canvas
+            canvas.addEventListener('mousemove', function (evt) {
+                triggerMouseEvent(evt, canvas, connectedGame.mouseMoveEvent);
+            }, false);
+        }
+        /**
+        * Enable all mouse and keyboard events in the Game.
+        *
+        * @function enableAllControls
+        */
+        function enableAllControls() {
+            enableMouseClick();
+            enableMouseRelease();
+            enableMouseMove();
         }
         // Functions returned by the module
         return {
@@ -769,45 +798,57 @@ var GW = (function () {
             isPaused: isPaused,
             isActive: isActive,
             connectGame: connectGame,
-            togglePause: togglePause
+            togglePause: togglePause,
+            enableMouseMove: enableMouseMove,
+            enableMouseClick: enableMouseClick,
+            enableAllControls: enableAllControls,
+            enableMouseRelease: enableMouseRelease
         };
-    }
+    }());
     /**
     * The Game module acts as an abstract module used to build a Game object
     * that manages the control, update and rendering of the game.
     *
-    * @abstract
     * @author Salinder Sidhu
     * @module Game
     */
-    function Game(ctx, canvas, FPS) {
+    function Game() {
         // Module constants and variables
         var _this = this;
-        _this.ctx = ctx;
-        _this.FPS = FPS;
-        _this.canvas = canvas;
         _this.gameObjects = {};
-        _this.customUpdate = null;
-        _this.customRender = null;
         /**
-        * Abstract function that initializes the Game. This function needs to
-        * be overriden.
+        * Initialize the Game and call the custom init function if a custom
+        * init function is connected to the Game.
         *
-        * @abstract
         * @function init
+        * @param {number} FPS The game's frames per second.
+        * @param {object} ctx The 2D context of the game canvas.
+        * @param {object} canvas The game canvas.
         */
-        function init() {
-            throw new Error('Cannot call abstract function!');
+        function init(FPS, ctx, canvas) {
+            _this.FPS = FPS;
+            _this.ctx = ctx;
+            _this.canvas = canvas;
+            // Call the custom init function if it is defined
+            if (_this.customInit) {
+                _this.customInit();
+            }
         }
         /**
-        * Abstract function that resets the Game. This function needs to be
-        * overriden.
+        * Reset the Game and call the custom reset function if a custom reset
+        * function is connected to the Game.
         *
-        * @abstract
         * @function reset
         */
         function reset() {
-            throw new Error('Cannot call abstract function!');
+            // Call the custom reset function if it is defined
+            if (_this.customReset) {
+                _this.customReset();
+            }
+            // Clear all the GameObjects
+            Object.keys(_this.gameObjects).forEach(function (type) {
+                _this.gameObjects[type] = [];
+            });
         }
         /**
         * Delete a conrete GameObject from the Game if it is flaged for
@@ -827,8 +868,8 @@ var GW = (function () {
             }
         }
         /**
-        * Update the game and call the custom update function if a custom
-        * update function is connected to the game.
+        * Update the Game and call the custom update function if a custom
+        * update function is connected to the Game.
         *
         * @function update
         */
@@ -840,13 +881,13 @@ var GW = (function () {
             // Update all of the GameObjects and handle GameObject deletion
             Object.keys(_this.gameObjects).forEach(function (type) {
                 _this.gameObjects[type].forEach(function (obj) {
-                    obj.update(FPS);
+                    obj.update(_this.FPS);
                     handleDelete(obj, type);
                 });
             });
         }
         /**
-        * Render the game and call the custom render function if a custom
+        * Render the Game and call the custom render function if a custom
         * render function is connected to the Game.
         *
         * @function render
@@ -878,6 +919,24 @@ var GW = (function () {
             _this.gameObjects[type].push(gameObject);
         }
         /**
+        * Connect a custom Init function to the Game.
+        *
+        * @function connectCustomInit
+        * @param {function} customInit The custom init function.
+        */
+        function connectCustomInit(customInit) {
+            _this.customInit = customInit;
+        }
+        /**
+        * Connect a custom reset function to the Game.
+        *
+        * @function connectCustomReset
+        * @param {function} customReset The custom reset function.
+        */
+        function connectCustomReset(customReset) {
+            _this.customReset = customReset;
+        }
+        /**
         * Connect a custom update function to the Game.
         *
         * @function connectCustomUpdate
@@ -902,6 +961,8 @@ var GW = (function () {
             update: update,
             render: render,
             addGameObject: addGameObject,
+            connectCustomInit: connectCustomInit,
+            connectCustomReset: connectCustomReset,
             connectCustomRender: connectCustomRender,
             connectCustomUpdate: connectCustomUpdate
         };
@@ -911,8 +972,8 @@ var GW = (function () {
         Game: Game,
         Utils: Utils,
         Sprite: Sprite,
+        System: System,
         GameObject: GameObject,
-        GameSystem: GameSystem,
         FadingText: FadingText,
         BoundingBox: BoundingBox,
         ResourceManager: ResourceManager,

@@ -591,7 +591,6 @@ var Setup = (function () {
     var SPR_BUG_ORANGE = 'assets/orange_bug_sprite.png';
     // Instance variables
     var game;
-    var system;
     // Function that initializes setup of the game page and DOM elements
     function init() {
         // Initialize all of the required components for the game
@@ -602,8 +601,10 @@ var Setup = (function () {
         bindEventHandlers();
         // Configure TapTapBugGame
         configGame();
-        // Initialize GameSystem
-        system.init();
+        // Initialize the System
+        GW.System.init(FPS, ID_CANVAS);
+        GW.System.enableMouseMove();
+        GW.System.enableMouseClick();
     }
     // Funtion that binds event functions to specific links and buttons
     function bindEventHandlers() {
@@ -630,7 +631,6 @@ var Setup = (function () {
     function initGameComponents() {
         // Create new ResourceManager, GameSystem and TapTapBugGame objects
         game = new TapTapBugGame();
-        system = new GW.GameSystem(FPS, ID_CANVAS);
     }
     // Function that adds all of the game resources using the ResourceManager
     function initResources() {
@@ -658,7 +658,7 @@ var Setup = (function () {
         game.addBugToDB('SPR_BUG_RED', 3, 2.5, 0.3);
         game.addBugToDB('SPR_BUG_ORANGE', 1, 1.5, 0.5);
         game.addBugToDB('SPR_BUG_GREY', 5, 4, 0.2);
-        system.connectGame(game);
+        GW.System.connectGame(game);
     }
     // Function that updates the score text
     function updateScore(score) {
@@ -671,7 +671,7 @@ var Setup = (function () {
     // Function that handles events for when TapTapBugGame is finished
     function gameOverEvent(score, isWin) {
         // Stop the GameSystem
-        system.stop();
+        GW.System.stop();
         // Navigate to score page
         navScoreEvent();
         // Hide the game page section and show the retry button
@@ -693,7 +693,7 @@ var Setup = (function () {
     // Function that handles the events for the score navigation link
     function navScoreEvent() {
         // Call events if game is not running
-        if (!system.isActive()) {
+        if (!GW.System.isActive()) {
             // Set score link item to active and home link item to inactive
             $(ID_TAB_SCORE).addClass('active');
             $(ID_TAB_HOME).removeClass('active');
@@ -707,7 +707,7 @@ var Setup = (function () {
     // Function that handles the events for the home navigation link
     function navHomeEvent() {
         // Call events if game is not running
-        if (!system.isActive()) {
+        if (!GW.System.isActive()) {
             // Set home link item to active and score link item to inactive
             $(ID_TAB_HOME).addClass('active');
             $(ID_TAB_SCORE).removeClass('active');
@@ -731,14 +731,14 @@ var Setup = (function () {
         $(ID_SECTION_HOME).hide();
         $(ID_SECTION_GAME).show();
         // Start the GameSystem
-        system.start();
+        GW.System.start();
     }
     // Function that handles the events for the pause / resume button
     function pauseResumeButtonEvent() {
         // Pause the game if the game is running and resume if game is paused
-        system.togglePause();
+        GW.System.togglePause();
         // Change the image of the button depending on the state of the game
-        if (system.isPaused()) {
+        if (GW.System.isPaused()) {
             $(ID_BUTTON_PAUSE + ' img').attr('src', IMG_BUTTON_PLAY);
         } else {
             $(ID_BUTTON_PAUSE + ' img').attr('src', IMG_BUTTON_PAUSE);
