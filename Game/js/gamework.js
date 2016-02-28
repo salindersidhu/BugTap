@@ -860,9 +860,10 @@ var GW = (function () {
         function handleDelete(gameObject, type) {
             if (gameObject.canDelete()) {
                 _this.gameObjects[type].splice(
-                    _this.gameObjects[type].indexof(gameObject),
+                    _this.gameObjects[type].indexOf(gameObject),
                     1
                 );
+                gameObject = null;
             }
         }
         /**
@@ -874,7 +875,7 @@ var GW = (function () {
         function update() {
             // Call the custom update function if it is defined
             if (_this.customUpdate) {
-                _this.customUpdate();
+                _this.customUpdate(_this.FPS);
             }
             // Update all of the GameObjects and handle GameObject deletion
             Object.keys(_this.gameObjects).forEach(function (type) {
@@ -907,6 +908,18 @@ var GW = (function () {
             });
         }
         /**
+        * Return the Game's collection of GameObjects specified by type, if the
+        * collection of GameObjects do not exist for the specified type return
+        * an empty array.
+        *
+        * @function getGameObjects
+        * @param {string} type The Type of GameObjects to return.
+        * @return {object} The GameObjects.
+        */
+        function getGameObjects(type) {
+            return _this.gameObjects[type] || [];
+        }
+        /**
         * Add a concrete GameObject with a specific type to the Game.
         *
         * @function addGameObject
@@ -914,6 +927,11 @@ var GW = (function () {
         * @param {string} type The concrete GameObject's type.
         */
         function addGameObject(gameObject, type) {
+            // If array of specific objects doesn't exist then create it
+            if (Object.keys(_this.gameObjects).indexOf(type) < 0) {
+                // Create an new array of items
+                _this.gameObjects[type] = [];
+            }
             _this.gameObjects[type].push(gameObject);
         }
         /**
@@ -993,6 +1011,7 @@ var GW = (function () {
             render: render,
             addGameObject: addGameObject,
             mouseMoveEvent: mouseMoveEvent,
+            getGameObjects: getGameObjects,
             mouseClickEvent: mouseClickEvent,
             mouseReleaseEvent: mouseReleaseEvent,
             connectCustomInit: connectCustomInit,
