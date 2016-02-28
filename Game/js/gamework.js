@@ -863,7 +863,6 @@ var GW = (function () {
                     _this.gameObjects[type].indexOf(gameObject),
                     1
                 );
-                gameObject = null;
             }
         }
         /**
@@ -875,7 +874,7 @@ var GW = (function () {
         function update() {
             // Call the custom update function if it is defined
             if (_this.customUpdate) {
-                _this.customUpdate(_this.FPS);
+                _this.customUpdate(_this.FPS, _this.canvas);
             }
             // Update all of the GameObjects and handle GameObject deletion
             Object.keys(_this.gameObjects).forEach(function (type) {
