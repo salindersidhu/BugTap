@@ -1,7 +1,7 @@
 /*jshint browser:true, jquery:true, quotmark:single, maxlen:80, eqeqeq:true,
 strict:true, unused:false, undef:true*/
 /*jslint browser:true, this:true, maxlen:80*/
-/*global $, window*/
+/*global $, window, createjs*/
 
 /**
 * Gamework is a 2D game development module based framework used to develop 2D
@@ -108,6 +108,7 @@ var GW = (function () {
     */
     var ResourceManager = (function () {
         // Module constants and variables
+        var soundIDs = [];
         var imageDict = {};
         var spriteDict = {};
         /**
@@ -135,7 +136,7 @@ var GW = (function () {
         * @param {string} src The source file path of the image.
         * @param {number} width The image's width.
         * @param {number} height The image's height.
-        * @throws {Error} Image object with the specified id already exists.
+        * @throws {Error} Image object with the specified ID already exists.
         */
         function addImage(id, src, width, height) {
             if (!imageDict.hasOwnProperty(id)) {
@@ -153,7 +154,7 @@ var GW = (function () {
         * @param {number} weight The sprite image's width.
         * @param {number} height The sprite image's height.
         * @param {number} numFrames The number of frames in the sprite image.
-        * @throws {Error} Sprite object with the specified id already exists.
+        * @throws {Error} Sprite object with the specified ID already exists.
         */
         function addSprite(id, src, width, height, numFrames) {
             if (!spriteDict.hasOwnProperty(id)) {
@@ -172,7 +173,7 @@ var GW = (function () {
         * @function getImage
         * @param {string} id The unique ID corresponding to an Image object.
         * @return {object} An Image object.
-        * @throws {Error} Image object with the specified id does not exist!
+        * @throws {Error} Image object with the specified ID does not exist!
         */
         function getImage(id) {
             if (imageDict.hasOwnProperty(id)) {
@@ -186,7 +187,7 @@ var GW = (function () {
         * @function getSprite
         * @param {string} id The unique ID corresponding to a Sprite object.
         * @return {object} A Sprite object.
-        * @throws {Error} Sprite object with the specified id does not exist!
+        * @throws {Error} Sprite object with the specified ID does not exist!
         */
         function getSprite(id) {
             if (spriteDict.hasOwnProperty(id)) {
@@ -194,12 +195,47 @@ var GW = (function () {
             }
             throw new Error('Sprite with ID ' + id + ' does not exist!');
         }
+        /**
+        * Add a new sound with a unique ID to the ResourceManager. This
+        * function uses code from the createjs.Sound module.
+        *
+        * @function addSound
+        * @param {string} id
+        * @param {string} src
+        * @throws {Error} Sound with specified ID already exists.
+        */
+        function addSound(id, src) {
+            if (!soundIDs.hasOwnProperty(id)) {
+                createjs.Sound.registerSound(src, id);
+                // Add Sound ID to the array of Sound IDs
+                soundIDs.push(id);
+            } else {
+                throw new Error('Sound with ID ' + id + ' already exists!');
+            }
+        }
+        /**
+        * Play a sound corresponding to a unqiue ID. This function uses code
+        * from the createjs.Sound module.
+        *
+        * @function playSound
+        * @param {string} id
+        * @throws {Error} Sound with specified ID does not exist.
+        */
+        function playSound(id) {
+            if (soundIDs.indexOf(id) >= 0) {
+                createjs.Sound.play(id);
+            } else {
+                throw new Error('Sound with ID ' + id + ' does not exist!');
+            }
+        }
         // Functions returned by the module
         return {
             addImage: addImage,
             getImage: getImage,
+            addSound: addSound,
             addSprite: addSprite,
-            getSprite: getSprite
+            getSprite: getSprite,
+            playSound: playSound
         };
     }());
     /**
