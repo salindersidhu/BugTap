@@ -23,6 +23,8 @@ Playable hosted version via [RawGit.](https://rawgit.com/SalinderSidhu/TapTapBug
     - Media button images from [Vector.me](http://vector.me/browse/695406/icon_set_player)
     - Favicon generated from [Font Awesome Favicon Generator](http://paulferrett.com/fontawesome-favicon/)
     - Tablecloth texture created by **Patrick Hoesly** from [Flickr](http://www.everystockphoto.com/photo.php?imageId=5778707) under [Create Commons Attribution](http://creativecommons.org/licenses/by/4.0/)
+- **Original Sound**
+    - All sound effects obtained from [RPG Maker VX Ace](http://www.rpgmakerweb.com/products/programs/rpg-maker-vx-ace)
 
 ## License:
 Copyright &copy; 2016 Salinder Sidhu

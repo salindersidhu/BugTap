@@ -237,6 +237,7 @@ var TapTapBugGame = (function () {
                     object.getBox().getY() + object.getBox().getHeight()),
             'POINTS'
         );
+        GW.ResourceManager.playSound('SND_POINTS_WON');
     }
     // Function that shows points lost using PointUpText on a specific object
     function showPointsLost(points, object) {
@@ -247,6 +248,7 @@ var TapTapBugGame = (function () {
                     object.getBox().getY() + object.getBox().getHeight()),
             'POINTS'
         );
+        GW.ResourceManager.playSound('SND_POINTS_LOST');
     }
     // Reference to a function that gives points for remaining Food only once
     var awardFoodRemaining = GW.Utils.once(function () {
@@ -530,6 +532,8 @@ var Setup = (function () {
     var IMG_BG = 'assets/background_table.png';
     var SPR_BUG_R = 'assets/red_bug_sprite.png';
     var SPR_BUG_G = 'assets/grey_bug_sprite.png';
+    var SND_POINTS_WON = 'assets/points_won.ogg';
+    var SND_POINTS_LOST = 'assets/points_lost.ogg';
     var SPR_BUG_O = 'assets/orange_bug_sprite.png';
     var IMG_BUTTON_PLAY = 'assets/button_play.png';
     var IMG_BUTTON_PAUSE = 'assets/button_pause.png';
@@ -537,11 +541,15 @@ var Setup = (function () {
     var LOCAL_STORAGE_HIGHSCORE = 'highscore';
     // Function that adds all of the game resources using the ResourceManager
     function initResources() {
+        // Add and config all Image and Sprite resources
         GW.ResourceManager.addImage('IMG_BACKGROUND', IMG_BG, 387, 600);
         GW.ResourceManager.addSprite('SPR_FOOD', SPR_FOOD, 896, 56, 16);
         GW.ResourceManager.addSprite('SPR_BUG_RED', SPR_BUG_R, 90, 50, 2);
         GW.ResourceManager.addSprite('SPR_BUG_ORANGE', SPR_BUG_O, 90, 50, 2);
         GW.ResourceManager.addSprite('SPR_BUG_GREY', SPR_BUG_G, 90, 50, 2);
+        // Add and config all Sound resources
+        GW.ResourceManager.addSound('SND_POINTS_WON', SND_POINTS_WON);
+        GW.ResourceManager.addSound('SND_POINTS_LOST', SND_POINTS_LOST);
     }
     // Function that updates the score text
     function updateScore(score) {
