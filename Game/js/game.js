@@ -237,7 +237,7 @@ var TapTapBugGame = (function () {
                     object.getBox().getY() + object.getBox().getHeight()),
             'POINTS'
         );
-        GW.ResourceManager.playSound('SND_POINTS_WON');
+        GW.ResourceManager.playSound('SND_POINTS_WON', {volume: 0.45});
     }
     // Function that shows points lost using PointUpText on a specific object
     function showPointsLost(points, object) {
@@ -248,7 +248,7 @@ var TapTapBugGame = (function () {
                     object.getBox().getY() + object.getBox().getHeight()),
             'POINTS'
         );
-        GW.ResourceManager.playSound('SND_POINTS_LOST');
+        GW.ResourceManager.playSound('SND_POINTS_LOST', {volume: 0.45});
     }
     // Reference to a function that gives points for remaining Food only once
     var awardFoodRemaining = GW.Utils.once(function () {

@@ -200,8 +200,8 @@ var GW = (function () {
         * function uses code from the createjs.Sound module.
         *
         * @function addSound
-        * @param {string} id
-        * @param {string} src
+        * @param {string} id The unique ID corresponding to a Sound.
+        * @param {string} src The source file path of the Sound file.
         * @throws {Error} Sound with specified ID already exists.
         */
         function addSound(id, src) {
@@ -218,12 +218,13 @@ var GW = (function () {
         * from the createjs.Sound module.
         *
         * @function playSound
-        * @param {string} id
+        * @param {string} id The unique ID corresponding to a Sound.
+        * @param {boolean} [options] - SoundJS additional play options.
         * @throws {Error} Sound with specified ID does not exist.
         */
-        function playSound(id) {
+        function playSound(id, options) {
             if (soundIDs.indexOf(id) >= 0) {
-                createjs.Sound.play(id);
+                createjs.Sound.play(id, options || {});
             } else {
                 throw new Error('Sound with ID ' + id + ' does not exist!');
             }
