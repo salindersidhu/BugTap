@@ -74,26 +74,8 @@ var GW = (function () {
                 return Math.random() - 0.5;
             });
         }
-        /**
-        * Wrapper that executes a function within a context extractly once.
-        *
-        * @function once
-        * @param {object} funct The function to be called.
-        * @param {object} context The context of the function.
-        */
-        function once(funct, context) {
-            var result;
-            return function () {
-                if (funct) {
-                    result = funct.apply(context || this, arguments);
-                    funct = null;
-                }
-                return result;
-            };
-        }
         // Functions returned by the module
         return {
-            once: once,
             shuffle: shuffle,
             randomItem: randomItem,
             randomNumber: randomNumber

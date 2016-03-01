@@ -203,6 +203,7 @@ var TapTapBugGame = (function () {
     var bugDB = {};
     var bugSpawnTime;
     var remainingTime;
+    var rewardedPoints;
     var bugSpawnTimes = [];
     var bugSpwanProbs = [];
     var defaultAllotedTime;
@@ -250,14 +251,6 @@ var TapTapBugGame = (function () {
         );
         GW.ResourceManager.playSound('SND_POINTS_LOST', {volume: 0.45});
     }
-    // Reference to a function that gives points for remaining Food only once
-    var awardFoodRemaining = GW.Utils.once(function () {
-        superModule.getGameObjects('FOOD').forEach(function (food) {
-            score += foodSettings.POINTS;
-            eventFuncts.UPDATESCORE(score);
-            showPointsGained(foodSettings.POINTS, food);
-        });
-    });
     // Function that updates remaining time and calls the time update function
     function updateTime(FPS) {
         remainingTime -= 1 / FPS;
@@ -269,7 +262,15 @@ var TapTapBugGame = (function () {
         if (remainingTime < 1 ||
                 superModule.getGameObjects('FOOD').length < 1) {
             isGameOver = true;
-            awardFoodRemaining();
+            // Reward points for any remaining Food but only once
+            if (!rewardedPoints) {
+                superModule.getGameObjects('FOOD').forEach(function (food) {
+                    score += foodSettings.POINTS;
+                    eventFuncts.UPDATESCORE(score);
+                    showPointsGained(foodSettings.POINTS, food);
+                });
+                rewardedPoints = true;
+            }
         }
         // If game is over and all Bugs are dead then call game over event
         if (isGameOver &&
@@ -380,6 +381,7 @@ var TapTapBugGame = (function () {
         score = 0;
         timeTicks = 0;
         isGameOver = false;
+        rewardedPoints = false;
         remainingTime = defaultAllotedTime;
         // Set default score of 0 and spawn need Food
         spawnFood();
