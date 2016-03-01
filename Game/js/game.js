@@ -103,7 +103,7 @@ function Bug(sprite, points, speed, x, y, foodObjects) {
         var distX = targetX - _this.x - (_this.width / 2);
         var distY = targetY - _this.y - (_this.height / 2);
         // Calculate the hypotenuse
-        var hypotenuse = Math.sqrt(Math.pow(distX, 2) + Math.pow(distY, 2));
+        var hypotenuse = Math.sqrt(distX * distX + distY * distY);
         distX /= hypotenuse;
         distY /= hypotenuse;
         // Move towards point
@@ -132,9 +132,7 @@ function Bug(sprite, points, speed, x, y, foodObjects) {
                     var distX = foodX - x;
                     var distY = foodY - y;
                     // Calculate the hypotenuse to find the shortest distance
-                    var hypotenuse = Math.sqrt(
-                        Math.pow(distX, 2) + Math.pow(distY, 2)
-                    );
+                    var hypotenuse = Math.sqrt(distX * distX + distY * distY);
                     // If hypotenuse is shorter than current shortest distance
                     if (hypotenuse < shortestDistance) {
                         // Set mouse move coordinates to Food's position
