@@ -25,6 +25,3 @@ Playable hosted version via [RawGit.](https://rawgit.com/SalinderSidhu/TapTapBug
     - Tablecloth texture created by **Patrick Hoesly** from [Flickr](http://www.everystockphoto.com/photo.php?imageId=5778707) under [Create Commons Attribution](http://creativecommons.org/licenses/by/4.0/)
 - **Original Sounds**:
     - All sound effects obtained from [RPG Maker VX Ace](http://www.rpgmakerweb.com/products/programs/rpg-maker-vx-ace)
-
-## License:
-MIT
