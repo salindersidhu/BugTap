@@ -11,9 +11,6 @@ In this game, there are 6 pieces of food randomly positioned near the center of 
 - Opera 35+
 - Safari 9+
 
-## Game:
-Playable hosted version via [RawGit.](https://rawgit.com/SalinderSidhu/TapTapBug/master/Game/index.html)
-
 ## Credits:
 - **Original Assignment**:
     - University of Toronto: CSC309 Programming on the Web, Summer 2015
