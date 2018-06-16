@@ -22,4 +22,7 @@ In this game, there are 6 pieces of food randomly positioned near the center of 
     - Tablecloth texture created by **Patrick Hoesly** from [Flickr](http://www.everystockphoto.com/photo.php?imageId=5778707) under [Create Commons Attribution License](http://creativecommons.org/licenses/by/4.0/)
 - **Sound Effects**:
     - Coin (Retro video game SFX) created by **cabled_mess** from [Freesound](https://freesound.org/people/cabled_mess/sounds/350874/) under [Create Commons 0 License](https://creativecommons.org/publicdomain/zero/1.0/)
-    - Chewing, Breadstick, Single, D.wav created by **InspectorJ** from [Freesound](https://freesound.org/people/InspectorJ/sounds/429591/) under [Create Commons Attribution License](https://creativecommons.org/licenses/by/3.0/)
+    - Chewing, Breadstick, Single created by **InspectorJ** from [Freesound](https://freesound.org/people/InspectorJ/sounds/429591/) under [Create Commons Attribution License](https://creativecommons.org/licenses/by/3.0/)
+
+# License
+[![License: MIT](https://img.shields.io/badge/License-Apache-yellow.svg)](/LICENSE.md)
