@@ -1,22 +1,22 @@
 /*jshint browser:true, jquery:true, quotmark:single, maxlen:80, eqeqeq:true,
 strict:true, unused:false, undef:true*/
-/*jslint browser:true, this:true, maxlen:80*/
+/*jslint browser:true, this:true/
 /*global $, window, createjs*/
 
 /**
-* Gamework is a 2D game development module based framework used to develop 2D
-* games in JavaScript on the HTML5 canvas.
+* SimpleGameEngine is a 2D game development module based framework used to
+* develop 2D games in JavaScript on the HTML5 canvas.
 *
 * @author Salinder Sidhu
-* @namespace Gamework
+* @namespace SimpleGameEngine
 */
-var GW = (function () {
+var SGE = (function () {
     'use strict';
     /**
     * Sprite represents a sprite sheet image. A single image consisting of
     * multiple images that together form an animation.
     *
-    * @memberof Gamework
+    * @memberof SimpleGameEngine
     * @function Sprite
     * @param {string} Sprite.image The Sprite sheet image.
     * @param {number} Sprite.numFrames The number of frames on the sprite sheet
@@ -1088,7 +1088,7 @@ var GW = (function () {
             connectCustomUpdate: connectCustomUpdate
         };
     }
-    // Modules returned by GameWork
+    // Modules returned by SimpleGameEngine
     return {
         Game: Game,
         Utils: Utils,

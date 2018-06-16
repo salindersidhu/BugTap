@@ -1,19 +1,19 @@
 /*jshint browser:true, jquery:true, quotmark:single, maxlen:80, eqeqeq:true,
 strict:true, unused:true, undef:true*/
-/*jslint browser:true, this:true, maxlen:80*/
-/*global $, window, GW*/
+/*jslint browser:true, this:true*/
+/*global $, window, SGE*/
 
 // PointUpText draws text which scrolls upwards and fades out
 function PointUpText(text, font, colour, moveSpeed, fadeSpeed, x, y) {
     'use strict';
     // Module constnts and variables
-    var superModule = new GW.GameObject();
+    var superModule = new SGE.GameObject();
     superModule.setDrawPriority(2);
     var _this = this;
     _this.x = x;
     _this.y = y;
     _this.moveSpeed = moveSpeed;
-    _this.fadingText = new GW.FadingText(text, font, colour, fadeSpeed);
+    _this.fadingText = new SGE.FadingText(text, font, colour, fadeSpeed);
     _this.fadingText.setOutline('black', 6);
     // Function that updates the PointUpText
     superModule.update = function (FPS) {
@@ -37,13 +37,13 @@ function PointUpText(text, font, colour, moveSpeed, fadeSpeed, x, y) {
 function Food(sprite, selectedFrame, x, y) {
     'use strict';
     // Module constants and variables
-    var superModule = new GW.GameObject();
+    var superModule = new SGE.GameObject();
     var _this = this;
     _this.x = x;
     _this.y = y;
     _this.isEaten = false;
-    _this.animation = new GW.SpriteAnimation(sprite, 0, selectedFrame);
-    _this.bBox = new GW.BoundingBox(x, y, sprite.frameWidth,
+    _this.animation = new SGE.SpriteAnimation(sprite, 0, selectedFrame);
+    _this.bBox = new SGE.BoundingBox(x, y, sprite.frameWidth,
             sprite.image.height);
     // Function that handles updating the Food's state
     superModule.update = function (FPS) {
@@ -80,7 +80,7 @@ function Food(sprite, selectedFrame, x, y) {
 function Bug(sprite, points, speed, x, y, foodObjects) {
     'use strict';
     // Module constants and variables
-    var superModule = new GW.GameObject();
+    var superModule = new SGE.GameObject();
     superModule.setDrawPriority(1);
     var _this = this;
     _this.x = x;
@@ -94,8 +94,8 @@ function Bug(sprite, points, speed, x, y, foodObjects) {
     _this.foodObjects = foodObjects;
     _this.width = sprite.frameWidth;
     _this.height = sprite.image.height;
-    _this.animation = new GW.SpriteAnimation(sprite, 10 / speed);
-    _this.bBox = new GW.BoundingBox(x, y, sprite.frameWidth,
+    _this.animation = new SGE.SpriteAnimation(sprite, 10 / speed);
+    _this.bBox = new SGE.BoundingBox(x, y, sprite.frameWidth,
             sprite.image.height);
     // Function that moves the Bug's position to a specific target point
     function moveToPoint(targetX, targetY) {
@@ -205,7 +205,7 @@ var TapTapBugGame = (function () {
     var bugSpawnTimes = [];
     var bugSpwanProbs = [];
     var defaultAllotedTime;
-    var superModule = new GW.Game();
+    var superModule = new SGE.Game();
     var resourceIDs = {'FOOD': null, 'BACKGROUND': null};
     var eventFuncts = {'UPDATESCORE': null, 'UPDATETIME': null,
             'GAMEOVER': null};
@@ -213,7 +213,7 @@ var TapTapBugGame = (function () {
             'ENDY': 0, 'SPREADX': 0, 'SPREADY': 0, 'POINTS': 0};
     // Function that initializes TapTapBugGame
     superModule.connectCustomInit(function (ctx) {
-        var bgImage = GW.ResourceManager.getImage(resourceIDs.BACKGROUND);
+        var bgImage = SGE.ResourceManager.getImage(resourceIDs.BACKGROUND);
         // Setup the background pattern
         bgImage.onload = function () {
             // Create a pattern using the background Image
@@ -236,7 +236,7 @@ var TapTapBugGame = (function () {
                     object.getBox().getY() + object.getBox().getHeight()),
             'POINTS'
         );
-        GW.ResourceManager.playSound('SND_POINTS_WON', {volume: 0.45});
+        SGE.ResourceManager.playSound('SND_POINTS_WON', {volume: 0.45});
     }
     // Function that shows points lost using PointUpText on a specific object
     function showPointsLost(points, object) {
@@ -247,7 +247,7 @@ var TapTapBugGame = (function () {
                     object.getBox().getY() + object.getBox().getHeight()),
             'POINTS'
         );
-        GW.ResourceManager.playSound('SND_POINTS_LOST', {volume: 0.45});
+        SGE.ResourceManager.playSound('SND_POINTS_LOST', {volume: 0.45});
     }
     // Function that updates remaining time and calls the time update function
     function updateTime(FPS) {
@@ -304,7 +304,7 @@ var TapTapBugGame = (function () {
         var foodCount = 0;
         var usedFrames = [];
         // Obtain the Food's Sprite, frame width, height and number of frames
-        var foodSprite = GW.ResourceManager.getSprite(resourceIDs.FOOD);
+        var foodSprite = SGE.ResourceManager.getSprite(resourceIDs.FOOD);
         var foodWidth = foodSprite.frameWidth;
         var foodHeight = foodSprite.image.height;
         var foodFrames = foodSprite.numFrames;
@@ -318,10 +318,10 @@ var TapTapBugGame = (function () {
         // Generate Food with specific frame index within a specific range
         while (foodCount < foodSettings.AMOUNT) {
             // Generate random positions specified by the bound variables
-            x = GW.Utils.randomNumber(foodSettings.STARTX, foodSettings.ENDX);
-            y = GW.Utils.randomNumber(foodSettings.STARTY, foodSettings.ENDY);
+            x = SGE.Utils.randomNumber(foodSettings.STARTX, foodSettings.ENDX);
+            y = SGE.Utils.randomNumber(foodSettings.STARTY, foodSettings.ENDY);
             // Generate a random frame index for the Food's Sprite image
-            randFrame = GW.Utils.randomNumber(0, foodFrames - 1);
+            randFrame = SGE.Utils.randomNumber(0, foodFrames - 1);
             // Ensure new position doesn't overlap with previous positions
             isOverlap = usedPos.some(checkFoodOverlap);
             // Create Food if there is no overlap
@@ -330,9 +330,9 @@ var TapTapBugGame = (function () {
                 while (usedFrames.indexOf(randFrame) >= 0) {
                     // Use existing index if all frame indicies are used
                     if (usedFrames.length === foodSprite.numFrames) {
-                        randFrame = GW.Utils.randomItem(usedFrames);
+                        randFrame = SGE.Utils.randomItem(usedFrames);
                     } else {
-                        randFrame = GW.Utils.randomNumber(0, foodFrames - 1);
+                        randFrame = SGE.Utils.randomNumber(0, foodFrames - 1);
                     }
                 }
                 superModule.addGameObject(
@@ -355,16 +355,16 @@ var TapTapBugGame = (function () {
         if (timeTicks > bugSpawnTime * FPS) {
             // Reset the Bug spawn timer
             timeTicks = 0;
-            bugSpawnTime = GW.Utils.randomItem(bugSpawnTimes);
+            bugSpawnTime = SGE.Utils.randomItem(bugSpawnTimes);
             // Configure the Bug using randomly chosen attributes
-            var spriteID = GW.Utils.randomItem(bugSpwanProbs);
+            var spriteID = SGE.Utils.randomItem(bugSpwanProbs);
             var points = bugDB[spriteID].POINTS;
             var speed = bugDB[spriteID].SPEED;
-            var sprite = GW.ResourceManager.getSprite(spriteID);
+            var sprite = SGE.ResourceManager.getSprite(spriteID);
             var width = sprite.frameWidth;
             var height = sprite.image.height;
-            var x = GW.Utils.randomNumber(width, canvas.width - width);
-            var y = GW.Utils.randomItem([0 - height, canvas.height + height]);
+            var x = SGE.Utils.randomNumber(width, canvas.width - width);
+            var y = SGE.Utils.randomItem([0 - height, canvas.height + height]);
             // Create a new Bug using the above attributes
             superModule.addGameObject(
                 new Bug(sprite, points, speed, x, y,
@@ -462,7 +462,7 @@ var TapTapBugGame = (function () {
     superModule.setBugSpawnTimes = function (spawnTimes) {
         bugSpawnTimes = spawnTimes;
         // Set a default spawn time
-        bugSpawnTime = GW.Utils.randomItem(bugSpawnTimes);
+        bugSpawnTime = SGE.Utils.randomItem(bugSpawnTimes);
     };
     // Function that sets the range to spawn and position the Food
     superModule.setFoodSpawnRange = function (startX, endX, startY, endY) {
@@ -542,14 +542,14 @@ var Setup = (function () {
     // Function that adds all of the game resources using the ResourceManager
     function initResources() {
         // Add and config all Image and Sprite resources
-        GW.ResourceManager.addImage('IMG_BACKGROUND', IMG_BG, 387, 600);
-        GW.ResourceManager.addSprite('SPR_FOOD', SPR_FOOD, 896, 56, 16);
-        GW.ResourceManager.addSprite('SPR_BUG_RED', SPR_BUG_R, 90, 50, 2);
-        GW.ResourceManager.addSprite('SPR_BUG_ORANGE', SPR_BUG_O, 90, 50, 2);
-        GW.ResourceManager.addSprite('SPR_BUG_GREY', SPR_BUG_G, 90, 50, 2);
+        SGE.ResourceManager.addImage('IMG_BACKGROUND', IMG_BG, 387, 600);
+        SGE.ResourceManager.addSprite('SPR_FOOD', SPR_FOOD, 896, 56, 16);
+        SGE.ResourceManager.addSprite('SPR_BUG_RED', SPR_BUG_R, 90, 50, 2);
+        SGE.ResourceManager.addSprite('SPR_BUG_ORANGE', SPR_BUG_O, 90, 50, 2);
+        SGE.ResourceManager.addSprite('SPR_BUG_GREY', SPR_BUG_G, 90, 50, 2);
         // Add and config all Sound resources
-        GW.ResourceManager.addSound('SND_POINTS_WON', SND_POINTS_WON);
-        GW.ResourceManager.addSound('SND_POINTS_LOST', SND_POINTS_LOST);
+        SGE.ResourceManager.addSound('SND_POINTS_WON', SND_POINTS_WON);
+        SGE.ResourceManager.addSound('SND_POINTS_LOST', SND_POINTS_LOST);
     }
     // Function that updates the score text
     function updateScore(score) {
@@ -562,7 +562,7 @@ var Setup = (function () {
     // Function that handles the events for the home navigation link
     function navHomeEvent() {
         // Call events if game is not running
-        if (!GW.System.isActive()) {
+        if (!SGE.System.isActive()) {
             // Set home link item to active and score link item to inactive
             $(ID_TAB_HOME).addClass('active');
             $(ID_TAB_SCORE).removeClass('active');
@@ -581,7 +581,7 @@ var Setup = (function () {
         $(ID_SECTION_HOME).hide();
         $(ID_SECTION_GAME).show();
         // Start the GameSystem
-        GW.System.start();
+        SGE.System.start();
     }
     // Function that handles the events for the retry button
     function retryButtonEvent() {
@@ -591,9 +591,9 @@ var Setup = (function () {
     // Function that handles the events for the pause / resume button
     function pauseResumeButtonEvent() {
         // Pause the game if the game is running and resume if game is paused
-        GW.System.togglePause();
+        SGE.System.togglePause();
         // Change the image of the button depending on the state of the game
-        if (GW.System.isPaused()) {
+        if (SGE.System.isPaused()) {
             $(ID_BUTTON_PAUSE + ' img').attr('src', IMG_BUTTON_PLAY);
         } else {
             $(ID_BUTTON_PAUSE + ' img').attr('src', IMG_BUTTON_PAUSE);
@@ -619,7 +619,7 @@ var Setup = (function () {
     // Function that handles the events for the score navigation link
     function navScoreEvent() {
         // Call events if game is not running
-        if (!GW.System.isActive()) {
+        if (!SGE.System.isActive()) {
             // Set score link item to active and home link item to inactive
             $(ID_TAB_SCORE).addClass('active');
             $(ID_TAB_HOME).removeClass('active');
@@ -633,7 +633,7 @@ var Setup = (function () {
     // Function that handles events for when TapTapBugGame is finished
     function gameOverEvent(score, isWin) {
         // Stop the GameSystem
-        GW.System.stop();
+        SGE.System.stop();
         // Navigate to score page
         navScoreEvent();
         // Hide the game page section and show the retry button
@@ -698,10 +698,10 @@ var Setup = (function () {
         bindEventHandlers();
         // Create and configure TapTapBugGame instance
         createConfigureGame();
-        // Initalize and configure the Gamework system with TapTapBugGame
-        GW.System.init(60, ID_CANVAS, TapTapBugGame);
-        GW.System.enableMouseMove();
-        GW.System.enableMouseClick();
+        // Initalize and configure the Simple Game Engine with TapTapBugGame
+        SGE.System.init(60, ID_CANVAS, TapTapBugGame);
+        SGE.System.enableMouseMove();
+        SGE.System.enableMouseClick();
     }
     // Functions returned by the module
     return {
