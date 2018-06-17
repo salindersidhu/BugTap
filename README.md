@@ -11,6 +11,9 @@ In this game, there are 6 pieces of food randomly positioned near the center of 
 - Firefox 44+
 - Chrome / Chromium 48+
 
+## Game Demo
+- Playable demo avaliable via [RawGit](https://rawgit.com/salindersidhu/TapTapBug/master/Game/index.html).
+
 ## Credits:
 - **Original Assignment**:
     - University of Toronto: CSC309 Programming on the Web, Summer 2015
