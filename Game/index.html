@@ -1,110 +1,97 @@
 <!DOCTYPE html>
-<html lang='en'>
-<!-- Head -->
-<head>
-    <meta charset='utf-8'>
-    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
-    <meta name='viewport' content='width=device-width, initial-scale=1'>
-    <!-- The above 3 meta tags *must* come first in the head; any other content must come *after* these tags -->
-    <title>Tap Tap Bug!</title>
-    <!-- Latest compiled and minified Bootstrap CSS -->
-    <link href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css' rel='stylesheet'>
-    <!-- Link Font Awesome CSS -->
-    <link href='https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css' rel='stylesheet'>
-    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-    <link href='css/ie10-viewport-bug-workaround.css' rel='stylesheet'>
-    <!-- Custom styles for this template -->
-    <link href='css/cover.css' rel='stylesheet'>
-    <!-- Link external CSS -->
-    <link href='css/index.css' rel='stylesheet'>
-    <!-- Link favicon -->
-    <link href='assets/favicon.ico' rel='icon' type='image/x-icon'/>
-</head>
-<!-- Body -->
-<body>
-    <div class='site-wrapper'>
-        <div class='site-wrapper-inner'>
-            <div class='cover-container'>
-                <!-- Navigation -->
-                <div class='masthead clearfix'>
-                    <div class='inner'>
-                        <!-- Heading title -->
-                        <h3 class='masthead-brand'><i class='fa fa-bug fa-lg'></i> Tap Tap Bug!</h3>
-                        <!-- Navigation menu -->
-                        <nav>
-                            <ul class='nav masthead-nav'>
-                                <li id='home-link' class='active'><a href='#'><i class='fa fa-home fa-1x'></i> Home</a></li>
-                                <li id='score-link'><a href='#'><i class='fa fa-trophy fa-1x'></i> Score</a></li>
-                            </ul>
-                        </nav>
-                    </div>
+<html lang="en">
+    <head>
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <meta name="description" content="A single player 2D bug squishing game developed using HTML5, CSS3 and JavaScript with jQuery">
+        <meta name="author" content="Salinder Sidhu">
+
+        <title>Tap Tap Bug!</title>
+        <link href="assets/favicon.ico" rel="icon" type="image/x-icon"/>
+
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+        <!-- Link Font Awesome CSS -->
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+        <!-- Custom styles for this template -->
+        <link href="css/cover.css" rel="stylesheet">
+        <!-- Styles for the game -->
+        <link href="css/tap_tap_bug.css" rel="stylesheet">
+    </head>
+    <body class="text-center">
+        <div class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
+            <!-- Navigation Header -->
+            <header class="masthead mb-auto">
+                <div class="inner">
+                    <!-- Heading title -->
+                    <h3 class="masthead-brand"><i class="fas fa-bug fa-lg"></i> Tap Tap Bug!</h3>
+                    <!-- Navigation menu -->
+                    <nav class="nav nav-masthead justify-content-center">
+                        <a id="home-link" class="nav-link active" href="#"> Home</a>
+                        <a id="score-link" class="nav-link" href="#"> Score</a>
+                    </nav>
                 </div>
-                <!-- Page content -->
-                <div class='inner cover'>
-                    <!-- Welcome section -->
-                    <div id='home-section'>
-                        <h1 class='cover-heading'>Welcome</h1>
-                        <p class='lead'>Squish as many bugs as you can within one minute before the bugs eat all the food, good luck!</p>
-                        <p class='lead'>
-                            <a id='play-button' class='btn btn-lg btn-primary'><i class='fa fa-play-circle fa-1x'></i> Play Game</a>
-                        </p>
-                    </div>
-                    <!-- High Score section -->
-                    <div id='score-section' style='display:none;'>
-                        <h1 id='game-lose-message' style='display:none;' class='cover-heading'>Game Over - The Bugs Won <i class='fa fa-frown-o fa-lg'></i></h1>
-                        <h1 id='game-won-message' style='display:none;' class='cover-heading'>Congratulations! - You've Won <i class='fa fa-smile-o fa-lg'></i></h1>
-                        <h1 id='score-heading' class='cover-heading'>High Score: 0</h1>
-                        <p class='lead'></p>
-                        <p class='lead'>
-                            <a id='clear-button' class='btn btn-lg btn-danger'><i class='fa fa-trash fa-1x'></i> Clear</a>
-                            <a id='retry-button' style='display:none;' class='btn btn-lg btn-success'><i class='fa fa-refresh fa-1x'></i> Retry</a>
-                        </p>
-                    </div>
-                    <!-- Game canvas section -->
-                    <div id='game-section' style='display:none;'>
-                        <!-- Information bar -->
-                        <div id='infobar'>
-                            <!-- Time remaining in seconds -->
-                            <p id='time-text' class='lead'>Time: 0</p>
-                            <!-- Pause and resume image button -->
-                            <a href='#' id='pause-button'>
-                                <img alt='Pause/Resume Button' src='assets/button_pause.png'/>
-                            </a>
-                            <!-- The current score -->
-                            <p id='score-text' class='lead'>Score: 0</p>
-                        </div>
-                        <!-- Game Canvas -->
-                        <canvas id='game-canvas' width='387' height='600'>
-                            <p class='lead'>Your browser does not support the canvas functionality to play this game.</p>
-                            <p class='lead'>Please update to a modern browser such as <a href='www.google.com/chrome/'>Google Chrome</a> to play.</p>
-                        </canvas>
-                    </div>
+            </header>
+            <!-- Page content -->
+            <main role="main" class="inner cover">
+                <!-- Welcome section -->
+                <div id="home-section">
+                    <h1 class="cover-heading">Welcome</h1>
+                    <p class="lead">Squish as many bugs as you can within one minute before the bugs eat all the food, good luck!</p>
+                    <p class="lead">
+                        <a id="play-button" class="btn btn-lg btn-primary"><i class="fas fa-play-circle fa-1x"></i> Play Game</a>
+                    </p>
                 </div>
-                <!-- Footer -->
-                <div class='mastfoot'>
-                    <div class='inner'>
-                        <p>Copyright &copy; 2018 <a href='https://github.com/SalinderSidhu/TapTapBug'>Salinder Sidhu</a></p>
-                    </div>
+                <!-- High Score section -->
+                <div id="score-section" style="display:none;">
+                    <h1 id="game-lose-message" style="display:none;" class="cover-heading">Game Over - The Bugs Won <i class="fas fa-frown fa-lg"></i></h1>
+                    <h1 id="game-won-message" style="display:none;" class="cover-heading">Congratulations! - You Win <i class="fas fa-smile fa-lg"></i></h1>
+                    <h1 id="score-heading" class="cover-heading">High Score: 0</h1>
+                    <p class="lead"></p>
+                    <p class="lead">
+                        <a id="clear-button" class="btn btn-lg btn-danger"><i class="fas fa-minus-circle fa-1x"></i> Clear</a>
+                        <a id="retry-button" style="display:none;" class="btn btn-lg btn-success"><i class="fas fa-sync fa-1x"></i> Retry</a>
+                    </p>
                 </div>
-            </div>
+                <!-- Game canvas section -->
+                <div id="game-section" style="display:none;">
+                    <!-- Information bar -->
+                    <div id="infobar">
+                        <!-- Time remaining in seconds -->
+                        <p id="time-text" class="lead">Time: 0</p>
+                        <!-- Pause and resume image button -->
+                        <a href="#" id="pause-button">
+                            <img alt="Pause/Resume Button" src="Assets/button_pause.png"/>
+                        </a>
+                        <!-- The current score -->
+                        <p id="score-text" class="lead">Score: 0</p>
+                    </div>
+                    <!-- Game Canvas -->
+                    <canvas id="game-canvas" width="387" height="600">
+                        <p class="lead">Your browser does not support the canvas functionality to play this game.</p>
+                        <p class="lead">Please update to a modern browser such as <a href="www.google.com/chrome/">Google Chrome</a> to play.</p>
+                    </canvas>
+                </div>
+            </main>
+
+             <!-- Footer -->
+            <footer class="mastfoot mt-auto">
+                <div class="inner">
+                    <p>Copyright &copy; 2018 <a href="https://github.com/SalinderSidhu/TapTapBug">Salinder Sidhu</a></p>
+                </div>
+            </footer>
         </div>
-    </div>
-    <!-- Link JQuery library required for Bootstrap -->
-    <script src='https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js'></script>
-    <!-- Latest compiled and minified Bootstrap JavaScript -->
-    <script src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js'></script>
-    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-    <script src='js/ie10-viewport-bug-workaround.js'></script>
-    <!-- Link the SoundJS library -->
-    <script src="https://code.createjs.com/createjs-2015.11.26.min.js"></script>
-    <!-- Link the JavaScript containing the game framework -->
-    <script src='js/simple_game_engine.js'></script>
-    <!-- Link JavaScript containing the Tap Tap Bug game -->
-    <script src='js/tap_tap_bug.js'></script>
-    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
-    <!--[if lt IE 9]>
-        <script src='https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js'></script>
-        <script src='https://oss.maxcdn.com/respond/1.4.2/respond.min.js'></script>
-    <![endif]-->
-</body>
+        <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
+
+        <!-- Link the SoundJS library -->
+        <script src="https://code.createjs.com/soundjs-0.6.2.min.js"></script>
+
+        <!-- Link Simple Game Engine and Tap Tap Bug game -->
+        <script src="js/simple_game_engine.js"></script>
+        <script src="js/tap_tap_bug.js"></script>
+    </body>
 </html>

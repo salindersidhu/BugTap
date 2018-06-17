@@ -13,16 +13,16 @@
 /* Styles for the game canvas */
 #game-canvas {
     margin: 0 auto;
-    border-right: 2px solid black;
-    border-left: 2px solid black;
-    border-bottom: 2px solid black;
+    border-right: 1px solid black;
+    border-left: 1px solid black;
+    border-bottom: 1px solid black;
 }
 /* Styles for the infobar */
 #infobar {
     margin: 0 auto;
-    border: 2px solid black;
+    border: 1px solid black;
     background-color: #404040; /* Shade of Grey */
-    width: 391px;
+    width: 389px;
     height: auto;
     overflow: hidden;
 }
@@ -36,11 +36,13 @@
 }
 /* Specific styles for the time remaining text */
 #time-text {
+    font-weight: bold;
     padding-left: 15px;
     float: left;
 }
 /* Specific styles for the current score text */
 #score-text {
+    font-weight: bold;
     padding-right: 15px;
     float: right;
 }
