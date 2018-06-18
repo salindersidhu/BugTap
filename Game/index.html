@@ -6,26 +6,29 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
         <meta name="description" content="A single player 2D bug squishing game developed using HTML5, CSS3 and JavaScript with jQuery">
         <meta name="author" content="Salinder Sidhu">
-
-        <title>Tap Tap Bug!</title>
-        <link href="assets/favicon.ico" rel="icon" type="image/x-icon"/>
-
+        <!-- Title and favicon -->
+        <title>Bug Tap!</title>
+        <link rel="icon" type="image/x-icon" href="assets/favicon.ico"/>
         <!-- Bootstrap CSS -->
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
         <!-- Link Font Awesome CSS -->
         <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
         <!-- Custom styles for this template -->
-        <link href="css/cover.css" rel="stylesheet">
+        <link rel="stylesheet" href="css/theme.css">
         <!-- Styles for the game -->
-        <link href="css/tap_tap_bug.css" rel="stylesheet">
+        <link  rel="stylesheet" href="css/bug_tap.css">
     </head>
     <body class="text-center">
         <div class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
+            <!-- Fork me on GitHub ribbon -->
+            <a class="fork-me-ribbon" href="https://github.com/salindersidhu/BugTap">
+                <img src="https://s3.amazonaws.com/github/ribbons/forkme_left_red_aa0000.png" alt="Fork me on GitHub">
+            </a>
             <!-- Navigation Header -->
             <header class="masthead mb-auto">
                 <div class="inner">
                     <!-- Heading title -->
-                    <h3 class="masthead-brand"><i class="fas fa-bug fa-lg"></i> Tap Tap Bug!</h3>
+                    <h3 class="masthead-brand"><i class="fas fa-bug fa-lg"></i> Bug Tap!</h3>
                     <!-- Navigation menu -->
                     <nav class="nav nav-masthead justify-content-center">
                         <a id="home-link" class="nav-link active" href="#"> Home</a>
@@ -40,7 +43,7 @@
                     <h1 class="cover-heading">Welcome</h1>
                     <p class="lead">Squish as many bugs as you can within one minute before the bugs eat all the food, good luck!</p>
                     <p class="lead">
-                        <a id="play-button" class="btn btn-lg btn-primary"><i class="fas fa-play-circle fa-1x"></i> Play Game</a>
+                        <a id="play-button" class="btn btn-lg btn-primary"><i class="fas fa-play-circle fa-1x"></i> Start Game</a>
                     </p>
                 </div>
                 <!-- High Score section -->
@@ -74,11 +77,16 @@
                     </canvas>
                 </div>
             </main>
-
              <!-- Footer -->
             <footer class="mastfoot mt-auto">
                 <div class="inner">
-                    <p>Copyright &copy; 2018 <a href="https://github.com/SalinderSidhu/TapTapBug">Salinder Sidhu</a></p>
+                    <p>
+                        <small>
+                            Made with <i style="color:red;" class="fas fa-heart"></i> and <i class="fas fa-coffee"></i> in Toronto, Canada
+                        </br>
+                            Copyright &copy; 2018 by <a href="https://github.com/SalinderSidhu">Salinder Sidhu</a>
+                        </small>
+                    </p>
                 </div>
             </footer>
         </div>
@@ -86,12 +94,10 @@
         <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
-
         <!-- Link the SoundJS library -->
         <script src="https://code.createjs.com/soundjs-0.6.2.min.js"></script>
-
-        <!-- Link Simple Game Engine and Tap Tap Bug game -->
+        <!-- Link Simple Game Engine and Bug Tap game -->
         <script src="js/simple_game_engine.js"></script>
-        <script src="js/tap_tap_bug.js"></script>
+        <script src="js/bug_tap.js"></script>
     </body>
 </html>

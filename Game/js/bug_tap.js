@@ -1,11 +1,11 @@
-/*jshint browser:true, jquery:true, quotmark:single, maxlen:80, eqeqeq:true,
+/*jshint browser:true, jquery:true, quotmark:double, maxlen:80, eqeqeq:true,
 strict:true, unused:true, undef:true*/
 /*jslint browser:true, this:true*/
 /*global $, window, SGE*/
 
 // PointUpText draws text which scrolls upwards and fades out
 function PointUpText(text, font, colour, moveSpeed, fadeSpeed, x, y) {
-    'use strict';
+    "use strict";
     // Module constnts and variables
     var superModule = new SGE.GameObject();
     superModule.setDrawPriority(2);
@@ -14,7 +14,7 @@ function PointUpText(text, font, colour, moveSpeed, fadeSpeed, x, y) {
     _this.y = y;
     _this.moveSpeed = moveSpeed;
     _this.fadingText = new SGE.FadingText(text, font, colour, fadeSpeed);
-    _this.fadingText.setOutline('black', 6);
+    _this.fadingText.setOutline("black", 6);
     // Function that updates the PointUpText
     superModule.update = function (FPS) {
         // Move the PointUpText upwards (towards the top of the screen)
@@ -35,7 +35,7 @@ function PointUpText(text, font, colour, moveSpeed, fadeSpeed, x, y) {
 
 // Food handles event management and rendering tasks for Food
 function Food(sprite, selectedFrame, x, y) {
-    'use strict';
+    "use strict";
     // Module constants and variables
     var superModule = new SGE.GameObject();
     var _this = this;
@@ -43,8 +43,12 @@ function Food(sprite, selectedFrame, x, y) {
     _this.y = y;
     _this.isEaten = false;
     _this.animation = new SGE.SpriteAnimation(sprite, 0, selectedFrame);
-    _this.bBox = new SGE.BoundingBox(x, y, sprite.frameWidth,
-            sprite.image.height);
+    _this.bBox = new SGE.BoundingBox(
+        x,
+        y,
+        sprite.frameWidth,
+        sprite.image.height
+    );
     // Function that handles updating the Food's state
     superModule.update = function (FPS) {
         // If Food has been eaten then fade it out within half a second
@@ -78,7 +82,7 @@ function Food(sprite, selectedFrame, x, y) {
 
 // Bug handles all event management and rendering tasks for Bug
 function Bug(sprite, points, speed, x, y, foodObjects) {
-    'use strict';
+    "use strict";
     // Module constants and variables
     var superModule = new SGE.GameObject();
     superModule.setDrawPriority(1);
@@ -95,8 +99,12 @@ function Bug(sprite, points, speed, x, y, foodObjects) {
     _this.width = sprite.frameWidth;
     _this.height = sprite.image.height;
     _this.animation = new SGE.SpriteAnimation(sprite, 10 / speed);
-    _this.bBox = new SGE.BoundingBox(x, y, sprite.frameWidth,
-            sprite.image.height);
+    _this.bBox = new SGE.BoundingBox(
+        x,
+        y,
+        sprite.frameWidth,
+        sprite.image.height
+    );
     // Function that moves the Bug's position to a specific target point
     function moveToPoint(targetX, targetY) {
         // Calculate the distance to the target point
@@ -189,8 +197,8 @@ function Bug(sprite, points, speed, x, y, foodObjects) {
     return superModule;
 }
 
-var TapTapBugGame = (function () {
-    'use strict';
+var BugTapGame = (function () {
+    "use strict";
     // Module constants and variables
     var score;
     var mouseX;
@@ -206,18 +214,29 @@ var TapTapBugGame = (function () {
     var bugSpwanProbs = [];
     var defaultAllotedTime;
     var superModule = new SGE.Game();
-    var resourceIDs = {'FOOD': null, 'BACKGROUND': null};
-    var eventFuncts = {'UPDATESCORE': null, 'UPDATETIME': null,
-            'GAMEOVER': null};
-    var foodSettings = {'AMOUNT': 0, 'STARTX': 0, 'ENDX': 0, 'STARTY': 0,
-            'ENDY': 0, 'SPREADX': 0, 'SPREADY': 0, 'POINTS': 0};
-    // Function that initializes TapTapBugGame
+    var resourceIDs = {"FOOD": null, "BACKGROUND": null};
+    var eventFuncts = {
+        "updateScore": null,
+        "updateTime": null,
+        "gameOver": null
+    };
+    var foodSettings = {
+        "AMOUNT": 0,
+        "STARTX": 0,
+        "ENDX": 0,
+        "STARTY": 0,
+        "ENDY": 0,
+        "SPREADX": 0,
+        "SPREADY": 0,
+        "POINTS": 0
+    };
+    // Function that initializes BugTapGame
     superModule.connectCustomInit(function (ctx) {
         var bgImage = SGE.ResourceManager.getImage(resourceIDs.BACKGROUND);
         // Setup the background pattern
         bgImage.onload = function () {
             // Create a pattern using the background Image
-            bgPattern = ctx.createPattern(bgImage, 'repeat');
+            bgPattern = ctx.createPattern(bgImage, "repeat");
         };
         // Set the Bug spawn probability distribution
         Object.keys(bugDB).forEach(function (bugID) {
@@ -230,68 +249,80 @@ var TapTapBugGame = (function () {
     // Function that shows points gained using PointUpText on a specific object
     function showPointsGained(points, object) {
         superModule.addGameObject(
-            new PointUpText('+' + points, 'bold 30px Sans-serif', '#B8E600', 1,
-                    1.3,
-                    object.getBox().getX() + 5,
-                    object.getBox().getY() + object.getBox().getHeight()),
-            'POINTS'
+            new PointUpText(
+                "+" + points,
+                "bold 30px Sans-serif",
+                "#B8E600",
+                1,
+                1.3,
+                object.getBox().getX() + 5,
+                object.getBox().getY() + object.getBox().getHeight()
+            ),
+            "POINTS"
         );
-        SGE.ResourceManager.playSound('SND_POINTS_WON', {volume: 0.45});
+        SGE.ResourceManager.playSound("SND_POINTS_WON", {volume: 0.45});
     }
     // Function that shows points lost using PointUpText on a specific object
     function showPointsLost(points, object) {
         superModule.addGameObject(
-            new PointUpText('-' + points, 'bold 30px Sans-serif', '#FF5050', 1,
-                    1.3,
-                    object.getBox().getX() + 5,
-                    object.getBox().getY() + object.getBox().getHeight()),
-            'POINTS'
+            new PointUpText(
+                "-" + points,
+                "bold 30px Sans-serif",
+                "#FF5050",
+                1,
+                1.3,
+                object.getBox().getX() + 5,
+                object.getBox().getY() + object.getBox().getHeight()
+            ),
+            "POINTS"
         );
-        SGE.ResourceManager.playSound('SND_POINTS_LOST', {volume: 0.45});
+        SGE.ResourceManager.playSound("SND_POINTS_LOST", {volume: 0.45});
     }
     // Function that updates remaining time and calls the time update function
     function updateTime(FPS) {
         remainingTime -= 1 / FPS;
-        eventFuncts.UPDATETIME(Math.floor(remainingTime));
+        eventFuncts.updateTime(Math.floor(remainingTime));
     }
-    // Function that handles the game over event for TapTapBugGame
+    // Function that handles the game over event for BugTapGame
     function updateGameOver() {
         // Game is over when the timer expires or all of the Food is eaten
-        if (remainingTime < 1 ||
-                superModule.getGameObjects('FOOD').length < 1) {
+        if (
+            remainingTime < 1 || superModule.getGameObjects("FOOD").length < 1
+        ) {
             isGameOver = true;
             // Reward points for any remaining Food but only once
             if (!rewardedPoints) {
-                superModule.getGameObjects('FOOD').forEach(function (food) {
+                superModule.getGameObjects("FOOD").forEach(function (food) {
                     score += foodSettings.POINTS;
-                    eventFuncts.UPDATESCORE(score);
+                    eventFuncts.updateScore(score);
                     showPointsGained(foodSettings.POINTS, food);
                 });
                 rewardedPoints = true;
             }
         }
         // If game is over and all Bugs are dead then call game over event
-        if (isGameOver &&
-                superModule.getGameObjects('BUGS').length < 1 &&
-                superModule.getGameObjects('POINTS').length < 1) {
+        if (
+            isGameOver && superModule.getGameObjects("BUGS").length < 1 &&
+            superModule.getGameObjects("POINTS").length < 1
+        ) {
             // If the timer expired then player has won
             if (remainingTime < 1) {
-                eventFuncts.GAMEOVER(score, true);
+                eventFuncts.gameOver(score, true);
             } else {
-                eventFuncts.GAMEOVER(score, false);
+                eventFuncts.gameOver(score, false);
             }
         }
     }
     // Function that updates the canvas cursor when hovering over a Bug
     function updateCanvasCursor() {
-        superModule.getGameObjects('BUGS').some(function (bug) {
+        superModule.getGameObjects("BUGS").some(function (bug) {
             // If hovering over Bug then change cursor to 'pointer' and break
             if (bug.getBox().isMouseOverlap(mouseX, mouseY)) {
-                $('body').addClass('pointer-cursor');
+                $("body").addClass("pointer-cursor");
                 return true;
             }
             // Change the cursor back to 'hovering' when hot hovering over Bug
-            $('body').removeClass('pointer-cursor');
+            $("body").removeClass("pointer-cursor");
         });
     }
     // Function that spawns a specific amount of Food positioned randomly
@@ -337,9 +368,9 @@ var TapTapBugGame = (function () {
                 }
                 superModule.addGameObject(
                     new Food(foodSprite, randFrame, x, y),
-                    'FOOD'
+                    "FOOD"
                 );
-                usedPos.push({'x': x, 'y': y});
+                usedPos.push({"x": x, "y": y});
                 // Add the new frame index to used list if it doesn't exist
                 if (usedFrames.indexOf(randFrame) < 0) {
                     usedFrames.push(randFrame);
@@ -367,9 +398,15 @@ var TapTapBugGame = (function () {
             var y = SGE.Utils.randomItem([0 - height, canvas.height + height]);
             // Create a new Bug using the above attributes
             superModule.addGameObject(
-                new Bug(sprite, points, speed, x, y,
-                        superModule.getGameObjects('FOOD')),
-                'BUGS'
+                new Bug(
+                    sprite,
+                    points,
+                    speed,
+                    x,
+                    y,
+                    superModule.getGameObjects("FOOD")
+                ),
+                "BUGS"
             );
         }
     }
@@ -383,9 +420,9 @@ var TapTapBugGame = (function () {
         remainingTime = defaultAllotedTime;
         // Set default score of 0 and spawn need Food
         spawnFood();
-        eventFuncts.UPDATESCORE(score);
+        eventFuncts.updateScore(score);
     });
-    // Function that handle all update tasks for TapTapBugGame
+    // Function that handle all update tasks for BugTapGame
     superModule.connectCustomUpdate(function (FPS, canvas) {
         // If game is not over update remaining time and spawn Bugs
         if (!isGameOver) {
@@ -394,12 +431,12 @@ var TapTapBugGame = (function () {
         }
         // Update the canvas cursor when hovering over a Bug
         updateCanvasCursor();
-        // Handle game over event for TapTapBugGame
+        // Handle game over event for BugTapGame
         updateGameOver();
         // Update all Bug movement and collisions
-        superModule.getGameObjects('BUGS').forEach(function (bug) {
+        superModule.getGameObjects("BUGS").forEach(function (bug) {
             // Handle all collisions between Bugs and Food GameObjects
-            superModule.getGameObjects('FOOD').forEach(function (food) {
+            superModule.getGameObjects("FOOD").forEach(function (food) {
                 // Ensure that the current Food has not been eaten
                 if (!food.isEaten()) {
                     // Check if the Bug is colliding with a Food object
@@ -409,7 +446,7 @@ var TapTapBugGame = (function () {
                         score -= foodSettings.POINTS;
                         // Ensure that that score is non-negative
                         score = Math.max(score, 0);
-                        eventFuncts.UPDATESCORE(score);
+                        eventFuncts.updateScore(score);
                         showPointsLost(foodSettings.POINTS, food);
                     }
                 }
@@ -420,28 +457,28 @@ var TapTapBugGame = (function () {
             }
         });
     });
-    // Function that handles all rendering tasks for TapTapBugGame
+    // Function that handles all rendering tasks for BugTapGame
     superModule.connectCustomRender(function (ctx, canvas) {
         // Render the Game's background
         ctx.fillStyle = bgPattern;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
     });
-    // Function that handles all mouse move tasks for TapTapBugGame
+    // Function that handles all mouse move tasks for BugTapGame
     superModule.mouseMoveEvent = function (mX, mY) {
         // Store the mouse coordinates when the mouse has moved
         mouseX = mX;
         mouseY = mY;
     };
-    // Function that handles all mouse click tasks for TapTapBugGame
+    // Function that handles all mouse click tasks for BugTapGame
     superModule.mouseClickEvent = function (mX, mY) {
         // Handle mouse clicks on Bug objects
-        superModule.getGameObjects('BUGS').forEach(function (bug) {
+        superModule.getGameObjects("BUGS").forEach(function (bug) {
             // If mouse cursor is hovering over the Bug
             if (bug.getBox().isMouseOverlap(mX, mY)) {
                 // If Bug is not dead update the score and display points won
                 if (!bug.isDead()) {
                     score += bug.getPoints();
-                    eventFuncts.UPDATESCORE(score);
+                    eventFuncts.updateScore(score);
                     showPointsGained(bug.getPoints(), bug);
                 }
                 // Kill the Bug
@@ -451,8 +488,11 @@ var TapTapBugGame = (function () {
     };
     // Function that adds new info about a Bug to the Bug database
     superModule.addBugToDB = function (bugSpriteID, points, speed, weight) {
-        bugDB[bugSpriteID] = {'POINTS': points, 'SPEED': speed,
-                'WEIGHT': weight};
+        bugDB[bugSpriteID] = {
+            "POINTS": points,
+            "SPEED": speed,
+            "WEIGHT": weight
+        };
     };
     // Function that sets the amount of time alloted for the game
     superModule.setAllotedTime = function (allotedTime) {
@@ -486,15 +526,15 @@ var TapTapBugGame = (function () {
     };
     // Function that sets the update score text function for the game
     superModule.setUpdateScoreEvent = function (updateScoreEvent) {
-        eventFuncts.UPDATESCORE = updateScoreEvent;
+        eventFuncts.updateScore = updateScoreEvent;
     };
     // Function that sets the update time text function for the game
     superModule.setUpdateTimeEvent = function (updateTimeEvent) {
-        eventFuncts.UPDATETIME = updateTimeEvent;
+        eventFuncts.updateTime = updateTimeEvent;
     };
     // Function that sets the game over event function for the game
     superModule.setGameOverEvent = function (gameOverEvent) {
-        eventFuncts.GAMEOVER = gameOverEvent;
+        eventFuncts.gameOver = gameOverEvent;
     };
     // Function that sets the Sprite ID for the Food
     superModule.setSpriteFoodID = function (spriteFoodID) {
@@ -510,62 +550,62 @@ var TapTapBugGame = (function () {
 
 // Setup configures the game page and the behaviour of DOM elements
 var Setup = (function () {
-    'use strict';
+    "use strict";
     // DOM element IDs
-    var ID_CANVAS = '#game-canvas';
-    var ID_TAB_HOME = '#home-link';
-    var ID_TEXT_TIME = '#time-text';
-    var ID_TAB_SCORE = '#score-link';
-    var ID_TEXT_SCORE = '#score-text';
-    var ID_BUTTON_PLAY = '#play-button';
-    var ID_BUTTON_CLEAR = '#clear-button';
-    var ID_BUTTON_RETRY = '#retry-button';
-    var ID_BUTTON_PAUSE = '#pause-button';
-    var ID_SECTION_HOME = '#home-section';
-    var ID_SECTION_GAME = '#game-section';
-    var ID_HEADING_SCORE = '#score-heading';
-    var ID_SECTION_SCORE = '#score-section';
-    var ID_MESSAGE_WON = '#game-won-message';
-    var ID_MESSAGE_LOST = '#game-lose-message';
+    var ID_CANVAS = "#game-canvas";
+    var ID_TAB_HOME = "#home-link";
+    var ID_TEXT_TIME = "#time-text";
+    var ID_TAB_SCORE = "#score-link";
+    var ID_TEXT_SCORE = "#score-text";
+    var ID_BUTTON_PLAY = "#play-button";
+    var ID_BUTTON_CLEAR = "#clear-button";
+    var ID_BUTTON_RETRY = "#retry-button";
+    var ID_BUTTON_PAUSE = "#pause-button";
+    var ID_SECTION_HOME = "#home-section";
+    var ID_SECTION_GAME = "#game-section";
+    var ID_HEADING_SCORE = "#score-heading";
+    var ID_SECTION_SCORE = "#score-section";
+    var ID_MESSAGE_WON = "#game-won-message";
+    var ID_MESSAGE_LOST = "#game-lose-message";
     // Resource path IDs
-    var SPR_FOOD = 'assets/food_sprite.png';
-    var IMG_BG = 'assets/background_table.png';
-    var SPR_BUG_R = 'assets/red_bug_sprite.png';
-    var SPR_BUG_G = 'assets/grey_bug_sprite.png';
-    var SND_POINTS_WON = 'assets/points_won.ogg';
-    var SND_POINTS_LOST = 'assets/points_lost.ogg';
-    var SPR_BUG_O = 'assets/orange_bug_sprite.png';
-    var IMG_BUTTON_PLAY = 'assets/button_play.png';
-    var IMG_BUTTON_PAUSE = 'assets/button_pause.png';
+    var SPR_FOOD = "assets/food_sprite.png";
+    var IMG_BG = "assets/background_table.png";
+    var SPR_BUG_R = "assets/red_bug_sprite.png";
+    var SPR_BUG_G = "assets/grey_bug_sprite.png";
+    var SND_POINTS_WON = "assets/points_won.ogg";
+    var SND_POINTS_LOST = "assets/points_lost.ogg";
+    var SPR_BUG_O = "assets/orange_bug_sprite.png";
+    var IMG_BUTTON_PLAY = "assets/button_play.png";
+    var IMG_BUTTON_PAUSE = "assets/button_pause.png";
     // Instance variables
-    var LOCAL_STORAGE_HIGHSCORE = 'highscore';
+    var LOCAL_STORAGE_HIGHSCORE = "highscore";
     // Function that adds all of the game resources using the ResourceManager
     function initResources() {
         // Add and config all Image and Sprite resources
-        SGE.ResourceManager.addImage('IMG_BACKGROUND', IMG_BG, 387, 600);
-        SGE.ResourceManager.addSprite('SPR_FOOD', SPR_FOOD, 896, 56, 16);
-        SGE.ResourceManager.addSprite('SPR_BUG_RED', SPR_BUG_R, 90, 50, 2);
-        SGE.ResourceManager.addSprite('SPR_BUG_ORANGE', SPR_BUG_O, 90, 50, 2);
-        SGE.ResourceManager.addSprite('SPR_BUG_GREY', SPR_BUG_G, 90, 50, 2);
+        SGE.ResourceManager.addImage("IMG_BACKGROUND", IMG_BG, 387, 600);
+        SGE.ResourceManager.addSprite("SPR_FOOD", SPR_FOOD, 896, 56, 16);
+        SGE.ResourceManager.addSprite("SPR_BUG_RED", SPR_BUG_R, 90, 50, 2);
+        SGE.ResourceManager.addSprite("SPR_BUG_ORANGE", SPR_BUG_O, 90, 50, 2);
+        SGE.ResourceManager.addSprite("SPR_BUG_GREY", SPR_BUG_G, 90, 50, 2);
         // Add and config all Sound resources
-        SGE.ResourceManager.addSound('SND_POINTS_WON', SND_POINTS_WON);
-        SGE.ResourceManager.addSound('SND_POINTS_LOST', SND_POINTS_LOST);
+        SGE.ResourceManager.addSound("SND_POINTS_WON", SND_POINTS_WON);
+        SGE.ResourceManager.addSound("SND_POINTS_LOST", SND_POINTS_LOST);
     }
     // Function that updates the score text
     function updateScore(score) {
-        $(ID_TEXT_SCORE).text('Score: ' + score);
+        $(ID_TEXT_SCORE).text("Score: " + score);
     }
     // Function that updates the time text
     function updateTime(time) {
-        $(ID_TEXT_TIME).text('Time: ' + time);
+        $(ID_TEXT_TIME).text("Time: " + time);
     }
     // Function that handles the events for the home navigation link
     function navHomeEvent() {
         // Call events if game is not running
         if (!SGE.System.isActive()) {
             // Set home link item to active and score link item to inactive
-            $(ID_TAB_HOME).addClass('active');
-            $(ID_TAB_SCORE).removeClass('active');
+            $(ID_TAB_HOME).addClass("active");
+            $(ID_TAB_SCORE).removeClass("active");
             // Hide the score page section and show the home page section
             $(ID_SECTION_SCORE).hide();
             $(ID_SECTION_HOME).show();
@@ -594,9 +634,9 @@ var Setup = (function () {
         SGE.System.togglePause();
         // Change the image of the button depending on the state of the game
         if (SGE.System.isPaused()) {
-            $(ID_BUTTON_PAUSE + ' img').attr('src', IMG_BUTTON_PLAY);
+            $(ID_BUTTON_PAUSE + " img").attr("src", IMG_BUTTON_PLAY);
         } else {
-            $(ID_BUTTON_PAUSE + ' img').attr('src', IMG_BUTTON_PAUSE);
+            $(ID_BUTTON_PAUSE + " img").attr("src", IMG_BUTTON_PAUSE);
         }
     }
     // Function that return the highscore entry from local storage
@@ -608,7 +648,7 @@ var Setup = (function () {
     // Function that updates the score heading with score from local storage
     function refreshScore() {
         // Obtain the highScore from local storage and use 0 as default value
-        $(ID_HEADING_SCORE).text('High Score: ' + getScore());
+        $(ID_HEADING_SCORE).text("High Score: " + getScore());
     }
     // Function that handles the events for the clear score button
     function clearScoreButtonEvent() {
@@ -621,8 +661,8 @@ var Setup = (function () {
         // Call events if game is not running
         if (!SGE.System.isActive()) {
             // Set score link item to active and home link item to inactive
-            $(ID_TAB_SCORE).addClass('active');
-            $(ID_TAB_HOME).removeClass('active');
+            $(ID_TAB_SCORE).addClass("active");
+            $(ID_TAB_HOME).removeClass("active");
             // Hide the home page section and show the score page section
             $(ID_SECTION_HOME).hide();
             $(ID_SECTION_SCORE).show();
@@ -630,7 +670,7 @@ var Setup = (function () {
             refreshScore();
         }
     }
-    // Function that handles events for when TapTapBugGame is finished
+    // Function that handles events for when BugTapGame is finished
     function gameOverEvent(score, isWin) {
         // Stop the GameSystem
         SGE.System.stop();
@@ -646,28 +686,28 @@ var Setup = (function () {
             if (score > getScore()) {
                 window.localStorage.setItem(LOCAL_STORAGE_HIGHSCORE, score);
                 // Update high score heading
-                $(ID_HEADING_SCORE).text('New High Score: ' + score);
+                $(ID_HEADING_SCORE).text("New High Score: " + score);
             }
         } else {
             $(ID_MESSAGE_LOST).show();
         }
     }
-    // Function that creates and configures TapTapBugGame's attributes
+    // Function that creates and configures BugTapGame's attributes
     function createConfigureGame() {
-        TapTapBugGame.setFoodAmount(6);
-        TapTapBugGame.setAllotedTime(60);
-        TapTapBugGame.setFoodPoints(5);
-        TapTapBugGame.setFoodSpread(30, 30);
-        TapTapBugGame.setBugSpawnTimes([0.5, 0.9, 1.2]);
-        TapTapBugGame.setFoodSpawnRange(10, 320, 120, 380);
-        TapTapBugGame.setBgImageID('IMG_BACKGROUND');
-        TapTapBugGame.setSpriteFoodID('SPR_FOOD');
-        TapTapBugGame.setUpdateTimeEvent(updateTime);
-        TapTapBugGame.setGameOverEvent(gameOverEvent);
-        TapTapBugGame.setUpdateScoreEvent(updateScore);
-        TapTapBugGame.addBugToDB('SPR_BUG_RED', 3, 2.5, 0.3);
-        TapTapBugGame.addBugToDB('SPR_BUG_ORANGE', 1, 1.5, 0.5);
-        TapTapBugGame.addBugToDB('SPR_BUG_GREY', 5, 4, 0.2);
+        BugTapGame.setFoodAmount(6);
+        BugTapGame.setAllotedTime(60);
+        BugTapGame.setFoodPoints(5);
+        BugTapGame.setFoodSpread(30, 30);
+        BugTapGame.setBugSpawnTimes([0.5, 0.9, 1.2]);
+        BugTapGame.setFoodSpawnRange(10, 320, 120, 380);
+        BugTapGame.setBgImageID("IMG_BACKGROUND");
+        BugTapGame.setSpriteFoodID("SPR_FOOD");
+        BugTapGame.setUpdateTimeEvent(updateTime);
+        BugTapGame.setGameOverEvent(gameOverEvent);
+        BugTapGame.setUpdateScoreEvent(updateScore);
+        BugTapGame.addBugToDB("SPR_BUG_RED", 3, 2.5, 0.3);
+        BugTapGame.addBugToDB("SPR_BUG_ORANGE", 1, 1.5, 0.5);
+        BugTapGame.addBugToDB("SPR_BUG_GREY", 5, 4, 0.2);
     }
     // Funtion that binds event functions to specific links and buttons
     function bindEventHandlers() {
@@ -696,10 +736,10 @@ var Setup = (function () {
         initResources();
         // Bind unobtrusive event handlers
         bindEventHandlers();
-        // Create and configure TapTapBugGame instance
+        // Create and configure BugTapGame instance
         createConfigureGame();
-        // Initalize and configure the Simple Game Engine with TapTapBugGame
-        SGE.System.init(60, ID_CANVAS, TapTapBugGame);
+        // Initalize and configure the Simple Game Engine with BugTapGame
+        SGE.System.init(60, ID_CANVAS, BugTapGame);
         SGE.System.enableMouseMove();
         SGE.System.enableMouseClick();
     }

@@ -2,6 +2,13 @@
 .pointer-cursor {
     cursor: pointer;
 }
+/* Styles for Fork me on GitHub ribbon */
+.fork-me-ribbon > img {
+    top: 0;
+    left: 0;
+    border: 0;
+    position: absolute;
+}
 /* Common styles for canvas and infobar prevent highlighting and selecting */
 #game-canvas,
 #infobar {

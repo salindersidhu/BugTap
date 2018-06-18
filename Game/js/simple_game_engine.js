@@ -1,7 +1,7 @@
-/*jshint browser:true, jquery:true, quotmark:single, maxlen:80, eqeqeq:true,
+/*jshint browser:true, jquery:true, quotmark:double, maxlen:80, eqeqeq:true,
 strict:true, unused:false, undef:true*/
-/*jslint browser:true, this:true/
-/*global $, window, createjs*/
+/*jslint browser:true, this:true*/
+/*global $, window, Image, createjs*/
 
 /**
 * SimpleGameEngine is a 2D game development module based framework used to
@@ -11,7 +11,7 @@ strict:true, unused:false, undef:true*/
 * @namespace SimpleGameEngine
 */
 var SGE = (function () {
-    'use strict';
+    "use strict";
     /**
     * Sprite represents a sprite sheet image. A single image consisting of
     * multiple images that together form an animation.
@@ -124,7 +124,7 @@ var SGE = (function () {
             if (!imageDict.hasOwnProperty(id)) {
                 imageDict[id] = makeImage(src, width, height);
             } else {
-                throw new Error('Image with ID ' + id + ' already exists!');
+                throw new Error("Image with ID " + id + " already exists!");
             }
         }
         /**
@@ -146,7 +146,7 @@ var SGE = (function () {
                 sprite.frameWidth = width / numFrames;
                 spriteDict[id] = sprite;
             } else {
-                throw new Error('Sprite with ID ' + id + ' already exists!');
+                throw new Error("Sprite with ID " + id + " already exists!");
             }
         }
         /**
@@ -161,7 +161,7 @@ var SGE = (function () {
             if (imageDict.hasOwnProperty(id)) {
                 return imageDict[id];
             }
-            throw new Error('Image with ID ' + id + ' does not exist!');
+            throw new Error("Image with ID " + id + " does not exist!");
         }
         /**
         * Return a Sprite object corresponding to a unique ID.
@@ -175,7 +175,7 @@ var SGE = (function () {
             if (spriteDict.hasOwnProperty(id)) {
                 return spriteDict[id];
             }
-            throw new Error('Sprite with ID ' + id + ' does not exist!');
+            throw new Error("Sprite with ID " + id + " does not exist!");
         }
         /**
         * Add a new sound with a unique ID to the ResourceManager. This
@@ -192,7 +192,7 @@ var SGE = (function () {
                 // Add Sound ID to the array of Sound IDs
                 soundIDs.push(id);
             } else {
-                throw new Error('Sound with ID ' + id + ' already exists!');
+                throw new Error("Sound with ID " + id + " already exists!");
             }
         }
         /**
@@ -208,7 +208,7 @@ var SGE = (function () {
             if (soundIDs.indexOf(id) >= 0) {
                 createjs.Sound.play(id, options || {});
             } else {
-                throw new Error('Sound with ID ' + id + ' does not exist!');
+                throw new Error("Sound with ID " + id + " does not exist!");
             }
         }
         // Functions returned by the module
@@ -412,9 +412,17 @@ var SGE = (function () {
             ctx.rotate(angle);
             ctx.translate(-translateX, -translateY);
             // Draw the animated Sprite
-            ctx.drawImage(_this.image, _this.frameIndex * _this.frameWidth, 0,
-                    _this.frameWidth, _this.height, x, y, _this.frameWidth,
-                    _this.height);
+            ctx.drawImage(
+                _this.image,
+                _this.frameIndex * _this.frameWidth,
+                0,
+                _this.frameWidth,
+                _this.height,
+                x,
+                y,
+                _this.frameWidth,
+                _this.height
+            );
             // Restore the canvas state prior to rendering
             ctx.restore();
         }
@@ -570,7 +578,7 @@ var SGE = (function () {
         * @throws {Error} Abstract function.
         */
         function update() {
-            throw new Error('Cannot call abstract function!');
+            throw new Error("Cannot call abstract function!");
         }
         /**
         * Abstract function that renders the GameObject. This function needs to
@@ -581,7 +589,7 @@ var SGE = (function () {
         * @throws {Error} Abstract function.
         */
         function render() {
-            throw new Error('Cannot call abstract function!');
+            throw new Error("Cannot call abstract function!");
         }
         /**
         * Return true if the GameObject can be deleted, false otherwise.
@@ -700,14 +708,14 @@ var SGE = (function () {
                 connectedGame = game;
                 // Obtain the canvas and canvas 2D context from the DOM
                 canvas = $(canvasID).get(0);
-                var ctx = canvas.getContext('2d');
+                var ctx = canvas.getContext("2d");
                 // Initialize the connected game module
                 connectedGame.init(FPS, ctx, canvas);
                 // Execute the System main loop indefinitely
                 setInterval(mainLoop, 1000 / FPS);
             } else {
                 throw new Error(
-                    'Cannot initialize system, no connected game was found!'
+                    "Cannot initialize system, no connected game was found!"
                 );
             }
         }
@@ -751,7 +759,7 @@ var SGE = (function () {
                 isGameActive = true;
             } else {
                 throw new Error(
-                    'Cannot start system, no connected game was found!'
+                    "Cannot start system, no connected game was found!"
                 );
             }
         }
@@ -770,7 +778,7 @@ var SGE = (function () {
         */
         function enableMouseClick() {
             // Add event listener for mouse click events to the canvas
-            canvas.addEventListener('mousedown', function (evt) {
+            canvas.addEventListener("mousedown", function (evt) {
                 triggerMouseEvent(evt, canvas, connectedGame.mouseClickEvent);
             }, false);
         }
@@ -781,9 +789,12 @@ var SGE = (function () {
         */
         function enableMouseRelease() {
             // Add event listener for mouse release events to the canvas
-            canvas.addEventListener('mouseup', function (evt) {
-                triggerMouseEvent(evt, canvas,
-                        connectedGame.mouseReleaseEvent);
+            canvas.addEventListener("mouseup", function (evt) {
+                triggerMouseEvent(
+                    evt,
+                    canvas,
+                    connectedGame.mouseReleaseEvent
+                );
             }, false);
         }
         /**
@@ -793,7 +804,7 @@ var SGE = (function () {
         */
         function enableMouseMove() {
             // Add event listener for mouse move events to the canvas
-            canvas.addEventListener('mousemove', function (evt) {
+            canvas.addEventListener("mousemove", function (evt) {
                 triggerMouseEvent(evt, canvas, connectedGame.mouseMoveEvent);
             }, false);
         }
@@ -804,7 +815,7 @@ var SGE = (function () {
         */
         function enableKeyPress() {
             // Add event listener for keyboard press events to the canvas
-            window.addEventListener('keydown', function (evt) {
+            window.addEventListener("keydown", function (evt) {
                 connectedGame.keyPressEvent(evt);
             }, false);
         }
@@ -815,7 +826,7 @@ var SGE = (function () {
         */
         function enableKeyRelease() {
             // Add event listener for keyboard release events to the canvas
-            window.addEventListener('keyup', function (evt) {
+            window.addEventListener("keyup", function (evt) {
                 connectedGame.keyReleaseEvent(evt);
             }, false);
         }
@@ -1023,7 +1034,7 @@ var SGE = (function () {
         * @throws {Error} Abstract function.
         */
         function mouseClickEvent() {
-            throw new Error('Cannot call abstract function!');
+            throw new Error("Cannot call abstract function!");
         }
         /**
         * Abstract function that defines the Game's mouse release event. This
@@ -1034,7 +1045,7 @@ var SGE = (function () {
         * @throws {Error} Abstract function.
         */
         function mouseReleaseEvent() {
-            throw new Error('Cannot call abstract function!');
+            throw new Error("Cannot call abstract function!");
         }
         /**
         * Abstract function that defines the Game's mouse movement event. This
@@ -1045,7 +1056,7 @@ var SGE = (function () {
         * @throws {Error} Abstract function.
         */
         function mouseMoveEvent() {
-            throw new Error('Cannot call abstract function!');
+            throw new Error("Cannot call abstract function!");
         }
         /**
         * Abstract function that defines the Game's keyboard press event. This
@@ -1056,7 +1067,7 @@ var SGE = (function () {
         * @throws {Error} Abstract function.
         */
         function keyPressEvent() {
-            throw new Error('Cannot call abstract function!');
+            throw new Error("Cannot call abstract function!");
         }
         /**
         * Abstract function that defines the Game's keyboard release event.
@@ -1067,7 +1078,7 @@ var SGE = (function () {
         * @throws {Error} Abstract function.
         */
         function keyReleaseEvent() {
-            throw new Error('Cannot call abstract function!');
+            throw new Error("Cannot call abstract function!");
         }
         // Functions returned by the module
         return {
