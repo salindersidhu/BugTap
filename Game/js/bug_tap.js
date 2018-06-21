@@ -260,7 +260,7 @@ var BugTapGame = (function () {
             ),
             "POINTS"
         );
-        SGE.ResourceManager.playSound("SND_POINTS_WON", {volume: 0.45});
+        SGE.ResourceManager.playSound("SND_POINT_WON", {volume: 0.45});
     }
     // Function that shows points lost using PointUpText on a specific object
     function showPointsLost(points, object) {
@@ -276,7 +276,7 @@ var BugTapGame = (function () {
             ),
             "POINTS"
         );
-        SGE.ResourceManager.playSound("SND_POINTS_LOST", {volume: 0.45});
+        SGE.ResourceManager.playSound("SND_POINT_LOST", {volume: 0.45});
     }
     // Function that updates remaining time and calls the time update function
     function updateTime(FPS) {
@@ -568,15 +568,15 @@ var Setup = (function () {
     var ID_MESSAGE_WON = "#game-won-message";
     var ID_MESSAGE_LOST = "#game-lose-message";
     // Resource path IDs
-    var SPR_FOOD = "assets/food_sprite.png";
-    var IMG_BG = "assets/background_table.png";
-    var SPR_BUG_R = "assets/red_bug_sprite.png";
-    var SPR_BUG_G = "assets/grey_bug_sprite.png";
-    var SND_POINTS_WON = "assets/points_won.ogg";
-    var SND_POINTS_LOST = "assets/points_lost.ogg";
-    var SPR_BUG_O = "assets/orange_bug_sprite.png";
-    var IMG_BUTTON_PLAY = "assets/button_play.png";
-    var IMG_BUTTON_PAUSE = "assets/button_pause.png";
+    var SPR_FOOD = "assets/graphics/sprites/food.png";
+    var IMG_BG = "assets/graphics/bg_table.png";
+    var SPR_BUG_R = "assets/graphics/sprites/red_bug.png";
+    var SPR_BUG_G = "assets/graphics/sprites/grey_bug.png";
+    var SND_POINT_WON = "assets/sounds/point_won.ogg";
+    var SND_POINT_LOST = "assets/sounds/point_lost.ogg";
+    var SPR_BUG_O = "assets/graphics/sprites/orange_bug.png";
+    var IMG_BUTTON_PLAY = "assets/graphics/play.png";
+    var IMG_BUTTON_PAUSE = "assets/graphics/pause.png";
     // Instance variables
     var LOCAL_STORAGE_HIGHSCORE = "highscore";
     // Function that adds all of the game resources using the ResourceManager
@@ -588,8 +588,8 @@ var Setup = (function () {
         SGE.ResourceManager.addSprite("SPR_BUG_ORANGE", SPR_BUG_O, 90, 50, 2);
         SGE.ResourceManager.addSprite("SPR_BUG_GREY", SPR_BUG_G, 90, 50, 2);
         // Add and config all Sound resources
-        SGE.ResourceManager.addSound("SND_POINTS_WON", SND_POINTS_WON);
-        SGE.ResourceManager.addSound("SND_POINTS_LOST", SND_POINTS_LOST);
+        SGE.ResourceManager.addSound("SND_POINT_WON", SND_POINT_WON);
+        SGE.ResourceManager.addSound("SND_POINT_LOST", SND_POINT_LOST);
     }
     // Function that updates the score text
     function updateScore(score) {
