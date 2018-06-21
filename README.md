@@ -13,8 +13,8 @@ The objective of this game is to tap or click the bugs before they eat all of th
 - Firefox 44+
 - Chrome / Chromium 48+
 
-## Game Demo
-- Playable demo avaliable via [RawGit](https://rawgit.com/salindersidhu/BugTap/master/Game/index.html).
+## Playable Demo
+- Hosted via RawGit, click [here](https://cdn.rawgit.com/salindersidhu/BugTap/e8a3a1cb/Game/index.html).
 
 ## Credits:
 - **Original Assignment**:
