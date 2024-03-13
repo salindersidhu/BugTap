@@ -1,0 +1,22 @@
+{
+  "name": "bugtap",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "npm run build && http-server -o",
+    "build": "tsc",
+    "clean": "rm -rf public/dist",
+    "postinstall": "patch-package"
+  },
+  "dependencies": {
+    "soundjs": "^1.0.1"
+  },
+  "devDependencies": {
+    "http-server": "^14.1.1",
+    "patch-package": "^8.0.0",
+    "typescript": "^5.4.2"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
