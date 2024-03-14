@@ -38,14 +38,22 @@ npm run dev
 
     .
     ├── src
+    │    ├── engine                 # Game engine
+    │    │    ├── index.ts
+    │    │    └── ...
+    │    ├── game                   # Game source
+    │    │    ├── index.ts
+    │    │    └── ...
+    │    ├── index.ts
+    │    └── ...
+    ├── assets                      # Game assets
     │    └── ...
     ├── public
-    │    ├── assets                 # Game assets
-    │    │   └── ...
     │    ├── favicon.ico            # Favicon
     │    ├── index.html
     │    └── ...
     ├── tsconfig.json               # TypeScript config
+    ├── webpack.config.js           # Webpack config
     └── ...
 
 ## Acknowledgements
