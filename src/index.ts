@@ -1,5 +1,5 @@
-import BugTap from "./game"
+import BugTap from "./bugTap";
 
-window.addEventListener('load', function(){
-    new BugTap('game-canvas');
-})
+window.addEventListener("load", function () {
+  new BugTap("game-canvas");
+});
