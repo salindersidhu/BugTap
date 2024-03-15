@@ -18,8 +18,8 @@
 .settings/
 *.sublime-workspace
 
-# IDE - VSCode
-.vscode/*
+# VS Code
+.vscode
 
 # Misc
 /logs
