@@ -5,9 +5,7 @@ import GameObject from "./GameObject";
  *
  * @author Salinder Sidhu
  */
-export default abstract class Game {
-  canvasId: string | null = null;
-
+export default class Game {
   canvas: HTMLCanvasElement;
   context: CanvasRenderingContext2D;
 
@@ -40,7 +38,13 @@ export default abstract class Game {
   };
 
   private update() {
-    this.gameObjects.forEach((gameObject) => gameObject.update());
+    this.gameObjects.forEach((gameObject) => {
+      gameObject.update();
+
+      if (gameObject.canDelete()) {
+        this.deleteGameObject(gameObject);
+      }
+    });
   }
 
   private render() {
@@ -48,13 +52,21 @@ export default abstract class Game {
 
     this.gameObjects
       .sort(this.sortGameObjectsByDrawPriority)
-      .forEach((gameObject) => gameObject.render(this.context));
+      .forEach((gameObject) => gameObject.render());
+  }
+
+  private deleteGameObject(gameObject: GameObject) {
+    const index = this.gameObjects.indexOf(gameObject);
+
+    if (index >= 0) {
+      this.gameObjects.splice(index, 1);
+    }
   }
 
   private sortGameObjectsByDrawPriority(
     gameObjectA: GameObject,
     gameObjectB: GameObject
   ) {
-    return gameObjectA.getDrawPriority() - gameObjectB.getDrawPriority();
+    return gameObjectA.drawPriority() - gameObjectB.drawPriority();
   }
 }

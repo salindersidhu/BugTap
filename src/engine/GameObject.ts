@@ -1,4 +1,4 @@
-import type BoundingBox from "./BoundingBox";
+import BoundingBox from "./BoundingBox";
 
 /**
  * GameObject is an abstract class used to create objects for a game with
@@ -8,13 +8,25 @@ import type BoundingBox from "./BoundingBox";
  * @author Salinder Sidhu
  */
 export default abstract class GameObject {
-  protected drawPriority: number;
-  protected canDelete: boolean;
-  protected boundingBox!: BoundingBox;
+  private _canDelete: boolean;
+  private _drawPriority: number;
 
-  constructor(drawPriority: number = 0) {
-    this.drawPriority = drawPriority;
-    this.canDelete = false;
+  protected boundingBox: BoundingBox;
+
+  protected canvas: HTMLCanvasElement;
+  protected context: CanvasRenderingContext2D;
+
+  constructor(
+    canvas: HTMLCanvasElement,
+    context: CanvasRenderingContext2D,
+    boundingBox: BoundingBox = new BoundingBox(0, 0, 0, 0),
+    drawPriority: number = 0
+  ) {
+    this.canvas = canvas;
+    this.context = context;
+    this.boundingBox = boundingBox;
+    this._canDelete = false;
+    this._drawPriority = drawPriority;
   }
 
   /**
@@ -29,19 +41,26 @@ export default abstract class GameObject {
    *
    * @abstract
    */
-  abstract render(context: CanvasRenderingContext2D): void;
+  abstract render(): void;
 
   /**
    * Flag the GameObject to be deleted.
    */
-  flagAsDelete() {
-    this.canDelete = true;
+  protected delete() {
+    this._canDelete = true;
+  }
+
+  /**
+   * Indicate if the GameObject can be deleted.
+   */
+  canDelete() {
+    return this._canDelete;
   }
 
   /**
    * Return the GameObject's draw priority.
    */
-  getDrawPriority() {
-    return this.drawPriority;
+  drawPriority() {
+    return this._drawPriority;
   }
 }

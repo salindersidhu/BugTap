@@ -1,5 +1,8 @@
 import { GameObject } from "../engine";
 
+/**
+ * Represents a cursor that tracks mouse movements.
+ */
 export default class Cursor extends GameObject {
   x: number;
   y: number;
@@ -9,13 +12,41 @@ export default class Cursor extends GameObject {
     y: number;
   };
 
-  constructor(x: number, y: number, mouse: any) {
-    super();
+  constructor(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D) {
+    super(canvas, context);
 
-    this.x = x;
-    this.y = y;
+    this.x = 0;
+    this.y = 0;
     this.radius = 15;
-    this.mouse = mouse;
+    this.mouse = {
+      x: this.canvas.width / 2,
+      y: this.canvas.height / 2,
+    };
+
+    this.bindMouseMoveListener();
+
+    // Hide default cursor
+    this.canvas.style.cursor = "none";
+  }
+
+  private handleMouseMove = (event: MouseEvent) => {
+    this.mouse = {
+      x: event.offsetX,
+      y: event.offsetY,
+    };
+  };
+
+  private bindMouseMoveListener() {
+    this.canvas.addEventListener("mousemove", this.handleMouseMove);
+  }
+
+  private unbindMouseMoveListener() {
+    this.canvas.removeEventListener("mousemove", this.handleMouseMove);
+  }
+
+  delete() {
+    super.delete();
+    this.unbindMouseMoveListener();
   }
 
   update() {
@@ -23,15 +54,18 @@ export default class Cursor extends GameObject {
     this.y = this.mouse.y;
   }
 
-  render(context: CanvasRenderingContext2D) {
-    context.beginPath();
-    context.fillStyle = "black";
-    context.strokeStyle = "black";
-    context.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-    context.save();
-    context.globalAlpha = 0.6;
-    context.fill();
-    context.restore();
-    context.stroke();
+  render() {
+    this.context.beginPath();
+    this.context.fillStyle = "black";
+    this.context.strokeStyle = "black";
+    this.context.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+    this.context.save();
+    this.context.globalAlpha = 0.4;
+    this.context.fill();
+    this.context.restore();
+    this.context.globalAlpha = 0.4;
+    this.context.lineWidth = 2;
+    this.context.stroke();
+    this.context.closePath();
   }
 }
