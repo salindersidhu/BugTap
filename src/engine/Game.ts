@@ -27,8 +27,8 @@ export default class Game {
     this.loop();
   }
 
-  addGameObject(gameObject: GameObject) {
-    this.gameObjects.push(gameObject);
+  addGameObjects(gameObjects: GameObject[]) {
+    this.gameObjects.push(...gameObjects);
   }
 
   private loop = () => {
