@@ -2,7 +2,6 @@ import BoundingBox from "./BoundingBox";
 import Game from "./Game";
 import GameObject from "./GameObject";
 import GameObjectFactory from "./GameObjectFactory";
-import Sprite from "./Sprite";
 import SpriteAnimation from "./SpriteAnimation";
 import Text from "./Text";
 
@@ -13,7 +12,6 @@ export {
   Game,
   GameObject,
   GameObjectFactory,
-  Sprite,
   SpriteAnimation,
   Text,
   getRandomItem,

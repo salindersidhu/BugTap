@@ -1,5 +1,3 @@
-import BoundingBox from "./BoundingBox";
-
 /**
  * GameObject is an abstract class used to create objects for a game with
  * abstract methods for updating state and rendering.
@@ -8,23 +6,19 @@ import BoundingBox from "./BoundingBox";
  * @author Salinder Sidhu
  */
 export default abstract class GameObject {
-  private _canDelete: boolean;
-  private _drawPriority: number;
-
-  protected boundingBox: BoundingBox;
-
   protected canvas: HTMLCanvasElement;
   protected context: CanvasRenderingContext2D;
+
+  private _canDelete: boolean;
+  private _drawPriority: number;
 
   constructor(
     canvas: HTMLCanvasElement,
     context: CanvasRenderingContext2D,
-    boundingBox: BoundingBox = new BoundingBox(0, 0, 0, 0),
     drawPriority: number = 0
   ) {
     this.canvas = canvas;
     this.context = context;
-    this.boundingBox = boundingBox;
     this._canDelete = false;
     this._drawPriority = drawPriority;
   }

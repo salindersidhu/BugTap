@@ -13,7 +13,7 @@ export default class Cursor extends GameObject {
   };
 
   constructor(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D) {
-    super(canvas, context);
+    super(canvas, context, 1);
 
     this.x = 0;
     this.y = 0;

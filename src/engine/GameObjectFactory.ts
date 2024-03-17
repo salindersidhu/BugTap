@@ -2,7 +2,9 @@ import GameObject from "./GameObject";
 
 /**
  * Represents a factory class for creating instances of GameObject subclasses.
+ *
  * @template T The type of GameObject subclass to instantiate.
+ * @author Salinder Sidhu
  */
 export default class GameObjectFactory<T extends GameObject> {
   private canvas: HTMLCanvasElement;
@@ -10,21 +12,27 @@ export default class GameObjectFactory<T extends GameObject> {
   private gameObjectClass: new (
     canvas: HTMLCanvasElement,
     context: CanvasRenderingContext2D
-  ) => T;
+  ) =>
+    | T
+    | ((
+        canvas: HTMLCanvasElement,
+        context: CanvasRenderingContext2D,
+        ...args: any[]
+      ) => T);
 
-  /**
-   * Constructs a new GameObjectFactory.
-   * @param {HTMLCanvasElement} canvas The HTML canvas element to pass to created GameObject instances.
-   * @param {CanvasRenderingContext2D} context The 2D rendering context to pass to created GameObject instances.
-   * @param {new (canvas: HTMLCanvasElement, context: CanvasRenderingContext2D) => T} gameObjectClass The GameObject subclass to instantiate.
-   */
   constructor(
     canvas: HTMLCanvasElement,
     context: CanvasRenderingContext2D,
     gameObjectClass: new (
       canvas: HTMLCanvasElement,
       context: CanvasRenderingContext2D
-    ) => T
+    ) =>
+      | T
+      | ((
+          canvas: HTMLCanvasElement,
+          context: CanvasRenderingContext2D,
+          ...args: any[]
+        ) => T)
   ) {
     this.canvas = canvas;
     this.context = context;
@@ -32,10 +40,28 @@ export default class GameObjectFactory<T extends GameObject> {
   }
 
   /**
-   * Factory method to create a new instance of the specified GameObject subclass.
-   * @returns {T} A new instance of the specified GameObject subclass with the canvas and context objects passed to it.
+   * Factory method to create a new instance of the specified GameObject
+   * subclass.
+   * @returns {T} A new instance of the specified GameObject subclass with the
+   * canvas and context objects passed to it.
    */
-  createGameObject(): T {
-    return new this.gameObjectClass(this.canvas, this.context);
+  createGameObject(...args: any[]): T {
+    if (typeof this.gameObjectClass === "function") {
+      // If gameObjectClass is a constructor function
+      const constructorFunc = this.gameObjectClass as new (
+        canvas: HTMLCanvasElement,
+        context: CanvasRenderingContext2D,
+        ...args: any[]
+      ) => T;
+      return new constructorFunc(this.canvas, this.context, ...args);
+    } else {
+      // If gameObjectClass is a factory function
+      const factoryFunc = this.gameObjectClass as (
+        canvas: HTMLCanvasElement,
+        context: CanvasRenderingContext2D,
+        ...args: any[]
+      ) => T;
+      return factoryFunc(this.canvas, this.context, ...args);
+    }
   }
 }
