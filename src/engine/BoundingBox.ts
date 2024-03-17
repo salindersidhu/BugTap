@@ -12,10 +12,11 @@ export default class BoundingBox {
 
   /**
    * Create an instance of BoundingBox.
-   * @param {number} x The BoundingBox's initial x position coordinate.
-   * @param {number} y The BoundingBox's initial y position coordinate.
-   * @param {number} width The BoundingBox's width.
-   * @param {number} height The BoundingBox's height.
+   *
+   * @param x The BoundingBox's initial x position coordinate.
+   * @param y The BoundingBox's initial y position coordinate.
+   * @param width The BoundingBox's width.
+   * @param height The BoundingBox's height.
    */
   constructor(x: number, y: number, width: number, height: number) {
     this.x = x;
@@ -27,8 +28,8 @@ export default class BoundingBox {
   /**
    * Update the position of the BoundingBox to a new point.
    *
-   * @param {number} x The new x coordinate of the BoundingBox's position.
-   * @param {number} y The new y coordinate of the BoundingBox's position.
+   * @param x The new x coordinate of the BoundingBox's position.
+   * @param y The new y coordinate of the BoundingBox's position.
    */
   update(x: number, y: number): void {
     this.x = x;
@@ -39,8 +40,7 @@ export default class BoundingBox {
    * Return true if this BoundingBox completely overlaps another BoundingBox,
    * otherwise return false.
    *
-   * @param {BoundingBox} bbox A BoundingBox object.
-   * @return {boolean}
+   * @param bbox A BoundingBox object.
    */
   isOverlapping(bbox: BoundingBox): boolean {
     return (
@@ -55,8 +55,7 @@ export default class BoundingBox {
    * Return true if this BoundingBox intersects another BoundingBox, otherwise
    * return false.
    *
-   * @param {BoundingBox} bbox A BoundingBox object.
-   * @return {boolean}
+   * @param bbox A BoundingBox object.
    */
   isIntersecting(bbox: BoundingBox): boolean {
     return (
@@ -71,9 +70,8 @@ export default class BoundingBox {
    * Return true if this BoundingBox overlaps with a point, otherwise return
    * false.
    *
-   * @param {number} x The x coordinate of the point.
-   * @param {number} y The y coordinate of the point.
-   * @return {boolean}
+   * @param x The x coordinate of the point.
+   * @param y The y coordinate of the point.
    */
   isOverlappingPoint(x: number, y: number): boolean {
     return (

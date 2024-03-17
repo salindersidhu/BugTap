@@ -17,17 +17,17 @@ export default class Cursor extends GameObject {
   constructor(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D) {
     super(canvas, context, 1);
 
-    this.x = 0;
-    this.y = 0;
     this.radius = 15;
+    this.x = -this.radius;
+    this.y = -this.radius;
     this.mouse = {
-      x: this.canvas.width / 2,
-      y: this.canvas.height / 2,
+      x: this.x,
+      y: this.y,
     };
 
     this.bindMouseMoveListener();
 
-    // Hide default cursor
+    // Hide the default cursor
     this.canvas.style.cursor = "none";
   }
 

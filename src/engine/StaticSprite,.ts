@@ -1,48 +1,38 @@
 /**
- * The SpriteAnimation class provides functions for creating and rendering
- * an animated image from a sprite.
+ * The StaticSprite provides functions for creating and rendering a single
+ * frame from a sprite.
  *
  * @author Salinder Sidhu
  */
-export default class SpriteAnimation {
-  private _cyclesPerSecond: number;
+export default class StaticSprite {
   private _frameIndex: number;
 
   private _height: number;
   private _width: number;
-  private _numFrames: number;
 
   private _image: HTMLImageElement;
   private _opacity: number;
-  private _cycleCounter: number;
 
   /**
-   * Create an instance of SpriteAnimation.
+   * Create an instance of StaticSprite.
    *
    * @param spriteSrc The source URL of the sprite image.
    * @param height The height of the sprite frame.
    * @param width The width of the sprite frame.
-   * @param cyclesPerSecond The number of animation cycles per second.
-   * @param numFrames The total number of frames in the sprite animation.
    * @param initFrame The initial frame index (default is -1).
    */
   constructor(
     spriteSrc: string,
     height: number,
     width: number,
-    cyclesPerSecond: number,
-    numFrames: number,
     initFrame: number = -1
   ) {
-    this._cyclesPerSecond = cyclesPerSecond;
-    this._numFrames = numFrames;
     this._frameIndex = initFrame;
 
     this._height = height;
     this._width = width;
 
     this._opacity = 1;
-    this._cycleCounter = 0;
 
     // Load image
     this._image = new Image();
@@ -50,20 +40,7 @@ export default class SpriteAnimation {
   }
 
   /**
-   * Update the sprite animation frame by frame on each function call.
-   */
-  update() {
-    this._cycleCounter += 1;
-    if (this._cycleCounter > this._cyclesPerSecond) {
-      this._cycleCounter -= this._cyclesPerSecond; // Reset the cycle counter
-
-      // Increment the frame index and reset it at the end of the animation
-      this._frameIndex = (this._frameIndex + 1) % this._numFrames;
-    }
-  }
-
-  /**
-   * Render the animated sprite frame by frame on each function call.
+   * Render a frame from the sprite.
    *
    * @param context The 2D canvas rendering context.
    * @param x The x-coordinate of the sprite's position.

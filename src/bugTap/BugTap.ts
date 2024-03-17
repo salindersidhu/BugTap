@@ -35,7 +35,6 @@ export default class BugTap extends Game {
         height: number,
         width: number,
         spriteSrc: string,
-        numFrames: number,
         initFrame: number
       ) => {
         return new Food(
@@ -46,7 +45,6 @@ export default class BugTap extends Game {
           height,
           width,
           spriteSrc,
-          numFrames,
           initFrame
         );
       }
@@ -59,7 +57,7 @@ export default class BugTap extends Game {
    * Create GameOjects and add them to the game.
    */
   private initGameObjects() {
-    // Create a cursor to provide visual indicator of the player's mouse
+    // Create a cursor to provide a visual indicator of the player's mouse
     const cursor = this.cursorFactory.createGameObject();
 
     // Create food randomly spread near the center of the table
@@ -113,7 +111,6 @@ export default class BugTap extends Game {
         width,
         height,
         spriteSrc,
-        numFrames,
         frameIndex
       );
       food.push(newFood);
