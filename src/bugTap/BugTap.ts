@@ -43,7 +43,7 @@ export default class BugTap extends Game {
     const cursor = this.cursorFactory.createGameObject();
 
     // Create food randomly spread near the center of the table
-    let food = this.generateFood(6);
+    let food = this.generateFood(7);
 
     this.addGameObjects([cursor, ...food]);
   }
@@ -52,16 +52,29 @@ export default class BugTap extends Game {
    * Generate an array of Food objects with random positions.
    *
    * @param amount The number of Food objects to generate.
-   * @returns An array of Food objects.
    */
   private generateFood(amount: number): Food[] {
-    return Array.from({ length: amount }, () => {
+    const food: Food[] = [];
+
+    while (food.length < amount) {
       // Generate random positions specified by the bound variables
       const x = getRandomNumber(150, 744);
       const y = getRandomNumber(100, 444);
 
-      // Create a Food object with the random positions
-      return this.foodFactory.createGameObject(x, y, 56, 56);
-    });
+      // Create a new Food object
+      const newFood = this.foodFactory.createGameObject(x, y, 56, 56);
+
+      // Check if the new food intersects with any existing food
+      const isOverlapping = food.some((existingFood) =>
+        newFood.isIntersectingWithFood(existingFood)
+      );
+
+      // If the new food does not overlap, add it to the array
+      if (!isOverlapping) {
+        food.push(newFood);
+      }
+    }
+
+    return food;
   }
 }

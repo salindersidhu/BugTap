@@ -1,18 +1,15 @@
-import { GameObject, SpriteAnimation, getRandomNumber } from "../engine";
+import { BoundingBox, GameObject } from "../engine";
 
 /**
- *
+ * Represents a food item in the game.
  */
 export default class Food extends GameObject {
   private _x: number;
   private _y: number;
   private _height: number;
   private _width: number;
-  //private _spriteImage: string;
 
-  //spriteAnimation: SpriteAnimation;
-
-  counter: number = 0;
+  private _boundingBox: BoundingBox;
 
   constructor(
     canvas: HTMLCanvasElement,
@@ -21,7 +18,6 @@ export default class Food extends GameObject {
     y: number,
     height: number,
     width: number
-    //spriteImage: string
   ) {
     super(canvas, context);
 
@@ -29,9 +25,20 @@ export default class Food extends GameObject {
     this._y = y;
     this._height = height;
     this._width = width;
+
+    this._boundingBox = new BoundingBox(x, y, height, width);
   }
 
   update() {}
+
+  /**
+   * Determines whether this food item intersects with another food item.
+   *
+   * @param {Food} food The other food item to check intersection with.
+   */
+  isIntersectingWithFood(food: Food): boolean {
+    return this._boundingBox.isIntersecting(food._boundingBox);
+  }
 
   render() {
     this.context.fillStyle = "black";
