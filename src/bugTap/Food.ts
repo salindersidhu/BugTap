@@ -1,15 +1,17 @@
-import { BoundingBox, GameObject } from "../engine";
+import { BoundingBox, GameObject, SpriteAnimation } from "../engine";
 
 /**
  * Represents a food item in the game.
+ *
+ * @author Salinder Sidhu
  */
 export default class Food extends GameObject {
   private _x: number;
   private _y: number;
-  private _height: number;
-  private _width: number;
 
-  private _boundingBox: BoundingBox;
+  private _spriteAnimation: SpriteAnimation;
+
+  boundingBox: BoundingBox;
 
   constructor(
     canvas: HTMLCanvasElement,
@@ -17,32 +19,32 @@ export default class Food extends GameObject {
     x: number,
     y: number,
     height: number,
-    width: number
+    width: number,
+    spriteSrc: string,
+    numFrames: number,
+    initFrame: number
   ) {
     super(canvas, context);
 
     this._x = x;
     this._y = y;
-    this._height = height;
-    this._width = width;
 
-    this._boundingBox = new BoundingBox(x, y, height, width);
+    this.boundingBox = new BoundingBox(x, y, height, width);
+    this._spriteAnimation = new SpriteAnimation(
+      spriteSrc,
+      height, // Use the same height and width as the food item
+      width,
+      0, // Adjust cycles per second as needed
+      numFrames,
+      initFrame
+    );
   }
 
-  update() {}
-
-  /**
-   * Determines whether this food item intersects with another food item.
-   *
-   * @param {Food} food The other food item to check intersection with.
-   */
-  isIntersectingWithFood(food: Food): boolean {
-    return this._boundingBox.isIntersecting(food._boundingBox);
+  update() {
+    this._spriteAnimation.update();
   }
 
   render() {
-    this.context.fillStyle = "black";
-    this.context.globalAlpha = 1;
-    this.context.fillRect(this._x, this._y, this._width, this._height);
+    this._spriteAnimation.render(this.context, this._x, this._y, 0);
   }
 }

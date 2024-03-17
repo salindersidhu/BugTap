@@ -1,48 +1,54 @@
-import type Sprite from "./Sprite";
-
 /**
  * The SpriteAnimation module provides functions for creating and rendering
- * an animated sprite.
+ * an animated image from a sprite sheet.
  *
  * @author Salinder Sidhu
  */
 export default class SpriteAnimation {
-  private fps: number;
-  private image: HTMLImageElement;
-  private frameIndex: number;
-  private height: number;
-  private numFrames: number;
-  private frameWidth: number;
-  public opacity: number;
-  private cycleCounter: number;
+  private _cyclesPerSecond: number;
+  private _frameIndex: number;
 
-  /**
-   * Create an instance of SpriteAnimation.
-   *
-   * @param {Sprite} sprite The Sprite object of the sprite animation.
-   * @param {number} fps Frames per second.
-   * @param {number} [initFrame] - The initial animation starting frame.
-   */
-  constructor(sprite: Sprite, fps: number, initFrame?: number) {
-    this.fps = fps;
-    this.image = sprite.image;
-    this.frameIndex = initFrame ?? -1;
-    this.height = sprite.image.height;
-    this.numFrames = sprite.numFrames;
-    this.frameWidth = sprite.frameWidth;
-    this.opacity = 1;
-    this.cycleCounter = 0;
+  private _height: number;
+  private _width: number;
+  private _numFrames: number;
+
+  private _image: HTMLImageElement;
+  private _opacity: number;
+  private _cycleCounter: number;
+
+  constructor(
+    spriteSrc: string,
+    height: number,
+    width: number,
+    cyclesPerSecond: number,
+    numFrames: number,
+    initFrame: number = -1
+  ) {
+    this._cyclesPerSecond = cyclesPerSecond;
+    this._numFrames = numFrames;
+    this._frameIndex = initFrame;
+
+    this._height = height;
+    this._width = width;
+
+    this._opacity = 1;
+    this._cycleCounter = 0;
+
+    // Load image
+    this._image = new Image();
+    this._image.src = spriteSrc;
   }
 
   /**
    * Update the sprite animation frame by frame on each function call.
    */
   update() {
-    this.cycleCounter += 1;
-    if (this.cycleCounter > this.fps) {
-      this.cycleCounter = 0;
-      // Update and reset the frame index at the end of the animation
-      this.frameIndex = (this.frameIndex + 1) % this.numFrames;
+    this._cycleCounter += 1;
+    if (this._cycleCounter > this._cyclesPerSecond) {
+      this._cycleCounter -= this._cyclesPerSecond; // Reset the cycle counter
+
+      // Increment the frame index and reset it at the end of the animation
+      this._frameIndex = (this._frameIndex + 1) % this._numFrames;
     }
   }
 
@@ -61,14 +67,14 @@ export default class SpriteAnimation {
     angle: number
   ) {
     // Configure the translation point to sprite's center when rotating
-    const translateX = x + this.frameWidth / 2;
-    const translateY = y + this.height / 2;
+    const translateX = x + this._width / 2;
+    const translateY = y + this._height / 2;
 
     // Save current state of the canvas prior to rendering
     context.save();
 
     // Configure the canvas opacity
-    context.globalAlpha = this.opacity;
+    context.globalAlpha = this._opacity;
 
     // Translate and rotate canvas to draw the Sprite at an angle
     context.translate(translateX, translateY);
@@ -77,34 +83,18 @@ export default class SpriteAnimation {
 
     // Draw a frame of the Sprite
     context.drawImage(
-      this.image,
-      this.frameIndex * this.frameWidth,
+      this._image,
+      this._frameIndex * this._width,
       0,
-      this.frameWidth,
-      this.height,
+      this._width,
+      this._height,
       x,
       y,
-      this.frameWidth,
-      this.height
+      this._width,
+      this._height
     );
 
     // Restore the canvas state prior to rendering
     context.restore();
-  }
-
-  /**
-   * Reduce the opacity of the sprite animation. This generates a fade out
-   * effect for sprite animation.
-   *
-   * @param {number} FPS The game's frames per second.
-   * @param {number} fadeSpeed The speed, in seconds, of the fade out
-   * effect.
-   */
-  reduceOpacity(FPS: number, fadeSpeed: number) {
-    this.opacity -= 1 / (FPS * fadeSpeed);
-    // Condition the opacity so it is non-negative
-    if (this.opacity < 0) {
-      this.opacity = 0;
-    }
   }
 }

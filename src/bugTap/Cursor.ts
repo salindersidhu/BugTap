@@ -2,6 +2,8 @@ import { GameObject } from "../engine";
 
 /**
  * Represents a cursor that tracks mouse movements.
+ *
+ * @author Salinder Sidhu
  */
 export default class Cursor extends GameObject {
   x: number;

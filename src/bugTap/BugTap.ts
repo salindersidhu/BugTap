@@ -1,8 +1,16 @@
-import { Game, GameObjectFactory, getRandomNumber } from "../engine";
+import {
+  BoundingBox,
+  Game,
+  GameObjectFactory,
+  getRandomNumber,
+} from "../engine";
 
 import Cursor from "./Cursor";
 import Food from "./Food";
 
+/**
+ * @author Salinder Sidhu
+ */
 export default class BugTap extends Game {
   private cursorFactory: GameObjectFactory<Cursor>;
   private foodFactory: GameObjectFactory<Food>;
@@ -13,22 +21,34 @@ export default class BugTap extends Game {
     this.cursorFactory = new GameObjectFactory<Cursor>(
       this.canvas,
       this.context,
-      Cursor
+      (canvas, context) => new Cursor(canvas, context)
     );
 
     this.foodFactory = new GameObjectFactory<Food>(
       this.canvas,
       this.context,
-      // @ts-ignore: Ignoring type error for factory function with specific arguments
       (
         canvas: HTMLCanvasElement,
         context: CanvasRenderingContext2D,
         x: number,
         y: number,
         height: number,
-        width: number
+        width: number,
+        spriteSrc: string,
+        numFrames: number,
+        initFrame: number
       ) => {
-        return new Food(canvas, context, x, y, height, width);
+        return new Food(
+          canvas,
+          context,
+          x,
+          y,
+          height,
+          width,
+          spriteSrc,
+          numFrames,
+          initFrame
+        );
       }
     );
 
@@ -56,23 +76,47 @@ export default class BugTap extends Game {
   private generateFood(amount: number): Food[] {
     const food: Food[] = [];
 
+    const spriteSrc = "./assets/graphics/food.png";
+    const numFrames = 16;
+    const width = 56;
+    const height = 56;
+
+    let availableFrames = Array.from({ length: numFrames }, (_, i) => i);
+
     while (food.length < amount) {
-      // Generate random positions specified by the bound variables
+      // Generate random coordinates for a food's bounding box
       const x = getRandomNumber(150, 744);
       const y = getRandomNumber(100, 444);
 
-      // Create a new Food object
-      const newFood = this.foodFactory.createGameObject(x, y, 56, 56);
-
-      // Check if the new food intersects with any existing food
+      // Skip food creation if new food will intersect with any existing food
+      const newBoundingBox = new BoundingBox(x, y, width, height);
       const isOverlapping = food.some((existingFood) =>
-        newFood.isIntersectingWithFood(existingFood)
+        newBoundingBox.isIntersecting(existingFood.boundingBox)
       );
-
-      // If the new food does not overlap, add it to the array
-      if (!isOverlapping) {
-        food.push(newFood);
+      if (isOverlapping) {
+        continue;
       }
+
+      // If all frames have been used, refresh the availableFrames list
+      if (availableFrames.length === 0) {
+        availableFrames = Array.from({ length: numFrames }, (_, i) => i);
+      }
+
+      // Pick a random frame index from available frames list
+      const randomIndex = getRandomNumber(0, availableFrames.length - 1);
+      const frameIndex = availableFrames.splice(randomIndex, 1);
+
+      // Create Food
+      const newFood = this.foodFactory.createGameObject(
+        x,
+        y,
+        width,
+        height,
+        spriteSrc,
+        numFrames,
+        frameIndex
+      );
+      food.push(newFood);
     }
 
     return food;
