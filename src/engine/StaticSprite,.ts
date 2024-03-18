@@ -5,7 +5,7 @@
  * @author Salinder Sidhu
  */
 export default class StaticSprite {
-  private _frameIndex: number;
+  protected frameIndex: number;
 
   private _height: number;
   private _width: number;
@@ -27,7 +27,7 @@ export default class StaticSprite {
     width: number,
     initFrame: number = -1
   ) {
-    this._frameIndex = initFrame;
+    this.frameIndex = initFrame;
 
     this._height = height;
     this._width = width;
@@ -71,7 +71,7 @@ export default class StaticSprite {
     // Draw a frame of the Sprite
     context.drawImage(
       this._image,
-      this._frameIndex * this._width,
+      this.frameIndex * this._width,
       0,
       this._width,
       this._height,

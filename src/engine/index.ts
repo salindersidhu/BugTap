@@ -2,7 +2,7 @@ import BoundingBox from "./BoundingBox";
 import Game from "./Game";
 import GameObject from "./GameObject";
 import GameObjectFactory from "./GameObjectFactory";
-import SpriteAnimation from "./SpriteAnimation";
+import SpriteAnimation from "./AnimatedSprite";
 import StaticSprite from "./StaticSprite,";
 import Text from "./Text";
 
