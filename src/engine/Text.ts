@@ -17,10 +17,10 @@ export default class Text {
   /**
    * Create an instance of Text.
    *
-   * @param {string} text The text string to be displayed.
-   * @param {string} font The font and font styles of the text.
-   * @param {string} colour The fill colour of the text.
-   * @param {number} speed The speed, in seconds, of the fade effect.
+   * @param text The text string to be displayed.
+   * @param font The font and font styles of the text.
+   * @param colour The fill colour of the text.
+   * @param speed The speed, in seconds, of the fade effect.
    */
   constructor(text: string, font: string, colour: string, speed: number) {
     this.text = text;
@@ -34,7 +34,7 @@ export default class Text {
   /**
    * Update the text's fade effect frame by frame on each function call.
    *
-   * @param {number} fps Frames per second.
+   * @param fps Frames per second.
    */
   update(fps: number) {
     // Reduce opacity
@@ -48,10 +48,10 @@ export default class Text {
   /**
    * Render the fading text frame by frame on each function call.
    *
-   * @param {CanvasRenderingContext2D} context The 2D canvas context.
-   * @param {number} x The x position coordinate of the fading text.
-   * @param {number} y The y position coordinate of the fading text.
-   * @param {number} angle The angle, in radians, of the fading text.
+   * @param context The 2D canvas context.
+   * @param x The x position coordinate of the fading text.
+   * @param y The y position coordinate of the fading text.
+   * @param angle The angle, in radians, of the fading text.
    */
   render(
     context: CanvasRenderingContext2D,
@@ -92,8 +92,8 @@ export default class Text {
    * Enable rendering of the text's outline and set the colour and width
    * of the text's outline.
    *
-   * @param {string} colour The colour of the text's outline.
-   * @param {number} width The width of the text's outline.
+   * @param colour The colour of the text's outline.
+   * @param width The width of the text's outline.
    */
   setOutline(colour: string, width: number) {
     this.outlineColour = colour;

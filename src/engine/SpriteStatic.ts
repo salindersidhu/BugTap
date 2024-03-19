@@ -1,10 +1,10 @@
 /**
- * The StaticSprite provides functions for creating and rendering a single
+ * The SpriteStatic provides functions for creating and rendering a single
  * frame from a sprite.
  *
  * @author Salinder Sidhu
  */
-export default class StaticSprite {
+export default class SpriteStatic {
   protected frameIndex: number;
 
   private _height: number;
@@ -14,7 +14,7 @@ export default class StaticSprite {
   private _opacity: number;
 
   /**
-   * Create an instance of StaticSprite.
+   * Create an instance of SpriteStatic.
    *
    * @param spriteSrc The source URL of the sprite image.
    * @param height The height of the sprite frame.

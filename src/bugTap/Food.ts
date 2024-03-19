@@ -1,4 +1,4 @@
-import { BoundingBox, GameObject, StaticSprite } from "../engine";
+import { BoundingBox, GameObject, SpriteStatic } from "../engine";
 
 /**
  * Represents a food item in the game.
@@ -9,7 +9,7 @@ export default class Food extends GameObject {
   private _x: number;
   private _y: number;
 
-  private _staticSprite: StaticSprite;
+  private _sprite: SpriteStatic;
 
   boundingBox: BoundingBox;
 
@@ -29,17 +29,12 @@ export default class Food extends GameObject {
     this._y = y;
 
     this.boundingBox = new BoundingBox(x, y, height, width);
-    this._staticSprite = new StaticSprite(
-      spriteSrc,
-      height, // Use the same height and width as the food item
-      width,
-      initFrame
-    );
+    this._sprite = new SpriteStatic(spriteSrc, height, width, initFrame);
   }
 
   update() {}
 
   render() {
-    this._staticSprite.render(this.context, this._x, this._y, 0);
+    this._sprite.render(this.context, this._x, this._y, 0);
   }
 }
