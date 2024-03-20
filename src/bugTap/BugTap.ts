@@ -1,17 +1,21 @@
 import { Game } from "../engine";
 
 import Cursor from "./Cursor";
+
+import BugManager from "./BugManager";
 import FoodManager from "./FoodManager";
 
 /**
  * @author Salinder Sidhu
  */
 export default class BugTap extends Game {
+  private bugManager: BugManager;
   private foodManager: FoodManager;
 
   constructor(canvasId: string) {
     super(canvasId);
 
+    this.bugManager = BugManager.getInstance(this.canvas, this.context);
     this.foodManager = FoodManager.getInstance(this.canvas, this.context);
 
     this.initGameObjects();
@@ -26,7 +30,7 @@ export default class BugTap extends Game {
     const cursor = new Cursor(this.canvas, this.context);
 
     // Create food randomly spread near the center of the table
-    const food = this.foodManager.generateFood(8);
+    const food = this.foodManager.generate(8);
 
     this.addGameObjects([cursor, ...food]);
   }

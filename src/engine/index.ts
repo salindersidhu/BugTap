@@ -6,7 +6,15 @@ import SpriteAnimated from "./SpriteAnimated";
 import SpriteStatic from "./SpriteStatic";
 import Text from "./Text";
 
-import { getRandomItem, getRandomNumber, shuffle } from "./utils";
+import {
+  addToStore,
+  clearStore,
+  getFromStore,
+  getRandomItem,
+  getRandomNumber,
+  removeFromStore,
+  shuffle,
+} from "./utils";
 
 export {
   BoundingBox,
@@ -16,7 +24,11 @@ export {
   SpriteAnimated,
   SpriteStatic,
   Text,
+  addToStore,
+  clearStore,
+  getFromStore,
   getRandomItem,
   getRandomNumber,
+  removeFromStore,
   shuffle,
 };
