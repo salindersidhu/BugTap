@@ -30,3 +30,39 @@ export function shuffle<T>(itemArray: T[]): T[] {
   itemArray = itemArray || [];
   return itemArray.sort(() => Math.random() - 0.5);
 }
+
+/**
+ * Adds or updates a value in the store with the specified key.
+ *
+ * @param key The key to store the value under.
+ * @param value The value to be stored.
+ */
+export function addToStore(key: string, value: string): void {
+  localStorage.setItem(key, value);
+}
+
+/**
+ * Retrieves a value from the store with the specified key.
+ *
+ * @param key The key of the value to retrieve.
+ * @returns The value stored under the key, or null if the key does not exist.
+ */
+export function getFromStore(key: string): string | null {
+  return localStorage.getItem(key);
+}
+
+/**
+ * Removes a value from the store with the specified key.
+ *
+ * @param key The key of the value to remove.
+ */
+export function removeFromStore(key: string): void {
+  localStorage.removeItem(key);
+}
+
+/**
+ * Clears all values stored in the store.
+ */
+export function clearStore(): void {
+  localStorage.clear();
+}
