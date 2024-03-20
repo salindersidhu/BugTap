@@ -9,6 +9,7 @@ import GameObject from "./GameObject";
 export default class GameObjectFactory<T extends GameObject> {
   private canvas: HTMLCanvasElement;
   private context: CanvasRenderingContext2D;
+
   private gameObjectFactory: (
     canvas: HTMLCanvasElement,
     context: CanvasRenderingContext2D,

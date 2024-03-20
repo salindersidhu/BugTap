@@ -15,6 +15,7 @@ export default class BugTap extends Game {
     this.foodManager = FoodManager.getInstance(this.canvas, this.context);
 
     this.initGameObjects();
+    this.initEventHandlers();
   }
 
   /**
@@ -28,5 +29,16 @@ export default class BugTap extends Game {
     const food = this.foodManager.generateFood(8);
 
     this.addGameObjects([cursor, ...food]);
+  }
+
+  /**
+   * Initialize event handlers for the game.
+   */
+  private initEventHandlers() {
+    document.addEventListener("keydown", (event: KeyboardEvent) => {
+      if (event.code === "Space") {
+        this.togglePause();
+      }
+    });
   }
 }

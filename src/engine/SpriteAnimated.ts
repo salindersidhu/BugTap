@@ -7,7 +7,7 @@ import StaticSprite from "./SpriteStatic";
  * @author Salinder Sidhu
  */
 export default class SpriteAnimated extends StaticSprite {
-  private _framesPerSecond: number;
+  private _speed: number;
   private _frameCounter: number = 0;
   private _numFrames: number;
 
@@ -17,7 +17,7 @@ export default class SpriteAnimated extends StaticSprite {
    * @param spriteSrc The source URL of the sprite image.
    * @param height The height of the sprite frame.
    * @param width The width of the sprite frame.
-   * @param framesPerSecond The number of frames per second for the animation.
+   * @param speed The speed factor for the animation.
    * @param numFrames The total number of frames in the sprite animation.
    * @param initFrame The initial frame index (default is -1).
    */
@@ -25,14 +25,13 @@ export default class SpriteAnimated extends StaticSprite {
     spriteSrc: string,
     height: number,
     width: number,
-    framesPerSecond: number,
+    speed: number,
     numFrames: number,
     initFrame: number = -1
   ) {
     super(spriteSrc, height, width, initFrame);
 
-    // Ensure framesPerSecond is not negative
-    this._framesPerSecond = Math.max(0, framesPerSecond);
+    this._speed = Math.max(0, speed); // Ensure speed is not negative
     this._numFrames = numFrames;
   }
 
@@ -41,9 +40,9 @@ export default class SpriteAnimated extends StaticSprite {
    */
   update() {
     this._frameCounter += 1;
-    if (this._frameCounter >= 100 / this._framesPerSecond) {
+    if (this._frameCounter >= 100 / this._speed) {
       // Reset the frame counter
-      this._frameCounter -= 100 / this._framesPerSecond;
+      this._frameCounter -= 100 / this._speed;
 
       // Increment the frame index and reset it at the end of the animation
       this.frameIndex = (this.frameIndex + 1) % this._numFrames;
