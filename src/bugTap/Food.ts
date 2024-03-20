@@ -32,7 +32,7 @@ export default class Food extends GameObject {
     this._sprite = new SpriteStatic(spriteSrc, height, width, initFrame);
   }
 
-  update() {}
+  update(_: number): void {}
 
   render() {
     this._sprite.render(this.context, this._x, this._y, 0);

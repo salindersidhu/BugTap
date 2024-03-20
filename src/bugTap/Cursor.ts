@@ -51,7 +51,7 @@ export default class Cursor extends GameObject {
     this.unbindMouseMoveListener();
   }
 
-  update() {
+  update(_: number) {
     this.x = this.mouse.x;
     this.y = this.mouse.y;
   }

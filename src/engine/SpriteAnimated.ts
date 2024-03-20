@@ -36,13 +36,16 @@ export default class SpriteAnimated extends StaticSprite {
   }
 
   /**
-   * Update the sprite animation frame by frame on each function call.
+   * Update the sprite animation frame by frame based on the given frames
+   * per second.
+   *
+   * @param fps The current frames per second.
    */
-  update() {
+  update(fps: number) {
     this._frameCounter += 1;
-    if (this._frameCounter >= 100 / this._speed) {
+    if (this._frameCounter >= fps / this._speed) {
       // Reset the frame counter
-      this._frameCounter -= 100 / this._speed;
+      this._frameCounter -= fps / this._speed;
 
       // Increment the frame index and reset it at the end of the animation
       this.frameIndex = (this.frameIndex + 1) % this._numFrames;

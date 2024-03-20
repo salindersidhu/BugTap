@@ -27,8 +27,9 @@ export default abstract class GameObject {
    * Abstract function that updates the GameObject.
    *
    * @abstract
+   * @param fps The current frames per second.
    */
-  abstract update(): void;
+  abstract update(fps: number): void;
 
   /**
    * Abstract function that renders the GameObject.

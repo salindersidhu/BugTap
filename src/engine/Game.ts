@@ -81,19 +81,21 @@ export default class Game {
       return;
     }
 
-    this.update();
-    this.render();
     this.updateFps();
+    this.update(this.fps);
+    this.render();
 
     requestAnimationFrame(this.loop);
   };
 
   /**
    * Update all game objects.
+   *
+   * @param fps The current frames per second.
    */
-  private update() {
+  private update(fps: number) {
     this._gameObjects.forEach((gameObject) => {
-      gameObject.update();
+      gameObject.update(fps);
 
       if (gameObject.canDelete()) {
         this.deleteGameObject(gameObject);
