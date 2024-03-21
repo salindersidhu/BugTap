@@ -36,8 +36,9 @@ export default class BugTap extends Game {
     // Create a cursor to provide a visual indicator of the player's mouse
     const cursor = new Cursor(this.canvas, this.context);
 
-    // Create food randomly spread near the center of the table
+    // Create food spread randomly near the center of the table
     const food = this.foodManager.generate(8);
+    this.bugManager.receiveFood(food);
 
     this.addGameObjects([cursor, ...food]);
   }

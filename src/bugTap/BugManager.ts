@@ -1,6 +1,7 @@
 import { GameObjectFactory, getRandomItem, getRandomNumber } from "../engine";
 
 import Bug from "./Bug";
+import Food from "./Food";
 
 /**
  * Interface representing data structure for bug properties.
@@ -34,6 +35,7 @@ const bugData: BugData[] = [
 export default class BugManager {
   private static instance: BugManager;
   private bugFactory: GameObjectFactory<Bug>;
+  private _food: Food[] = [];
 
   /**
    * Creates an instance of BugManager.
@@ -68,6 +70,7 @@ export default class BugManager {
           width,
           spriteSrc,
           speed,
+          this._food,
           numFrames
         );
       }
@@ -89,6 +92,14 @@ export default class BugManager {
       BugManager.instance = new BugManager(canvas, context);
     }
     return BugManager.instance;
+  }
+
+  /**
+   *
+   * @param food
+   */
+  public receiveFood(food: Food[]) {
+    this._food = food;
   }
 
   /**

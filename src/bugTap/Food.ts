@@ -6,8 +6,10 @@ import { BoundingBox, GameObject, SpriteStatic } from "../engine";
  * @author Salinder Sidhu
  */
 export default class Food extends GameObject {
-  private _x: number;
-  private _y: number;
+  x: number;
+  y: number;
+  height: number;
+  width: number;
 
   private _sprite: SpriteStatic;
 
@@ -25,8 +27,10 @@ export default class Food extends GameObject {
   ) {
     super(canvas, context);
 
-    this._x = x;
-    this._y = y;
+    this.x = x;
+    this.y = y;
+    this.height = height;
+    this.width = width;
 
     this.boundingBox = new BoundingBox(x, y, height, width);
     this._sprite = new SpriteStatic(spriteSrc, height, width, initFrame);
@@ -35,6 +39,6 @@ export default class Food extends GameObject {
   update(_: number): void {}
 
   render() {
-    this._sprite.render(this.context, this._x, this._y, 0);
+    this._sprite.render(this.context, this.x, this.y, 0);
   }
 }

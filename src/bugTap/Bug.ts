@@ -1,5 +1,7 @@
 import { SpriteAnimated, GameObject, BoundingBox } from "../engine";
 
+import Food from "./Food";
+
 /**
  * Representing the state of a bug.
  */
@@ -24,8 +26,25 @@ export default class Bug extends GameObject {
 
   private _sprite: SpriteAnimated;
 
+  private _food: Food[] = [];
+
   boundingBox: BoundingBox;
 
+  /**
+   * Creates a new Bug instance.
+   *
+   * @param canvas The HTMLCanvasElement for rendering.
+   * @param context The CanvasRenderingContext2D for drawing.
+   * @param x The initial X coordinate of the bug.
+   * @param y The initial Y coordinate of the bug.
+   * @param height The height of the bug.
+   * @param width The width of the bug.
+   * @param spriteSrc The URL of the sprite image for rendering.
+   * @param speed The speed of the bug.
+   * @param food An array of Food objects for interaction.
+   * @param numFrames The number of frames in the animated sprite.
+   * @param initFrame The initial frame index of the animated sprite (default is 0).
+   */
   constructor(
     canvas: HTMLCanvasElement,
     context: CanvasRenderingContext2D,
@@ -35,6 +54,7 @@ export default class Bug extends GameObject {
     width: number,
     spriteSrc: string,
     speed: number,
+    food: Food[],
     numFrames: number,
     initFrame: number = 0
   ) {
@@ -46,6 +66,8 @@ export default class Bug extends GameObject {
     this._height = height;
 
     this._speed = speed;
+
+    this._food = food;
 
     this.boundingBox = new BoundingBox(x, y, height, width);
 
@@ -59,18 +81,76 @@ export default class Bug extends GameObject {
     );
   }
 
+  /**
+   * Updates the bug's position and animation frame.
+   *
+   * @param fps The frames per second.
+   */
   update(fps: number) {
-    this._moveToPoint(this.canvas.width / 2, this.canvas.height / 2);
+    this._moveToFood(this._food);
 
     this._sprite.update(fps);
   }
 
+  /**
+   * Renders the bug on the canvas.
+   */
   render() {
     this._sprite.render(this.context, this._x, this._y, this._angle);
   }
 
-  private _moveToFood() {}
+  /**
+   * Move the bug towards the nearest food.
+   *
+   * @param food An array of Food objects.
+   */
+  private _moveToFood(food: Food[]) {
+    // Do nothing if there's no food
+    if (food.length === 0) {
+      return;
+    }
 
+    // Compute the center coordinates of the nearest food
+    let nearestFood = food[0];
+    let minDistanceSquared = this._distanceSquared(nearestFood);
+    for (const _food of food) {
+      const distanceSquared = this._distanceSquared(_food);
+      if (distanceSquared < minDistanceSquared) {
+        minDistanceSquared = distanceSquared;
+        nearestFood = _food;
+      }
+    }
+    const foodCenterX = nearestFood.x + nearestFood.width / 2;
+    const foodCenterY = nearestFood.y + nearestFood.height / 2;
+
+    // Move towards the center of the nearest food
+    this._moveToPoint(foodCenterX, foodCenterY);
+  }
+
+  /**
+   * Computes the squared distance between the bug and a food object.
+   *
+   * @param food The Food object.
+   * @returns The squared distance between the bug and the food object.
+   */
+  private _distanceSquared(food: Food): number {
+    const bugCenterX = this._x + this._width / 2;
+    const bugCenterY = this._y + this._height / 2;
+    const foodCenterX = food.x + food.width / 2;
+    const foodCenterY = food.y + food.height / 2;
+
+    const dx = bugCenterX - foodCenterX;
+    const dy = bugCenterY - foodCenterY;
+
+    return dx * dx + dy * dy;
+  }
+
+  /**
+   * Moves the bug towards a specified point.
+   *
+   * @param x The X coordinate of the target point.
+   * @param y The Y coordinate of the target point.
+   */
   private _moveToPoint(x: number, y: number) {
     // Compute the distance to the point
     const dx = x - this._x - this._width / 2;
