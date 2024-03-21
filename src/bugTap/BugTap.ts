@@ -1,4 +1,4 @@
-import { Game } from "../engine";
+import { Game, getRandomNumber } from "../engine";
 
 import Cursor from "./Cursor";
 
@@ -9,6 +9,11 @@ import FoodManager from "./FoodManager";
  * @author Salinder Sidhu
  */
 export default class BugTap extends Game {
+  private static readonly MIN_BUGS_TO_SPAWN: number = 1;
+  private static readonly MAX_BUGS_TO_SPAWN: number = 3;
+  private static readonly MIN_SPAWN_INTERVAL: number = 800;
+  private static readonly MAX_SPAWN_INTERVAL: number = 1500;
+
   private bugManager: BugManager;
   private foodManager: FoodManager;
 
@@ -20,6 +25,8 @@ export default class BugTap extends Game {
 
     this.initGameObjects();
     this.initEventHandlers();
+
+    this.spawnBugsRandomly();
   }
 
   /**
@@ -44,5 +51,39 @@ export default class BugTap extends Game {
         this.togglePause();
       }
     });
+  }
+
+  /**
+   * Spawn bugs continuously at random times.
+   */
+  private spawnBugsRandomly() {
+    const spawnBugRandomly = () => {
+      if (!this.isPaused()) {
+        const numBugsToSpawn = getRandomNumber(
+          BugTap.MIN_BUGS_TO_SPAWN,
+          BugTap.MAX_BUGS_TO_SPAWN
+        );
+        Array(numBugsToSpawn)
+          .fill(null)
+          .forEach(() => {
+            this.spawnBug();
+          });
+      }
+      const spawnInterval = getRandomNumber(
+        BugTap.MIN_SPAWN_INTERVAL,
+        BugTap.MAX_SPAWN_INTERVAL
+      );
+      setTimeout(spawnBugRandomly, spawnInterval);
+    };
+
+    spawnBugRandomly();
+  }
+
+  /**
+   * Spawn a bug and add it to the game.
+   */
+  private spawnBug() {
+    const bug = this.bugManager.spawn(this.canvas);
+    this.addGameObject(bug);
   }
 }

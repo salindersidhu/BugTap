@@ -46,6 +46,15 @@ export default class Game {
   }
 
   /**
+   * Add a game object to the game.
+   *
+   * @param gameObject The GameObject instance to add to the game.
+   */
+  addGameObject(gameObject: GameObject) {
+    this._gameObjects.push(gameObject);
+  }
+
+  /**
    * Add game objects to the game.
    *
    * @param gameObjects An array of GameObject instances to add to the game.
@@ -70,6 +79,15 @@ export default class Game {
     if (this._state === State.RUNNING) {
       this.loop();
     }
+  }
+
+  /**
+   * Indicate if the game is currently paused.
+   *
+   * @returns A boolean indicating whether the game is paused.
+   */
+  protected isPaused(): boolean {
+    return this._state === State.PAUSED;
   }
 
   /**
