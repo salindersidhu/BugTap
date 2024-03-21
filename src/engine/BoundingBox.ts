@@ -5,10 +5,10 @@
  * @author Salinder Sidhu
  */
 export default class BoundingBox {
-  private x: number;
-  private y: number;
-  private width: number;
-  private height: number;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
 
   /**
    * Create an instance of BoundingBox.

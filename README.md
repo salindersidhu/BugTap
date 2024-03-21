@@ -50,7 +50,7 @@ npm run dev
     │    └── ...
     ├── public
     │    ├── favicon.ico            # Favicon
-    │    ├── index.html
+    │    ├── template.html
     │    └── ...
     ├── tsconfig.json               # TypeScript config
     ├── webpack.config.js           # Webpack config
@@ -59,13 +59,13 @@ npm run dev
 ## Acknowledgements
 
 - **Original Assignment**:
-    - University of Toronto: CSC309 Programming on the Web, Summer 2015
+  - University of Toronto: CSC309 Programming on the Web, Summer 2015
 - **Graphics**:
-    - Bug sprite from [E-String](http://e-string.com/articles/create-simple-game-using-sprite-kit/)
-    - Food sprites from [Free Vector](http://all-free-download.com/free-vector/download/vivid_food_icon_design_vector_535039.html)
-    - Media button images from [Vector.me](http://vector.me/browse/695406/icon_set_player)
-    - Favicon generated from [Font Awesome Favicon Generator](http://paulferrett.com/fontawesome-favicon/)
-    - Tablecloth texture created by **Patrick Hoesly** from [Flickr](http://www.everystockphoto.com/photo.php?imageId=5778707) under [Create Commons Attribution License](http://creativecommons.org/licenses/by/4.0/)
+  - Bug sprite from [E-String](http://e-string.com/articles/create-simple-game-using-sprite-kit/)
+  - Food sprites from [Free Vector](http://all-free-download.com/free-vector/download/vivid_food_icon_design_vector_535039.html)
+  - Media button images from [Vector.me](http://vector.me/browse/695406/icon_set_player)
+  - Favicon generated from [Font Awesome Favicon Generator](http://paulferrett.com/fontawesome-favicon/)
+  - Tablecloth texture created by **Patrick Hoesly** from [Flickr](http://www.everystockphoto.com/photo.php?imageId=5778707) under [Create Commons Attribution License](http://creativecommons.org/licenses/by/4.0/)
 - **Sound Effects**:
-    - Coin (Retro video game SFX) created by **cabled_mess** from [Freesound](https://freesound.org/people/cabled_mess/sounds/350874/) under [Create Commons 0 License](https://creativecommons.org/publicdomain/zero/1.0/)
-    - Chewing, Breadstick, Single created by **InspectorJ** from [Freesound](https://freesound.org/people/InspectorJ/sounds/429591/) under [Create Commons Attribution License](https://creativecommons.org/licenses/by/3.0/)
+  - Coin (Retro video game SFX) created by **cabled_mess** from [Freesound](https://freesound.org/people/cabled_mess/sounds/350874/) under [Create Commons 0 License](https://creativecommons.org/publicdomain/zero/1.0/)
+  - Chewing, Breadstick, Single created by **InspectorJ** from [Freesound](https://freesound.org/people/InspectorJ/sounds/429591/) under [Create Commons Attribution License](https://creativecommons.org/licenses/by/3.0/)

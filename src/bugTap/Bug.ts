@@ -14,17 +14,10 @@ enum State {
  * @author Salinder Sidhu
  */
 export default class Bug extends GameObject {
-  private _x: number;
-  private _y: number;
-  private _height: number;
-  private _width: number;
-
+  private _sprite: SpriteAnimated;
   private _angle: number = 0;
   private _speed: number;
-
   private _state: State = State.ALIVE;
-
-  private _sprite: SpriteAnimated;
 
   private _food: Food[] = [];
 
@@ -60,17 +53,6 @@ export default class Bug extends GameObject {
   ) {
     super(canvas, context);
 
-    this._x = x;
-    this._y = y;
-    this._width = width;
-    this._height = height;
-
-    this._speed = speed;
-
-    this._food = food;
-
-    this.boundingBox = new BoundingBox(x, y, height, width);
-
     this._sprite = new SpriteAnimated(
       spriteSrc,
       height,
@@ -79,6 +61,11 @@ export default class Bug extends GameObject {
       numFrames,
       initFrame
     );
+    this._speed = speed;
+
+    this._food = food;
+
+    this.boundingBox = new BoundingBox(x, y, height, width);
   }
 
   /**
@@ -96,7 +83,8 @@ export default class Bug extends GameObject {
    * Renders the bug on the canvas.
    */
   render() {
-    this._sprite.render(this.context, this._x, this._y, this._angle);
+    const { x, y } = this.boundingBox;
+    this._sprite.render(this.context, x, y, this._angle);
   }
 
   /**
@@ -120,8 +108,9 @@ export default class Bug extends GameObject {
         nearestFood = _food;
       }
     }
-    const foodCenterX = nearestFood.x + nearestFood.width / 2;
-    const foodCenterY = nearestFood.y + nearestFood.height / 2;
+    const { x, y, width, height } = nearestFood.boundingBox;
+    const foodCenterX = x + width / 2;
+    const foodCenterY = y + height / 2;
 
     // Move towards the center of the nearest food
     this._moveToPoint(foodCenterX, foodCenterY);
@@ -134,10 +123,18 @@ export default class Bug extends GameObject {
    * @returns The squared distance between the bug and the food object.
    */
   private _distanceSquared(food: Food): number {
-    const bugCenterX = this._x + this._width / 2;
-    const bugCenterY = this._y + this._height / 2;
-    const foodCenterX = food.x + food.width / 2;
-    const foodCenterY = food.y + food.height / 2;
+    const { x, y, width, height } = this.boundingBox;
+    const {
+      x: foodX,
+      y: foodY,
+      width: foodWidth,
+      height: foodHeight,
+    } = food.boundingBox;
+
+    const bugCenterX = x + width / 2;
+    const bugCenterY = y + height / 2;
+    const foodCenterX = foodX + foodWidth / 2;
+    const foodCenterY = foodY + foodHeight / 2;
 
     const dx = bugCenterX - foodCenterX;
     const dy = bugCenterY - foodCenterY;
@@ -153,8 +150,9 @@ export default class Bug extends GameObject {
    */
   private _moveToPoint(x: number, y: number) {
     // Compute the distance to the point
-    const dx = x - this._x - this._width / 2;
-    const dy = y - this._y - this._height / 2;
+    const { x: bugX, y: bugY, width, height } = this.boundingBox;
+    const dx = x - bugX - width / 2;
+    const dy = y - bugY - height / 2;
 
     // Compute the hypotenuse
     const hypotenuse = Math.hypot(dx, dy);
@@ -167,8 +165,8 @@ export default class Bug extends GameObject {
 
       const nSpeed = 0.3 * this._speed;
 
-      this._x += ndx * nSpeed;
-      this._y += ndy * nSpeed;
+      this.boundingBox.x += ndx * nSpeed;
+      this.boundingBox.y += ndy * nSpeed;
 
       // Update the angle based on direction of movement
       this._angle = Math.atan2(ndy, ndx);

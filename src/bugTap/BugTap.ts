@@ -1,8 +1,7 @@
 import { Game, getRandomNumber } from "../engine";
 
-import Cursor from "./Cursor";
-
 import BugManager from "./BugManager";
+import CursorManager from "./CursorManager";
 import FoodManager from "./FoodManager";
 
 /**
@@ -14,6 +13,7 @@ export default class BugTap extends Game {
   private static readonly MIN_SPAWN_INTERVAL: number = 800;
   private static readonly MAX_SPAWN_INTERVAL: number = 1500;
 
+  private cursorManager: CursorManager;
   private bugManager: BugManager;
   private foodManager: FoodManager;
 
@@ -21,11 +21,11 @@ export default class BugTap extends Game {
     super(canvasId);
 
     this.bugManager = BugManager.getInstance(this.canvas, this.context);
+    this.cursorManager = CursorManager.getInstance(this.canvas, this.context);
     this.foodManager = FoodManager.getInstance(this.canvas, this.context);
 
     this.initGameObjects();
     this.initEventHandlers();
-
     this.spawnBugsRandomly();
   }
 
@@ -34,7 +34,7 @@ export default class BugTap extends Game {
    */
   private initGameObjects() {
     // Create a cursor to provide a visual indicator of the player's mouse
-    const cursor = new Cursor(this.canvas, this.context);
+    const cursor = this.cursorManager.create();
 
     // Create food spread randomly near the center of the table
     const food = this.foodManager.generate(8);

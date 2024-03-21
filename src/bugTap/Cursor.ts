@@ -9,10 +9,6 @@ export default class Cursor extends GameObject {
   x: number;
   y: number;
   radius: number;
-  mouse: {
-    x: number;
-    y: number;
-  };
 
   constructor(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D) {
     super(canvas, context, 1);
@@ -20,10 +16,6 @@ export default class Cursor extends GameObject {
     this.radius = 15;
     this.x = -this.radius;
     this.y = -this.radius;
-    this.mouse = {
-      x: this.x,
-      y: this.y,
-    };
 
     this.bindMouseMoveListener();
 
@@ -32,10 +24,8 @@ export default class Cursor extends GameObject {
   }
 
   private handleMouseMove = (event: MouseEvent) => {
-    this.mouse = {
-      x: event.offsetX,
-      y: event.offsetY,
-    };
+    this.x = event.offsetX;
+    this.y = event.offsetY;
   };
 
   private bindMouseMoveListener() {
@@ -51,10 +41,7 @@ export default class Cursor extends GameObject {
     this.unbindMouseMoveListener();
   }
 
-  update(_: number) {
-    this.x = this.mouse.x;
-    this.y = this.mouse.y;
-  }
+  update(_: number) {}
 
   render() {
     this.context.beginPath();

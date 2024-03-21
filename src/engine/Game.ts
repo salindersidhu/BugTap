@@ -126,7 +126,6 @@ export default class Game {
    */
   private render() {
     this.context.clearRect(0, 0, this.width, this.height);
-
     this._gameObjects
       .sort(this.sortGameObjectsByDrawPriority)
       .forEach((gameObject) => gameObject.render());

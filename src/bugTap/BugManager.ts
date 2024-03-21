@@ -95,8 +95,9 @@ export default class BugManager {
   }
 
   /**
+   * Receives an array of Food for bug interaction.
    *
-   * @param food
+   * @param food An array of Food to be assigned to the BugManager.
    */
   public receiveFood(food: Food[]) {
     this._food = food;
