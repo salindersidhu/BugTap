@@ -1,0 +1,6 @@
+/* Game canvas */
+#game-canvas {
+    background: url("./assets/graphics/table.png");
+    margin: 0 auto;
+    border: 1px solid black;
+}

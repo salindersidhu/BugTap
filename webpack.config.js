@@ -41,7 +41,6 @@ module.exports = {
       ],
     }),
     new HtmlWebpackPlugin({
-      title: "Bug Tap!",
       filename: "index.html",
       template: path.resolve(__dirname, "public/template.html"),
     }),
