@@ -16,6 +16,7 @@ a,
 a:focus,
 a:hover {
     color: #fff;
+    text-decoration: none;
 }
 
 .fork-me-ribbon > img {

@@ -11,7 +11,6 @@ export default class SpriteStatic {
   private _width: number;
 
   private _image: HTMLImageElement;
-  private _opacity: number;
 
   /**
    * Create an instance of SpriteStatic.
@@ -32,8 +31,6 @@ export default class SpriteStatic {
     this._height = height;
     this._width = width;
 
-    this._opacity = 1;
-
     // Load image
     this._image = new Image();
     this._image.src = spriteSrc;
@@ -51,7 +48,8 @@ export default class SpriteStatic {
     context: CanvasRenderingContext2D,
     x: number,
     y: number,
-    angle: number
+    angle: number,
+    opacity: number = 1
   ) {
     // Configure the translation point to sprite's center when rotating
     const translateX = x + this._width / 2;
@@ -61,7 +59,7 @@ export default class SpriteStatic {
     context.save();
 
     // Configure the canvas opacity
-    context.globalAlpha = this._opacity;
+    context.globalAlpha = opacity;
 
     // Translate and rotate canvas to draw the Sprite at an angle
     context.translate(translateX, translateY);

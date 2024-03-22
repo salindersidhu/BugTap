@@ -1,3 +1,5 @@
+import { Howl } from "howler";
+
 import { SpriteAnimated, GameObject, BoundingBox } from "../engine";
 
 import Food from "./Food";
@@ -14,12 +16,21 @@ enum State {
  * @author Salinder Sidhu
  */
 export default class Bug extends GameObject {
+  private readonly SOUND_EAT_FOOD: string = "./assets/sound/eat.ogg";
+
   private _sprite: SpriteAnimated;
   private _angle: number = 0;
   private _speed: number;
   private _state: State = State.ALIVE;
+  private _opacity: number = 1;
+  private _fadeSpeed: number = 0.7;
 
   private _food: Food[] = [];
+
+  private _spawnX: number = 0;
+  private _spawnY: number = 0;
+
+  private _soundEatFood: Howl;
 
   boundingBox: BoundingBox;
 
@@ -65,18 +76,76 @@ export default class Bug extends GameObject {
 
     this._food = food;
 
+    this._spawnX = x;
+    this._spawnY = y;
+
     this.boundingBox = new BoundingBox(x, y, height, width);
+
+    this._soundEatFood = new Howl({
+      src: [this.SOUND_EAT_FOOD],
+      html5: true,
+    });
   }
 
   /**
-   * Updates the bug's position and animation frame.
+   * Updates the bug's position, animation frame, and interactions.
    *
    * @param fps The frames per second.
    */
   update(fps: number) {
-    this._moveToFood(this._food);
-
     this._sprite.update(fps);
+
+    this._updateDeath(fps);
+    this._updateMovement(fps);
+    this._updateEatingFood();
+  }
+
+  /**
+   * Updates the bug's state when it's dead, handling the death animation.
+   *
+   * @param fps The frames per second.
+   */
+  private _updateDeath(fps: number) {
+    if (this._state === State.DEAD) {
+      this._opacity -= 1 / (fps * this._fadeSpeed);
+      if (this._opacity < 0) {
+        this.delete();
+      }
+    }
+  }
+
+  /**
+   * Updates the bug's movement based on food availability. If there's no food,
+   * the bug moves back to its spawn point.
+   *
+   * @param fps The frames per second.
+   */
+  private _updateMovement(fps: number) {
+    if (this._food.length < 1) {
+      this._state = State.DEAD;
+      this._moveToPoint(this._spawnX, this._spawnY);
+      return;
+    }
+    this._moveToFood(this._food);
+  }
+
+  /**
+   * Updates the bug's interaction with food. If the bug overlaps with any
+   * food, it eats the food.
+   */
+  private _updateEatingFood() {
+    for (const _food of this._food) {
+      if (_food.boundingBox.isOverlapping(this.boundingBox)) {
+        _food.delete();
+        this._soundEatFood.play();
+
+        // Remove the eaten food from the array
+        const index = this._food.indexOf(_food);
+        if (index >= 0) {
+          this._food.splice(index, 1);
+        }
+      }
+    }
   }
 
   /**
@@ -84,7 +153,7 @@ export default class Bug extends GameObject {
    */
   render() {
     const { x, y } = this.boundingBox;
-    this._sprite.render(this.context, x, y, this._angle);
+    this._sprite.render(this.context, x, y, this._angle, this._opacity);
   }
 
   /**
@@ -93,11 +162,6 @@ export default class Bug extends GameObject {
    * @param food An array of Food objects.
    */
   private _moveToFood(food: Food[]) {
-    // Do nothing if there's no food
-    if (food.length === 0) {
-      return;
-    }
-
     // Compute the center coordinates of the nearest food
     let nearestFood = food[0];
     let minDistanceSquared = this._distanceSquared(nearestFood);

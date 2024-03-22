@@ -1,5 +1,7 @@
 import { Game, getRandomNumber } from "../engine";
 
+import Food from "./Food";
+
 import BugManager from "./BugManager";
 import CursorManager from "./CursorManager";
 import FoodManager from "./FoodManager";
@@ -8,14 +10,18 @@ import FoodManager from "./FoodManager";
  * @author Salinder Sidhu
  */
 export default class BugTap extends Game {
-  private static readonly MIN_BUGS_TO_SPAWN: number = 1;
-  private static readonly MAX_BUGS_TO_SPAWN: number = 3;
-  private static readonly MIN_SPAWN_INTERVAL: number = 800;
-  private static readonly MAX_SPAWN_INTERVAL: number = 1500;
+  private readonly AMOUNT_OF_FOOD: number = 10;
+
+  private readonly MIN_BUGS_TO_SPAWN: number = 1;
+  private readonly MAX_BUGS_TO_SPAWN: number = 3;
+  private readonly MIN_SPAWN_INTERVAL: number = 800;
+  private readonly MAX_SPAWN_INTERVAL: number = 1500;
 
   private cursorManager: CursorManager;
   private bugManager: BugManager;
   private foodManager: FoodManager;
+
+  private _food: Food[] = [];
 
   constructor(canvasId: string) {
     super(canvasId);
@@ -37,10 +43,10 @@ export default class BugTap extends Game {
     const cursor = this.cursorManager.create();
 
     // Create food spread randomly near the center of the table
-    const food = this.foodManager.generate(8);
-    this.bugManager.receiveFood(food);
+    this._food = this.foodManager.generate(this.AMOUNT_OF_FOOD);
+    this.bugManager.receiveFood(this._food);
 
-    this.addGameObjects([cursor, ...food]);
+    this.addGameObjects([cursor, ...this._food]);
   }
 
   /**
@@ -52,6 +58,12 @@ export default class BugTap extends Game {
         this.togglePause();
       }
     });
+
+    this.canvas.addEventListener("mouseup", () => {
+      if (this.isStopped()) {
+        this.start();
+      }
+    });
   }
 
   /**
@@ -59,10 +71,10 @@ export default class BugTap extends Game {
    */
   private spawnBugsRandomly() {
     const spawnBugRandomly = () => {
-      if (!this.isPaused()) {
+      if (this.isRunning() && this._food.length > 0) {
         const numBugsToSpawn = getRandomNumber(
-          BugTap.MIN_BUGS_TO_SPAWN,
-          BugTap.MAX_BUGS_TO_SPAWN
+          this.MIN_BUGS_TO_SPAWN,
+          this.MAX_BUGS_TO_SPAWN
         );
         Array(numBugsToSpawn)
           .fill(null)
@@ -71,8 +83,8 @@ export default class BugTap extends Game {
           });
       }
       const spawnInterval = getRandomNumber(
-        BugTap.MIN_SPAWN_INTERVAL,
-        BugTap.MAX_SPAWN_INTERVAL
+        this.MIN_SPAWN_INTERVAL,
+        this.MAX_SPAWN_INTERVAL
       );
       setTimeout(spawnBugRandomly, spawnInterval);
     };

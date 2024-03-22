@@ -41,7 +41,7 @@ export default abstract class GameObject {
   /**
    * Flag the GameObject to be deleted.
    */
-  protected delete() {
+  delete() {
     this._canDelete = true;
   }
 

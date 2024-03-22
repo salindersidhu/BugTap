@@ -4,8 +4,9 @@ import GameObject from "./GameObject";
  * Enum representing the possible states of the game.
  */
 enum State {
-  RUNNING,
   PAUSED,
+  RUNNING,
+  STOPPED,
 }
 
 /**
@@ -22,7 +23,7 @@ export default class Game {
   width: number;
 
   private _gameObjects: GameObject[] = [];
-  private _state: State = State.RUNNING;
+  private _state: State = State.STOPPED;
   private _lastFrameTime = performance.now();
   private _frameCount = 0;
 
@@ -41,8 +42,6 @@ export default class Game {
     this.context = this.canvas.getContext("2d")!;
     this.height = this.canvas.height;
     this.width = this.canvas.width;
-
-    this.loop();
   }
 
   /**
@@ -68,16 +67,18 @@ export default class Game {
    */
   protected start() {
     this._state = State.RUNNING;
-    this.loop();
+    this._loop();
   }
 
   /**
    * Toggles the pause/resume state of the game.
    */
   protected togglePause() {
-    this._state = this._state === State.PAUSED ? State.RUNNING : State.PAUSED;
-    if (this._state === State.RUNNING) {
-      this.loop();
+    if (this._state !== State.STOPPED) {
+      this._state = this._state === State.PAUSED ? State.RUNNING : State.PAUSED;
+      if (this._state === State.RUNNING) {
+        this._loop();
+      }
     }
   }
 
@@ -91,19 +92,37 @@ export default class Game {
   }
 
   /**
+   * Indicate if the game is currently running.
+   *
+   * @returns A boolean indicating whether the game is running.
+   */
+  protected isRunning(): boolean {
+    return this._state === State.RUNNING;
+  }
+
+  /**
+   * Indicate if the game is currently stopped.
+   *
+   * @returns A boolean indicating whether the game is stopped.
+   */
+  protected isStopped(): boolean {
+    return this._state === State.STOPPED;
+  }
+
+  /**
    * Main game loop that updates and renders the game. It is called recursively
    * using requestAnimationFrame.
    */
-  private loop = () => {
+  private _loop = () => {
     if (this._state !== State.RUNNING) {
       return;
     }
 
-    this.updateFps();
-    this.update(this.fps);
-    this.render();
+    this._updateFps();
+    this._update(this.fps);
+    this._render();
 
-    requestAnimationFrame(this.loop);
+    requestAnimationFrame(this._loop);
   };
 
   /**
@@ -111,12 +130,12 @@ export default class Game {
    *
    * @param fps The current frames per second.
    */
-  private update(fps: number) {
+  private _update(fps: number) {
     this._gameObjects.forEach((gameObject) => {
       gameObject.update(fps);
 
       if (gameObject.canDelete()) {
-        this.deleteGameObject(gameObject);
+        this._deleteGameObject(gameObject);
       }
     });
   }
@@ -124,10 +143,10 @@ export default class Game {
   /**
    * Render all game objects.
    */
-  private render() {
+  private _render() {
     this.context.clearRect(0, 0, this.width, this.height);
     this._gameObjects
-      .sort(this.sortGameObjectsByDrawPriority)
+      .sort(this._sortGameObjectsByDrawPriority)
       .forEach((gameObject) => gameObject.render());
   }
 
@@ -135,7 +154,7 @@ export default class Game {
    * Update the frames per second (FPS) of the game based on the time elapsed
    * since the last frame.
    */
-  private updateFps() {
+  private _updateFps() {
     const currentTime = performance.now();
     const deltaTime = currentTime - this._lastFrameTime;
 
@@ -151,7 +170,7 @@ export default class Game {
    *
    * @param gameObject The GameObject instance to delete.
    */
-  private deleteGameObject(gameObject: GameObject) {
+  private _deleteGameObject(gameObject: GameObject) {
     const index = this._gameObjects.indexOf(gameObject);
 
     if (index >= 0) {
@@ -169,7 +188,7 @@ export default class Game {
    *          a positive value if gameObjectB has lower draw priority,
    *          or zero if both have equal draw priority.
    */
-  private sortGameObjectsByDrawPriority(
+  private _sortGameObjectsByDrawPriority(
     gameObjectA: GameObject,
     gameObjectB: GameObject
   ) {
