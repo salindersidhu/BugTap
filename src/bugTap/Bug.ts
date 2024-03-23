@@ -1,5 +1,3 @@
-import { Howl } from "howler";
-
 import { SpriteAnimated, GameObject, BoundingBox } from "../engine";
 
 import Food from "./Food";
@@ -16,8 +14,6 @@ enum State {
  * @author Salinder Sidhu
  */
 export default class Bug extends GameObject {
-  private readonly SOUND_EAT_FOOD: string = "./assets/sound/eat.ogg";
-
   private _sprite: SpriteAnimated;
   private _angle: number = 0;
   private _speed: number;
@@ -29,8 +25,6 @@ export default class Bug extends GameObject {
 
   private _spawnX: number = 0;
   private _spawnY: number = 0;
-
-  private _soundEatFood: Howl;
 
   boundingBox: BoundingBox;
 
@@ -80,11 +74,6 @@ export default class Bug extends GameObject {
     this._spawnY = y;
 
     this.boundingBox = new BoundingBox(x, y, height, width);
-
-    this._soundEatFood = new Howl({
-      src: [this.SOUND_EAT_FOOD],
-      html5: true,
-    });
   }
 
   /**
@@ -136,8 +125,7 @@ export default class Bug extends GameObject {
   private _updateEatingFood() {
     for (const _food of this._food) {
       if (_food.boundingBox.isOverlapping(this.boundingBox)) {
-        _food.delete();
-        this._soundEatFood.play();
+        _food.eaten();
 
         // Remove the eaten food from the array
         const index = this._food.indexOf(_food);
