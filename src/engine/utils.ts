@@ -15,7 +15,7 @@ export function getRandomNumber(min: number, max: number): number {
  * @param itemArray An array of objects.
  * @returns A random object from itemArray.
  */
-export function getRandomItem<T>(itemArray: T[]): T | undefined {
+export function getRandomItem<T>(itemArray: T[]): T {
   itemArray = itemArray || [];
   return itemArray[Math.floor(Math.random() * itemArray.length)];
 }
@@ -37,7 +37,7 @@ export function shuffle<T>(itemArray: T[]): T[] {
  * @param key The key to store the value under.
  * @param value The value to be stored.
  */
-export function addToStore(key: string, value: string): void {
+export function addToStore(key: string, value: string) {
   localStorage.setItem(key, value);
 }
 
@@ -56,13 +56,13 @@ export function getFromStore(key: string): string | null {
  *
  * @param key The key of the value to remove.
  */
-export function removeFromStore(key: string): void {
+export function removeFromStore(key: string) {
   localStorage.removeItem(key);
 }
 
 /**
  * Clears all values stored in the store.
  */
-export function clearStore(): void {
+export function clearStore() {
   localStorage.clear();
 }

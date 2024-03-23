@@ -19,6 +19,7 @@ enum State {
  */
 export default class Food extends GameObject {
   private _sprite: SpriteStatic;
+
   private _state: State = State.ACTIVE;
   private _opacity: number = 1;
   private _fadeSpeed: number = 0.7;

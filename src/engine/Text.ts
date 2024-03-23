@@ -8,11 +8,9 @@ export default class Text {
   private text: string;
   private font: string;
   private colour: string;
-  private speed: number;
-  public opacity: number;
-  private outlineColour: string | undefined;
-  private outlineWidth: number | undefined;
-  private canDrawOutline: boolean;
+  private outlineColour!: string;
+  private outlineWidth!: number;
+  private hasOutline: boolean;
 
   /**
    * Create an instance of Text.
@@ -20,29 +18,12 @@ export default class Text {
    * @param text The text string to be displayed.
    * @param font The font and font styles of the text.
    * @param colour The fill colour of the text.
-   * @param speed The speed, in seconds, of the fade effect.
    */
-  constructor(text: string, font: string, colour: string, speed: number) {
+  constructor(text: string, font: string, colour: string) {
     this.text = text;
     this.font = font;
-    this.speed = speed;
     this.colour = colour;
-    this.opacity = 1;
-    this.canDrawOutline = false;
-  }
-
-  /**
-   * Update the text's fade effect frame by frame on each function call.
-   *
-   * @param fps Frames per second.
-   */
-  update(fps: number) {
-    // Reduce opacity
-    this.opacity -= 1 / (fps * this.speed);
-    // Condition the opacity so it is non-negative
-    if (this.opacity < 0) {
-      this.opacity = 0;
-    }
+    this.hasOutline = false;
   }
 
   /**
@@ -57,7 +38,8 @@ export default class Text {
     context: CanvasRenderingContext2D,
     x: number,
     y: number,
-    angle: number
+    angle: number,
+    opacity: number
   ) {
     // Save current state of the canvas
     context.save();
@@ -68,13 +50,13 @@ export default class Text {
     context.translate(-x, -y);
 
     // Configure the canvas opacity
-    context.globalAlpha = this.opacity;
+    context.globalAlpha = opacity;
 
     // Set canvas font
     context.font = this.font;
 
     // Draw the text outline if can draw outline flag is true
-    if (this.canDrawOutline) {
+    if (this.hasOutline) {
       context.strokeStyle = this.outlineColour!;
       context.lineWidth = this.outlineWidth!;
       context.strokeText(this.text, x, y);
@@ -98,6 +80,6 @@ export default class Text {
   setOutline(colour: string, width: number) {
     this.outlineColour = colour;
     this.outlineWidth = width;
-    this.canDrawOutline = true;
+    this.hasOutline = true;
   }
 }
