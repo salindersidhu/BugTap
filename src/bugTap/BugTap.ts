@@ -30,38 +30,37 @@ export default class BugTap extends Game {
     this.cursorManager = CursorManager.getInstance(this.canvas, this.context);
     this.foodManager = FoodManager.getInstance(this.canvas, this.context);
 
-    this.initGameObjects();
-    this.initEventHandlers();
-    this.spawnBugsRandomly();
+    const cursor = this.cursorManager.create();
+    this.addGameObject(cursor);
+
+    this._initEventHandlers();
   }
 
   /**
-   * Create GameOjects and add them to the game.
+   * Create food spread randomly near the center of the table.
    */
-  private initGameObjects() {
-    // Create a cursor to provide a visual indicator of the player's mouse
-    const cursor = this.cursorManager.create();
-
-    // Create food spread randomly near the center of the table
+  private _initFood() {
     this._food = this.foodManager.generate(this.AMOUNT_OF_FOOD);
     this.bugManager.receiveFood(this._food);
 
-    this.addGameObjects([cursor, ...this._food]);
+    this.addGameObjects(this._food);
   }
 
   /**
    * Initialize event handlers for the game.
    */
-  private initEventHandlers() {
+  private _initEventHandlers() {
     document.addEventListener("keydown", (event: KeyboardEvent) => {
       if (event.code === "Space") {
-        this.togglePause();
+        this.isPaused() ? this.resume() : this.pause();
       }
     });
 
     this.canvas.addEventListener("mouseup", () => {
       if (this.isStopped()) {
         this.start();
+        this._initFood();
+        this._spawnBugsRandomly();
       }
     });
   }
@@ -69,7 +68,7 @@ export default class BugTap extends Game {
   /**
    * Spawn bugs continuously at random times.
    */
-  private spawnBugsRandomly() {
+  private _spawnBugsRandomly() {
     const spawnBugRandomly = () => {
       if (this.isRunning() && this._food.length > 0) {
         const numBugsToSpawn = getRandomNumber(
@@ -79,7 +78,7 @@ export default class BugTap extends Game {
         Array(numBugsToSpawn)
           .fill(null)
           .forEach(() => {
-            this.spawnBug();
+            this._spawnBug();
           });
       }
       const spawnInterval = getRandomNumber(
@@ -95,7 +94,7 @@ export default class BugTap extends Game {
   /**
    * Spawn a bug and add it to the game.
    */
-  private spawnBug() {
+  private _spawnBug() {
     const bug = this.bugManager.spawn(this.canvas);
     this.addGameObject(bug);
   }

@@ -10,39 +10,56 @@ export default class Cursor extends GameObject {
   y: number;
   radius: number;
 
+  /**
+   * Creates a new Cursor instance.
+   *
+   * @param canvas The HTML canvas element for rendering.
+   * @param context The 2D rendering context of the canvas.
+   */
   constructor(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D) {
-    super(canvas, context, 1);
+    super(canvas, context, 1, false);
 
     this.radius = 15;
     this.x = -this.radius;
     this.y = -this.radius;
 
-    this.bindMouseMoveListener();
+    this._bindMouseMoveListener();
 
     // Hide the default cursor
     this.canvas.style.cursor = "none";
   }
 
-  private handleMouseMove = (event: MouseEvent) => {
+  private _handleMouseMove = (event: MouseEvent) => {
     this.x = event.offsetX;
     this.y = event.offsetY;
   };
 
-  private bindMouseMoveListener() {
-    this.canvas.addEventListener("mousemove", this.handleMouseMove);
+  private _bindMouseMoveListener() {
+    this.canvas.addEventListener("mousemove", this._handleMouseMove);
   }
 
-  private unbindMouseMoveListener() {
-    this.canvas.removeEventListener("mousemove", this.handleMouseMove);
+  private _unbindMouseMoveListener() {
+    this.canvas.removeEventListener("mousemove", this._handleMouseMove);
   }
 
+  /**
+   * Deletes the cursor instance and unbinds event listeners.
+   */
   delete() {
     super.delete();
-    this.unbindMouseMoveListener();
+    this._unbindMouseMoveListener();
   }
 
+  /**
+   * Updates the cursor's state (not implemented).
+   *
+   * @param fps The current frames per second.
+   */
   update(_: number) {}
 
+  /**
+   * Renders the cursor on the canvas.
+   */
   render() {
     this.context.beginPath();
     this.context.fillStyle = "black";

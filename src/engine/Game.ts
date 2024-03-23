@@ -19,9 +19,6 @@ export default class Game {
   protected context: CanvasRenderingContext2D;
   protected fps: number = 0;
 
-  height: number;
-  width: number;
-
   private _gameObjects: GameObject[] = [];
   private _state: State = State.STOPPED;
   private _lastFrameTime = performance.now();
@@ -40,8 +37,8 @@ export default class Game {
 
     this.canvas = <HTMLCanvasElement>document.getElementById(canvasId)!;
     this.context = this.canvas.getContext("2d")!;
-    this.height = this.canvas.height;
-    this.width = this.canvas.width;
+
+    this._loop();
   }
 
   /**
@@ -49,7 +46,7 @@ export default class Game {
    *
    * @param gameObject The GameObject instance to add to the game.
    */
-  addGameObject(gameObject: GameObject) {
+  protected addGameObject(gameObject: GameObject) {
     this._gameObjects.push(gameObject);
   }
 
@@ -58,28 +55,8 @@ export default class Game {
    *
    * @param gameObjects An array of GameObject instances to add to the game.
    */
-  addGameObjects(gameObjects: GameObject[]) {
+  protected addGameObjects(gameObjects: GameObject[]) {
     this._gameObjects.push(...gameObjects);
-  }
-
-  /**
-   * Start the game loop.
-   */
-  protected start() {
-    this._state = State.RUNNING;
-    this._loop();
-  }
-
-  /**
-   * Toggles the pause/resume state of the game.
-   */
-  protected togglePause() {
-    if (this._state !== State.STOPPED) {
-      this._state = this._state === State.PAUSED ? State.RUNNING : State.PAUSED;
-      if (this._state === State.RUNNING) {
-        this._loop();
-      }
-    }
   }
 
   /**
@@ -110,18 +87,40 @@ export default class Game {
   }
 
   /**
+   * Start the game.
+   */
+  protected start() {
+    if (this.isStopped()) {
+      this._state = State.RUNNING;
+    }
+  }
+
+  /**
+   * Pause the game.
+   */
+  protected pause() {
+    if (!this.isStopped()) {
+      this._state = State.PAUSED;
+    }
+  }
+
+  /**
+   * Resume the game.
+   */
+  protected resume() {
+    if (!this.isStopped()) {
+      this._state = State.RUNNING;
+    }
+  }
+
+  /**
    * Main game loop that updates and renders the game. It is called recursively
    * using requestAnimationFrame.
    */
   private _loop = () => {
-    if (this._state !== State.RUNNING) {
-      return;
-    }
-
     this._updateFps();
     this._update(this.fps);
     this._render();
-
     requestAnimationFrame(this._loop);
   };
 
@@ -132,6 +131,13 @@ export default class Game {
    */
   private _update(fps: number) {
     this._gameObjects.forEach((gameObject) => {
+      if (
+        this._state === State.STOPPED ||
+        (gameObject.isPausable() && this._state === State.PAUSED)
+      ) {
+        return;
+      }
+
       gameObject.update(fps);
 
       if (gameObject.canDelete()) {
@@ -144,7 +150,7 @@ export default class Game {
    * Render all game objects.
    */
   private _render() {
-    this.context.clearRect(0, 0, this.width, this.height);
+    this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
     this._gameObjects
       .sort(this._sortGameObjectsByDrawPriority)
       .forEach((gameObject) => gameObject.render());
