@@ -1,39 +1,61 @@
 /**
- * The SpriteStatic provides functions for creating and rendering a single
- * frame from a sprite.
+ * The Sprite class provides functions for creating and rendering an animated
+ * image.
  *
  * @author Salinder Sidhu
  */
-export default class SpriteStatic {
-  protected frameIndex: number;
-
+export default class Sprite {
+  private _image: HTMLImageElement;
   private _height: number;
   private _width: number;
 
-  private _image: HTMLImageElement;
+  private _frameIndex: number;
+  private _numFrames: number;
+  private _speed: number;
+  private _frameCounter: number = 0;
 
   /**
-   * Create an instance of SpriteStatic.
+   * Create an instance of Sprite.
    *
-   * @param spriteSrc The source URL of the sprite image.
+   * @param src The source URL of the sprite image.
    * @param height The height of the sprite frame.
    * @param width The width of the sprite frame.
+   * @param speed The speed factor for the animation.
+   * @param numFrames The total number of frames in the sprite animation.
    * @param initFrame The initial frame index (default is -1).
    */
   constructor(
-    spriteSrc: string,
+    src: string,
     height: number,
     width: number,
+    speed: number,
+    numFrames: number,
     initFrame: number = -1
   ) {
-    this.frameIndex = initFrame;
-
+    this._image = new Image();
+    this._image.src = src;
     this._height = height;
     this._width = width;
 
-    // Load image
-    this._image = new Image();
-    this._image.src = spriteSrc;
+    this._frameIndex = initFrame;
+    this._numFrames = numFrames;
+    this._speed = Math.max(0, speed); // Ensure speed is not negative
+  }
+
+  /**
+   * Update the sprite frame by frame based on the given frames per second.
+   *
+   * @param fps The current frames per second.
+   */
+  update(fps: number) {
+    this._frameCounter += 1;
+    if (this._frameCounter >= fps / this._speed) {
+      // Reset the frame counter
+      this._frameCounter -= fps / this._speed;
+
+      // Increment the frame index and reset it at the end of the animation
+      this._frameIndex = (this._frameIndex + 1) % this._numFrames;
+    }
   }
 
   /**
@@ -69,7 +91,7 @@ export default class SpriteStatic {
     // Draw a frame of the Sprite
     context.drawImage(
       this._image,
-      this.frameIndex * this._width,
+      this._frameIndex * this._width,
       0,
       this._width,
       this._height,

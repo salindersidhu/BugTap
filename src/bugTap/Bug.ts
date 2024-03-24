@@ -1,4 +1,4 @@
-import { SpriteAnimated, GameObject, BoundingBox } from "../engine";
+import { BoundingBox, GameObject, Sprite } from "../engine";
 
 import Food from "./Food";
 
@@ -14,7 +14,7 @@ enum State {
  * @author Salinder Sidhu
  */
 export default class Bug extends GameObject {
-  private _sprite: SpriteAnimated;
+  private _sprite: Sprite;
   private _angle: number = 0;
   private _speed: number;
   private _state: State = State.ALIVE;
@@ -58,7 +58,7 @@ export default class Bug extends GameObject {
   ) {
     super(canvas, context);
 
-    this._sprite = new SpriteAnimated(
+    this._sprite = new Sprite(
       spriteSrc,
       height,
       width,

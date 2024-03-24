@@ -1,6 +1,6 @@
 import { Howl } from "howler";
 
-import { BoundingBox, GameObject, SpriteStatic } from "../engine";
+import { BoundingBox, GameObject, Sprite } from "../engine";
 
 const SOUND_EAT_FOOD: string = "./assets/sound/eat.ogg";
 
@@ -18,7 +18,7 @@ enum State {
  * @author Salinder Sidhu
  */
 export default class Food extends GameObject {
-  private _sprite: SpriteStatic;
+  private _sprite: Sprite;
 
   private _state: State = State.ACTIVE;
   private _opacity: number = 1;
@@ -53,7 +53,7 @@ export default class Food extends GameObject {
     super(canvas, context);
 
     this.boundingBox = new BoundingBox(x, y, height, width);
-    this._sprite = new SpriteStatic(spriteSrc, height, width, initFrame);
+    this._sprite = new Sprite(spriteSrc, height, width, 0, 1, initFrame);
 
     this._soundEatFood = new Howl({
       src: [SOUND_EAT_FOOD],

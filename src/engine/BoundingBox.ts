@@ -26,17 +26,6 @@ export default class BoundingBox {
   }
 
   /**
-   * Update the position of the BoundingBox to a new point.
-   *
-   * @param x The new x coordinate of the BoundingBox's position.
-   * @param y The new y coordinate of the BoundingBox's position.
-   */
-  update(x: number, y: number): void {
-    this.x = x;
-    this.y = y;
-  }
-
-  /**
    * Return true if this BoundingBox completely overlaps another BoundingBox,
    * otherwise return false.
    *

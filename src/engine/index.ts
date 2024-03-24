@@ -2,8 +2,7 @@ import BoundingBox from "./BoundingBox";
 import Game from "./Game";
 import GameObject from "./GameObject";
 import GameObjectFactory from "./GameObjectFactory";
-import SpriteAnimated from "./SpriteAnimated";
-import SpriteStatic from "./SpriteStatic";
+import Sprite from "./Sprite";
 import Text from "./Text";
 
 import {
@@ -21,8 +20,7 @@ export {
   Game,
   GameObject,
   GameObjectFactory,
-  SpriteAnimated,
-  SpriteStatic,
+  Sprite,
   Text,
   addToStore,
   clearStore,
