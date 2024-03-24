@@ -1,5 +1,4 @@
 import { GameObjectFactory, getRandomItem, getRandomNumber } from "../engine";
-
 import Bug from "./Bug";
 import Food from "./Food";
 
@@ -22,9 +21,9 @@ const bugHeight = 50;
 const bugWidth = 45;
 
 const bugData: BugData[] = [
-  { points: 1, speed: 5, spriteSrc: redBugSprite },
-  { points: 3, speed: 10, spriteSrc: orangeBugSprite },
-  { points: 5, speed: 15, spriteSrc: greyBugSprite },
+  { points: 1, speed: 3, spriteSrc: redBugSprite },
+  { points: 3, speed: 5, spriteSrc: orangeBugSprite },
+  { points: 5, speed: 8, spriteSrc: greyBugSprite },
 ];
 
 /**
@@ -59,6 +58,7 @@ export default class BugManager {
         width: number,
         spriteSrc: string,
         speed: number,
+        points: number,
         numFrames: number
       ) => {
         return new Bug(
@@ -70,6 +70,7 @@ export default class BugManager {
           width,
           spriteSrc,
           speed,
+          points,
           this._food,
           numFrames
         );
@@ -151,6 +152,7 @@ export default class BugManager {
       bugWidth,
       selectedBugData.spriteSrc,
       selectedBugData.speed,
+      selectedBugData.points,
       numBugFrames
     );
   }

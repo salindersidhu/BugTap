@@ -1,10 +1,16 @@
-import { Game, getRandomNumber } from "../engine";
+import { Howl } from "howler";
+
+import { Game, addToStore, clearStore, getRandomNumber } from "../engine";
 
 import Food from "./Food";
+import Bug from "./Bug";
 
 import BugManager from "./BugManager";
 import CursorManager from "./CursorManager";
 import FoodManager from "./FoodManager";
+import Point from "./Point";
+
+const SOUND_POINT: string = "./assets/sound/click.ogg";
 
 /**
  * @author Salinder Sidhu
@@ -21,7 +27,12 @@ export default class BugTap extends Game {
   private bugManager: BugManager;
   private foodManager: FoodManager;
 
+  private _time: number = 0;
+  private _score: number = 0;
+
   private _food: Food[] = [];
+
+  private _soundPoint: Howl;
 
   constructor(canvasId: string) {
     super(canvasId);
@@ -34,6 +45,13 @@ export default class BugTap extends Game {
     this.addGameObject(cursor);
 
     this._initEventHandlers();
+
+    clearStore();
+
+    this._soundPoint = new Howl({
+      src: [SOUND_POINT],
+      html5: true,
+    });
   }
 
   /**
@@ -61,6 +79,38 @@ export default class BugTap extends Game {
         this.start();
         this._initFood();
         this._spawnBugsRandomly();
+        this._startTimeElapsed();
+      }
+    });
+
+    this.canvas.addEventListener("mousedown", (event: MouseEvent) => {
+      for (const gameObject of this.getGameObjects()) {
+        if (gameObject instanceof Bug) {
+          if (
+            (gameObject as Bug).boundingBox.isOverlappingPoint(
+              event.offsetX,
+              event.offsetY
+            )
+          ) {
+            if (gameObject.isAlive()) {
+              this._soundPoint.play();
+              const points = gameObject.getPoints();
+              this._score += points;
+
+              const point = new Point(
+                this.canvas,
+                this.context,
+                points,
+                gameObject.boundingBox.x,
+                gameObject.boundingBox.y
+              );
+              this.addGameObject(point);
+
+              addToStore("score", this._score.toString());
+              gameObject.setDead();
+            }
+          }
+        }
       }
     });
   }
@@ -89,6 +139,21 @@ export default class BugTap extends Game {
     };
 
     spawnBugRandomly();
+  }
+
+  /**
+   * Start the time elapsed counter.
+   */
+  private _startTimeElapsed() {
+    const startTime = () => {
+      if (!this.isPaused()) {
+        this._time++;
+        addToStore("time", this._time.toString());
+      }
+      setTimeout(startTime, 1000);
+    };
+
+    startTime();
   }
 
   /**

@@ -10,7 +10,7 @@ export default class Point extends GameObject {
 
   private _x: number;
   private _y: number;
-  private _moveSpeed: number = 5;
+  private _moveSpeed: number = 2;
   private _opacity: number = 1;
   private _fadeSpeed: number = 1;
 

@@ -32,7 +32,7 @@ export default class Game {
    */
   constructor(canvasId: string) {
     if (!canvasId) {
-      throw Error("Invalid canvas element id");
+      throw Error("Please provide an HTMLCanvasElement id");
     }
 
     this.canvas = <HTMLCanvasElement>document.getElementById(canvasId)!;
@@ -57,6 +57,15 @@ export default class Game {
    */
   protected addGameObjects(gameObjects: GameObject[]) {
     this._gameObjects.push(...gameObjects);
+  }
+
+  /**
+   * Return all GameObject instances.
+   *
+   * @returns All GameObject instances.
+   */
+  protected getGameObjects(): GameObject[] {
+    return this._gameObjects;
   }
 
   /**
@@ -90,27 +99,31 @@ export default class Game {
    * Start the game.
    */
   protected start() {
-    if (this.isStopped()) {
-      this._state = State.RUNNING;
+    if (!this.isStopped()) {
+      return;
     }
+
+    this._state = State.RUNNING;
   }
 
   /**
    * Pause the game.
    */
   protected pause() {
-    if (!this.isStopped()) {
-      this._state = State.PAUSED;
+    if (this.isStopped()) {
+      return;
     }
+    this._state = State.PAUSED;
   }
 
   /**
    * Resume the game.
    */
   protected resume() {
-    if (!this.isStopped()) {
-      this._state = State.RUNNING;
+    if (this.isStopped()) {
+      return;
     }
+    this._state = State.RUNNING;
   }
 
   /**

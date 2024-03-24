@@ -81,7 +81,7 @@ export default class Food extends GameObject {
   /**
    * Marks the food item as eaten and play the sound effect for eating food.
    */
-  eaten(): void {
+  eaten() {
     this._soundEatFood.play();
     this._state = State.EATEN;
   }

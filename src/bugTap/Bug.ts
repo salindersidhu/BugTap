@@ -26,6 +26,8 @@ export default class Bug extends GameObject {
   private _spawnX: number = 0;
   private _spawnY: number = 0;
 
+  private _points: number = 0;
+
   boundingBox: BoundingBox;
 
   /**
@@ -52,6 +54,7 @@ export default class Bug extends GameObject {
     width: number,
     spriteSrc: string,
     speed: number,
+    points: number,
     food: Food[],
     numFrames: number,
     initFrame: number = 0
@@ -73,6 +76,8 @@ export default class Bug extends GameObject {
     this._spawnX = x;
     this._spawnY = y;
 
+    this._points = points;
+
     this.boundingBox = new BoundingBox(x, y, height, width);
   }
 
@@ -82,11 +87,46 @@ export default class Bug extends GameObject {
    * @param fps The frames per second.
    */
   update(fps: number) {
-    this._sprite.update(fps);
+    if (this._state === State.ALIVE) {
+      this._sprite.update(fps);
+      this._updateMovement(fps);
+      this._updateEatingFood();
+    }
 
     this._updateDeath(fps);
-    this._updateMovement(fps);
-    this._updateEatingFood();
+  }
+
+  /**
+   * Renders the bug on the canvas.
+   */
+  render() {
+    const { x, y } = this.boundingBox;
+    this._sprite.render(this.context, x, y, this._angle, this._opacity);
+  }
+
+  /**
+   * Set the Bug's state to DEAD.
+   */
+  setDead() {
+    this._state = State.DEAD;
+  }
+
+  /**
+   * Return the number of points the Bug is worth.
+   *
+   * @returns number of points the Bug is worth.
+   */
+  getPoints(): number {
+    return this._points;
+  }
+
+  /**
+   * Indicate if the Bug is alive.
+   *
+   * @returns A boolean indicating whether the Bug is alive.
+   */
+  isAlive(): boolean {
+    return this._state === State.ALIVE;
   }
 
   /**
@@ -134,14 +174,6 @@ export default class Bug extends GameObject {
         }
       }
     }
-  }
-
-  /**
-   * Renders the bug on the canvas.
-   */
-  render() {
-    const { x, y } = this.boundingBox;
-    this._sprite.render(this.context, x, y, this._angle, this._opacity);
   }
 
   /**
