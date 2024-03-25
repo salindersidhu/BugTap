@@ -22,33 +22,36 @@
         <a class="fork-me-ribbon" href="https://github.com/salindersidhu/BugTap">
             <img src="./ribbon.png" alt="Fork me on GitHub">
         </a>
-        <!-- Navigation Header -->
-        <header class="masthead mb-auto p-3">
-            <div class="inner"></div>
-        </header>
         <!-- Page content -->
-        <main role="main" class="inner">
+        <main role="main" class="mt-auto mb-auto">
+            <!-- Information bar -->
+            <section class="info-bar">
+                <!-- Time remaining in seconds -->
+                <p id="time" class="h5">Time: 0:00</p>
+                <!-- Pause and resume image button -->
+                <input id="pause-resume-button" class="button" type="image" src="assets/graphics/play.png" />
+                <!-- The current score -->
+                <p id="score" class="h5">Score: 0</p>
+            </section>
             <!-- Game Canvas -->
-            <canvas id="game-canvas" width="946" height="602">
-                <p class="lead">Your browser does not support the canvas functionality to play this game.</p>
-                <p class="lead">Please update to a modern browser such as <a href="www.google.com/chrome/">Google Chrome</a> to play.</p>
+            <canvas id="game-canvas" class="game-canvas" width="946" height="602">
+                <p>Your browser does not support the canvas functionality to play this game.</p>
+                <p>Please update to a modern browser such as <a href="www.google.com/chrome/">Google Chrome</a> to play.</p>
             </canvas>
         </main>
         <!-- Footer -->
-        <footer class="mastfoot mt-auto p-3">
-            <div class="inner">
-                <p>
-                    <small>
-                        Made with <i style="color:red;" class="fas fa-heart"></i> and <i class="fas fa-coffee"></i>
-                    </br>
-                        Copyright &copy;
-                        <span id="copyright">
-                            <script>document.getElementById('copyright').appendChild(document.createTextNode(new Date().getFullYear()))</script>
-                        </span>
-                        by <a href="https://github.com/SalinderSidhu">Salinder Sidhu</a>
-                    </small>
-                </p>
-            </div>
+        <footer class="mastfoot">
+            <p>
+                <small>
+                    Made with <i style="color:red;" class="fas fa-heart"></i> and <i class="fas fa-coffee"></i>
+                </br>
+                    Copyright &copy;
+                    <span id="copyright">
+                        <script>document.getElementById('copyright').appendChild(document.createTextNode(new Date().getFullYear()))</script>
+                    </span>
+                    by <a href="https://github.com/SalinderSidhu">Salinder Sidhu</a>
+                </small>
+            </p>
         </footer>
     </div>
 </body>

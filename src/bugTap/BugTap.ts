@@ -68,14 +68,42 @@ export default class BugTap extends Game {
    * Initialize event handlers for the game.
    */
   private _initEventHandlers() {
+    const button = document.getElementById("pause-resume-button");
+    const score = document.getElementById("score");
+
     document.addEventListener("keydown", (event: KeyboardEvent) => {
       if (event.code === "Space") {
         this.isPaused() ? this.resume() : this.pause();
+
+        if (this.isPaused()) {
+          button?.setAttribute("src", "assets/graphics/play.png");
+        } else if (this.isRunning()) {
+          button?.setAttribute("src", "assets/graphics/pause.png");
+        }
+      }
+    });
+
+    button?.addEventListener("click", () => {
+      this.isPaused() ? this.resume() : this.pause();
+
+      if (this.isStopped()) {
+        this.start();
+        this._initFood();
+        this._spawnBugsRandomly();
+        this._startTimeElapsed();
+      }
+
+      if (this.isPaused()) {
+        button.setAttribute("src", "assets/graphics/play.png");
+      } else if (this.isRunning()) {
+        button.setAttribute("src", "assets/graphics/pause.png");
       }
     });
 
     this.canvas.addEventListener("mouseup", () => {
       if (this.isStopped()) {
+        button?.setAttribute("src", "assets/graphics/pause.png");
+
         this.start();
         this._initFood();
         this._spawnBugsRandomly();
@@ -106,6 +134,7 @@ export default class BugTap extends Game {
               );
               this.addGameObject(point);
 
+              score!.innerHTML = `Score: ${this._score}`;
               addToStore("score", this._score.toString());
               gameObject.setDead();
             }
@@ -145,9 +174,20 @@ export default class BugTap extends Game {
    * Start the time elapsed counter.
    */
   private _startTimeElapsed() {
+    const time = document.getElementById("time");
+
+    function formatSeconds(seconds: number) {
+      const minutes = Math.floor(seconds / 60);
+      const remainingSeconds = seconds % 60;
+      const paddedSeconds =
+        remainingSeconds < 10 ? `0${remainingSeconds}` : remainingSeconds;
+      return `${minutes}:${paddedSeconds}`;
+    }
+
     const startTime = () => {
       if (!this.isPaused()) {
         this._time++;
+        time!.innerHTML = `Time: ${formatSeconds(this._time)}`;
         addToStore("time", this._time.toString());
       }
       setTimeout(startTime, 1000);

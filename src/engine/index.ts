@@ -12,7 +12,6 @@ import {
   getRandomItem,
   getRandomNumber,
   removeFromStore,
-  shuffle,
 } from "./utils";
 
 export {
@@ -28,5 +27,4 @@ export {
   getRandomItem,
   getRandomNumber,
   removeFromStore,
-  shuffle,
 };
