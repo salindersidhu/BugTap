@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-bs-theme="dark">
 
 <head>
     <meta charset="UTF-8">
@@ -24,20 +24,33 @@
         </a>
         <!-- Page content -->
         <main role="main" class="mt-auto mb-auto">
-            <!-- Information bar -->
-            <section class="info-bar">
-                <!-- Time remaining in seconds -->
-                <p id="time" class="h5">Time: 0:00</p>
-                <!-- Pause and resume image button -->
-                <input id="pause-resume-button" class="button" type="image" src="assets/graphics/play.png" />
-                <!-- The current score -->
-                <p id="score" class="h5">Score: 0</p>
+            <!-- Welcome section -->
+            <section id="welcome-section">
+                <h1>Welcome</h1>
+                <p class="lead">Squish as many bugs as you can before they eat all of the food, good luck!</p>
+                <p>
+                    <a id="start-button" class="btn btn-lg btn-secondary">
+                        <i class="fas fa-play fa-1x"></i> Start Game
+                    </a>
+                </p>
             </section>
-            <!-- Game Canvas -->
-            <canvas id="game-canvas" class="game-canvas" width="946" height="602">
-                <p>Your browser does not support the canvas functionality to play this game.</p>
-                <p>Please update to a modern browser such as <a href="www.google.com/chrome/">Google Chrome</a> to play.</p>
-            </canvas>
+            <!-- Game section -->
+            <span id="game-section" class="hidden">
+                <!-- Information bar -->
+                <section class="info-bar">
+                    <!-- Time remaining in seconds -->
+                    <p id="time" class="h5">Time: 0:00</p>
+                    <!-- Pause and resume image button -->
+                    <input id="pause-resume-button" class="button" type="image" src="assets/graphics/pause.png" />
+                    <!-- The current score -->
+                    <p id="score" class="h5">Score: 0</p>
+                </section>
+                <!-- Game Canvas -->
+                <canvas id="game-canvas" class="game-canvas" width="946" height="602">
+                    <p>Your browser does not support the canvas functionality to play this game.</p>
+                    <p>Please update to a modern browser such as <a href="www.google.com/chrome/">Google Chrome</a> to play.</p>
+                </canvas>
+            </span>
         </main>
         <!-- Footer -->
         <footer class="mastfoot">

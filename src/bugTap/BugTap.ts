@@ -10,7 +10,7 @@ import CursorManager from "./CursorManager";
 import FoodManager from "./FoodManager";
 import Point from "./Point";
 
-const SOUND_POINT: string = "./assets/sound/click.ogg";
+const SOUND_POINT: string = "./assets/sound/point.ogg";
 
 /**
  * @author Salinder Sidhu
@@ -68,81 +68,97 @@ export default class BugTap extends Game {
    * Initialize event handlers for the game.
    */
   private _initEventHandlers() {
-    const button = document.getElementById("pause-resume-button");
-    const score = document.getElementById("score");
-
     document.addEventListener("keydown", (event: KeyboardEvent) => {
       if (event.code === "Space") {
-        this.isPaused() ? this.resume() : this.pause();
-
-        if (this.isPaused()) {
-          button?.setAttribute("src", "assets/graphics/play.png");
-        } else if (this.isRunning()) {
-          button?.setAttribute("src", "assets/graphics/pause.png");
-        }
+        this._pauseButtonOnClick();
       }
     });
 
-    button?.addEventListener("click", () => {
-      this.isPaused() ? this.resume() : this.pause();
+    const button = document.getElementById("pause-resume-button");
+    button?.addEventListener("click", this._pauseButtonOnClick);
 
-      if (this.isStopped()) {
-        this.start();
-        this._initFood();
-        this._spawnBugsRandomly();
-        this._startTimeElapsed();
-      }
+    const startButton = document.getElementById("start-button");
+    startButton?.addEventListener("click", this._startButtonOnClick);
 
-      if (this.isPaused()) {
-        button.setAttribute("src", "assets/graphics/play.png");
-      } else if (this.isRunning()) {
-        button.setAttribute("src", "assets/graphics/pause.png");
-      }
-    });
-
-    this.canvas.addEventListener("mouseup", () => {
-      if (this.isStopped()) {
-        button?.setAttribute("src", "assets/graphics/pause.png");
-
-        this.start();
-        this._initFood();
-        this._spawnBugsRandomly();
-        this._startTimeElapsed();
-      }
-    });
-
-    this.canvas.addEventListener("mousedown", (event: MouseEvent) => {
-      for (const gameObject of this.getGameObjects()) {
-        if (gameObject instanceof Bug) {
-          if (
-            (gameObject as Bug).boundingBox.isOverlappingPoint(
-              event.offsetX,
-              event.offsetY
-            )
-          ) {
-            if (gameObject.isAlive()) {
-              this._soundPoint.play();
-              const points = gameObject.getPoints();
-              this._score += points;
-
-              const point = new Point(
-                this.canvas,
-                this.context,
-                points,
-                gameObject.boundingBox.x,
-                gameObject.boundingBox.y
-              );
-              this.addGameObject(point);
-
-              score!.innerHTML = `Score: ${this._score}`;
-              addToStore("score", this._score.toString());
-              gameObject.setDead();
-            }
-          }
-        }
-      }
-    });
+    this.canvas.addEventListener("mousedown", this._canvasOnMouseClick);
   }
+
+  /**
+   * Handle event when the start button is clicked.
+   */
+  private _startButtonOnClick = () => {
+    this.start();
+    this._initFood();
+    this._spawnBugsRandomly();
+    this._startTimeElapsed();
+
+    const welcomeSection = document.getElementById("welcome-section");
+    const gameSection = document.getElementById("game-section");
+    welcomeSection?.classList.add("hidden");
+    gameSection?.classList.remove("hidden");
+  };
+
+  /**
+   * Handle event when the pause button is clicked.
+   */
+  private _pauseButtonOnClick = () => {
+    this.isPaused() ? this.resume() : this.pause();
+
+    const button = document.getElementById("pause-resume-button");
+    if (this.isPaused()) {
+      button?.setAttribute("src", "assets/graphics/play.png");
+    } else if (this.isRunning()) {
+      button?.setAttribute("src", "assets/graphics/pause.png");
+    }
+  };
+
+  /**
+   * Handle event when the game canvas is clicked.
+   */
+  private _canvasOnMouseClick = (event: MouseEvent) => {
+    if (!this.isRunning()) {
+      return;
+    }
+
+    for (const gameObject of this.getGameObjects()) {
+      if (!(gameObject instanceof Bug)) {
+        continue;
+      }
+
+      if (
+        !(gameObject as Bug).boundingBox.isOverlappingPoint(
+          event.offsetX,
+          event.offsetY
+        )
+      ) {
+        continue;
+      }
+
+      if (!gameObject.isAlive()) {
+        continue;
+      }
+
+      this._soundPoint.play();
+
+      const points = gameObject.getPoints();
+      this._score += points;
+
+      const point = new Point(
+        this.canvas,
+        this.context,
+        points,
+        gameObject.boundingBox.x,
+        gameObject.boundingBox.y
+      );
+      this.addGameObject(point);
+
+      const score = document.getElementById("score");
+      score!.innerHTML = `Score: ${this._score}`;
+
+      addToStore("score", this._score.toString());
+      gameObject.setDead();
+    }
+  };
 
   /**
    * Spawn bugs continuously at random times.
