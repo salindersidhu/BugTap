@@ -1,4 +1,8 @@
+import { Howl } from "howler";
+
 import { GameObject, Text } from "../engine";
+
+const SOUND_POINT: string = "./assets/sound/point.ogg";
 
 /**
  * Represents a point object displayed in the game.
@@ -13,6 +17,8 @@ export default class Point extends GameObject {
   private _moveSpeed: number = 2;
   private _opacity: number = 1;
   private _fadeSpeed: number = 1;
+
+  private _soundPoint: Howl;
 
   /**
    * Creates a new Point instance.
@@ -36,6 +42,13 @@ export default class Point extends GameObject {
     this._y = y;
     this._text = new Text(`+ ${points}`, "bold 30px Sans-serif", "#B8E600");
     this._text.setOutline("black", 6);
+
+    this._soundPoint = new Howl({
+      src: [SOUND_POINT],
+      html5: true,
+    });
+
+    this._soundPoint.play();
   }
 
   /**

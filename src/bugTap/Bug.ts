@@ -8,6 +8,7 @@ import Food from "./Food";
 enum State {
   ALIVE,
   DEAD,
+  FLEE,
 }
 
 /**
@@ -82,18 +83,21 @@ export default class Bug extends GameObject {
   }
 
   /**
-   * Updates the bug's position, animation frame, and interactions.
+   * Updates the bug's movement and behaviour.
    *
    * @param fps The frames per second.
    */
   update(fps: number) {
-    if (this._state === State.ALIVE) {
-      this._sprite.update(fps);
-      this._updateMovement(fps);
-      this._updateEatingFood();
+    this._handleDeath(fps);
+
+    if (this._state === State.DEAD) {
+      return;
     }
 
-    this._updateDeath(fps);
+    this._sprite.update(fps);
+    this._handleMovement();
+    this._handleEatingFood();
+    this._handleFleeing(fps);
   }
 
   /**
@@ -130,28 +134,51 @@ export default class Bug extends GameObject {
   }
 
   /**
-   * Updates the bug's state when it's dead, handling the death animation.
+   * Handle the bug's death behaviour.
    *
    * @param fps The frames per second.
    */
-  private _updateDeath(fps: number) {
-    if (this._state === State.DEAD) {
-      this._opacity -= 1 / (fps * this._fadeSpeed);
-      if (this._opacity < 0) {
-        this.delete();
-      }
+  private _handleDeath(fps: number) {
+    if (this._state !== State.DEAD) {
+      return;
+    }
+
+    this._fadeOutAndDelete(fps);
+  }
+
+  /**
+   * Handle the bug's fleeing behaviour.
+   *
+   * @param fps The frames per second.
+   */
+  private _handleFleeing(fps: number) {
+    if (this._state !== State.FLEE) {
+      return;
+    }
+
+    this._fadeOutAndDelete(fps);
+  }
+
+  /**
+   * Fade the bug out and remove it from the game.
+   *
+   * @param fps The frames per second.
+   */
+  private _fadeOutAndDelete(fps: number) {
+    this._opacity -= 1 / (fps * this._fadeSpeed);
+    if (this._opacity < 0) {
+      this.delete();
     }
   }
 
   /**
    * Updates the bug's movement based on food availability. If there's no food,
-   * the bug moves back to its spawn point.
-   *
-   * @param fps The frames per second.
+   * the bug flee back to its spawn point.
    */
-  private _updateMovement(fps: number) {
+  private _handleMovement() {
     if (this._food.length < 1) {
-      this._state = State.DEAD;
+      this._state = State.FLEE;
+      this._fadeSpeed = 1.3;
       this._moveToPoint(this._spawnX, this._spawnY);
       return;
     }
@@ -162,7 +189,7 @@ export default class Bug extends GameObject {
    * Updates the bug's interaction with food. If the bug overlaps with any
    * food, it eats the food.
    */
-  private _updateEatingFood() {
+  private _handleEatingFood() {
     for (const _food of this._food) {
       if (_food.boundingBox.isOverlapping(this.boundingBox)) {
         _food.eaten();

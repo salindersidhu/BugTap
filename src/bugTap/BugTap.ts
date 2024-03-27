@@ -1,5 +1,3 @@
-import { Howl } from "howler";
-
 import { Game, addToStore, clearStore, getRandomNumber } from "../engine";
 
 import Food from "./Food";
@@ -9,8 +7,6 @@ import BugManager from "./BugManager";
 import CursorManager from "./CursorManager";
 import FoodManager from "./FoodManager";
 import Point from "./Point";
-
-const SOUND_POINT: string = "./assets/sound/point.ogg";
 
 /**
  * @author Salinder Sidhu
@@ -32,8 +28,6 @@ export default class BugTap extends Game {
 
   private _food: Food[] = [];
 
-  private _soundPoint: Howl;
-
   constructor(canvasId: string) {
     super(canvasId);
 
@@ -47,11 +41,6 @@ export default class BugTap extends Game {
     this._initEventHandlers();
 
     clearStore();
-
-    this._soundPoint = new Howl({
-      src: [SOUND_POINT],
-      html5: true,
-    });
   }
 
   /**
@@ -116,7 +105,7 @@ export default class BugTap extends Game {
    * Handle event when the game canvas is clicked.
    */
   private _canvasOnMouseClick = (event: MouseEvent) => {
-    if (!this.isRunning()) {
+    if (!this.isRunning() || this._food.length < 1) {
       return;
     }
 
@@ -137,8 +126,6 @@ export default class BugTap extends Game {
       if (!gameObject.isAlive()) {
         continue;
       }
-
-      this._soundPoint.play();
 
       const points = gameObject.getPoints();
       this._score += points;
@@ -200,16 +187,20 @@ export default class BugTap extends Game {
       return `${minutes}:${paddedSeconds}`;
     }
 
-    const startTime = () => {
+    const startTimeElapsed = () => {
+      if (this._food.length < 1) {
+        return;
+      }
+
       if (!this.isPaused()) {
         this._time++;
         time!.innerHTML = `Time: ${formatSeconds(this._time)}`;
         addToStore("time", this._time.toString());
       }
-      setTimeout(startTime, 1000);
+      setTimeout(startTimeElapsed, 1000);
     };
 
-    startTime();
+    startTimeElapsed();
   }
 
   /**
