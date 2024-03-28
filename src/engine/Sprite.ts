@@ -43,7 +43,7 @@ export default class Sprite {
   }
 
   /**
-   * Update the sprite frame by frame based on the given frames per second.
+   * Update the sprite's frame based on the frames per second.
    *
    * @param fps The current frames per second.
    */
@@ -59,7 +59,7 @@ export default class Sprite {
   }
 
   /**
-   * Render a frame from the sprite.
+   * Render the sprite at the specified position, angle, and opacity.
    *
    * @param context The 2D canvas rendering context.
    * @param x The x-coordinate of the sprite's position.

@@ -40,8 +40,13 @@ export default class Point extends GameObject {
 
     this._x = x;
     this._y = y;
-    this._text = new Text(`+ ${points}`, "bold 30px Sans-serif", "#B8E600");
-    this._text.setOutline("black", 6);
+    this._text = new Text(
+      `+ ${points}`,
+      "bold 30px Sans-serif",
+      "#B8E600",
+      "black",
+      6
+    );
 
     this._soundPoint = new Howl({
       src: [SOUND_POINT],

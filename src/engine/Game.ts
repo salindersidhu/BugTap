@@ -10,7 +10,7 @@ enum State {
 }
 
 /**
- * Game manages the control, update and rendering of the game.
+ * Manage the control flow, update and rendering of the game.
  *
  * @author Salinder Sidhu
  */
@@ -25,7 +25,7 @@ export default class Game {
   private _frameCount = 0;
 
   /**
-   * Constructs a new Game instance.
+   * Create a new Game instance.
    *
    * @param canvasId The id of the HTML canvas element.
    * @throws Error if the canvas element with the specified id is not found.
@@ -42,7 +42,7 @@ export default class Game {
   }
 
   /**
-   * Add a game object to the game.
+   * Add a GameObject to the game.
    *
    * @param gameObject The GameObject instance to add to the game.
    */
@@ -51,7 +51,7 @@ export default class Game {
   }
 
   /**
-   * Add game objects to the game.
+   * Add a collection of GameObjects to the game.
    *
    * @param gameObjects An array of GameObject instances to add to the game.
    */
@@ -60,36 +60,36 @@ export default class Game {
   }
 
   /**
-   * Return all GameObject instances.
+   * Return all GameObject instances added to the game.
    *
-   * @returns All GameObject instances.
+   * @returns All GameObject instances added to the game.
    */
   protected getGameObjects(): GameObject[] {
     return this._gameObjects;
   }
 
   /**
-   * Indicate if the game is currently paused.
+   * Indicate if the game is paused.
    *
-   * @returns A boolean indicating whether the game is paused.
+   * @returns True if the game is paused, otherwise false.
    */
   protected isPaused(): boolean {
     return this._state === State.PAUSED;
   }
 
   /**
-   * Indicate if the game is currently running.
+   * Indicate if the game is running.
    *
-   * @returns A boolean indicating whether the game is running.
+   * @returns True if the game is running, otherwise false.
    */
   protected isRunning(): boolean {
     return this._state === State.RUNNING;
   }
 
   /**
-   * Indicate if the game is currently stopped.
+   * Indicate if the game is stopped.
    *
-   * @returns A boolean indicating whether the game is stopped.
+   * @returns True if the game is stopped, otherwise false.
    */
   protected isStopped(): boolean {
     return this._state === State.STOPPED;
@@ -113,6 +113,7 @@ export default class Game {
     if (this.isStopped()) {
       return;
     }
+
     this._state = State.PAUSED;
   }
 
@@ -123,22 +124,27 @@ export default class Game {
     if (this.isStopped()) {
       return;
     }
+
     this._state = State.RUNNING;
   }
 
   /**
-   * Main game loop that updates and renders the game. It is called recursively
-   * using requestAnimationFrame.
+   * Main game loop that continuously updates the frames per second, updates
+   * game objects, and renders the game.
    */
   private _loop = () => {
     this._updateFps();
     this._update(this.fps);
     this._render();
+
     requestAnimationFrame(this._loop);
   };
 
   /**
-   * Update all game objects.
+   * Update all GameObjects based on the current state of the game and the
+   * frames per second. If the game is stopped or if a pausable GameObject is
+   * paused, it will not be updated. Each GameObject's update method is called,
+   * and if it can be deleted, it will be removed from the game.
    *
    * @param fps The current frames per second.
    */
@@ -152,7 +158,6 @@ export default class Game {
       }
 
       gameObject.update(fps);
-
       if (gameObject.canDelete()) {
         this._deleteGameObject(gameObject);
       }
@@ -160,7 +165,7 @@ export default class Game {
   }
 
   /**
-   * Render all game objects.
+   * Render all GameObjects in sorted order based on their draw priority.
    */
   private _render() {
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -170,8 +175,8 @@ export default class Game {
   }
 
   /**
-   * Update the frames per second (FPS) of the game based on the time elapsed
-   * since the last frame.
+   * Update the frames per second of the game based on the time elapsed since
+   * the last frame.
    */
   private _updateFps() {
     const currentTime = performance.now();
@@ -185,16 +190,14 @@ export default class Game {
   }
 
   /**
-   * Delete a game object from the game.
+   * Delete a GameObject from the game.
    *
    * @param gameObject The GameObject instance to delete.
    */
-  private _deleteGameObject(gameObject: GameObject) {
-    const index = this._gameObjects.indexOf(gameObject);
-
-    if (index >= 0) {
-      this._gameObjects.splice(index, 1);
-    }
+  private _deleteGameObject(gameObjectToDelete: GameObject) {
+    this._gameObjects = this._gameObjects.filter(
+      (gameObject) => gameObject !== gameObjectToDelete
+    );
   }
 
   /**
@@ -203,9 +206,9 @@ export default class Game {
    *
    * @param gameObjectA The first GameObject to compare.
    * @param gameObjectB The second GameObject to compare.
-   * @returns A negative value if gameObjectA has lower draw priority,
-   *          a positive value if gameObjectB has lower draw priority,
-   *          or zero if both have equal draw priority.
+   * @returns A negative value if gameObjectA has lower draw priority, a
+   * positive value if gameObjectB has lower draw priority, or zero if both
+   * have equal draw priority.
    */
   private _sortGameObjectsByDrawPriority(
     gameObjectA: GameObject,

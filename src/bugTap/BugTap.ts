@@ -1,4 +1,4 @@
-import { Game, addToStore, clearStore, getRandomNumber } from "../engine";
+import { Game, clearStore, getRandomNumber, setToStore } from "../engine";
 
 import Food from "./Food";
 import Bug from "./Bug";
@@ -142,7 +142,7 @@ export default class BugTap extends Game {
       const score = document.getElementById("score");
       score!.innerHTML = `Score: ${this._score}`;
 
-      addToStore("score", this._score.toString());
+      setToStore("score", this._score.toString());
       gameObject.setDead();
     }
   };
@@ -195,7 +195,7 @@ export default class BugTap extends Game {
       if (!this.isPaused()) {
         this._time++;
         time!.innerHTML = `Time: ${formatSeconds(this._time)}`;
-        addToStore("time", this._time.toString());
+        setToStore("time", this._time.toString());
       }
       setTimeout(startTimeElapsed, 1000);
     };

@@ -6,12 +6,12 @@ import Sprite from "./Sprite";
 import Text from "./Text";
 
 import {
-  addToStore,
   clearStore,
   getFromStore,
   getRandomItem,
   getRandomNumber,
   removeFromStore,
+  setToStore,
 } from "./utils";
 
 export {
@@ -21,10 +21,10 @@ export {
   GameObjectFactory,
   Sprite,
   Text,
-  addToStore,
   clearStore,
   getFromStore,
   getRandomItem,
   getRandomNumber,
   removeFromStore,
+  setToStore,
 };

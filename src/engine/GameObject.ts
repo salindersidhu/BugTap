@@ -1,5 +1,5 @@
 /**
- * GameObject is an abstract class used to create objects for a game with
+ * An abstract class used to create objects for a game with
  * abstract methods for updating state and rendering.
  *
  * @abstract
@@ -49,7 +49,7 @@ export default abstract class GameObject {
   }
 
   /**
-   * Checks if the GameObject can be deleted.
+   * Indicate if the GameObject can be deleted.
    *
    * @returns True if the GameObject can be deleted, otherwise false.
    */
@@ -58,7 +58,7 @@ export default abstract class GameObject {
   }
 
   /**
-   * Returns the draw priority of the GameObject.
+   * Return the draw priority of the GameObject.
    *
    * @returns The draw priority of the GameObject.
    */
@@ -67,9 +67,9 @@ export default abstract class GameObject {
   }
 
   /**
-   * Check if the GameObject is pausable.
+   * Indicate if the GameObject can be paused.
    *
-   * @returns True if the GameObject is pausable, otherwise false.
+   * @returns True if the GameObject can be paused, otherwise false.
    */
   isPausable() {
     return this._isPausable;

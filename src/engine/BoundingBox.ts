@@ -26,10 +26,11 @@ export default class BoundingBox {
   }
 
   /**
-   * Return true if this BoundingBox completely overlaps another BoundingBox,
-   * otherwise return false.
+   * Indicate if this bounding box completely overlaps another bounding box.
    *
-   * @param bbox A BoundingBox object.
+   * @param bbox A BoundingBox.
+   * @returns True if this bounding box completely overlaps another bounding
+   * box, otherwise false.
    */
   isOverlapping(bbox: BoundingBox): boolean {
     return (
@@ -41,10 +42,11 @@ export default class BoundingBox {
   }
 
   /**
-   * Return true if this BoundingBox intersects another BoundingBox, otherwise
-   * return false.
+   * Indicates if this bounding box intersects with another bounding box.
    *
-   * @param bbox A BoundingBox object.
+   * @param bbox A BoundingBox.
+   * @returns True if this bounding box intersects with another bounding box,
+   * otherwise false.
    */
   isIntersecting(bbox: BoundingBox): boolean {
     return (
@@ -56,11 +58,12 @@ export default class BoundingBox {
   }
 
   /**
-   * Return true if this BoundingBox overlaps with a point, otherwise return
-   * false.
+   * Indicates if this bounding box overlaps with a point.
    *
    * @param x The x coordinate of the point.
    * @param y The y coordinate of the point.
+   * @returns True if this bounding box overlaps with the point, otherwise
+   * false.
    */
   isOverlappingPoint(x: number, y: number): boolean {
     return (

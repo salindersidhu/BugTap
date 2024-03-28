@@ -21,17 +21,17 @@ export function getRandomItem<T>(itemArray: T[]): T {
 }
 
 /**
- * Adds or updates a value in the store with the specified key.
+ * Add or update a value in the store with the specified key.
  *
  * @param key The key to store the value under.
  * @param value The value to be stored.
  */
-export function addToStore(key: string, value: string) {
+export function setToStore(key: string, value: string) {
   localStorage.setItem(key, value);
 }
 
 /**
- * Retrieves a value from the store with the specified key.
+ * Fetch a value from the store with the specified key.
  *
  * @param key The key of the value to retrieve.
  * @returns The value stored under the key, or null if the key does not exist.
@@ -41,7 +41,7 @@ export function getFromStore(key: string): string | null {
 }
 
 /**
- * Removes a value from the store with the specified key.
+ * Remove a value from the store with the specified key.
  *
  * @param key The key of the value to remove.
  */
@@ -50,7 +50,7 @@ export function removeFromStore(key: string) {
 }
 
 /**
- * Clears all values stored in the store.
+ * Remove all values stored in the store.
  */
 export function clearStore() {
   localStorage.clear();

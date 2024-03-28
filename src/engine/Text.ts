@@ -1,16 +1,15 @@
 /**
- * The Text module provides functions for creating and rendering text with an
+ * The Text class provides functions for creating and rendering text with
  * outline and opacity.
  *
  * @author Salinder Sidhu
  */
 export default class Text {
-  private text: string;
-  private font: string;
-  private colour: string;
-  private outlineColour!: string;
-  private outlineWidth!: number;
-  private hasOutline: boolean;
+  private _text: string;
+  private _font: string;
+  private _colour: string;
+  private _outlineColour: string;
+  private _outlineWidth: number;
 
   /**
    * Create an instance of Text.
@@ -18,16 +17,25 @@ export default class Text {
    * @param text The text string to be displayed.
    * @param font The font and font styles of the text.
    * @param colour The fill colour of the text.
+   * @param outlineColour The colour of the text's outline.
+   * @param outlineWidth The width of the text's outline.
    */
-  constructor(text: string, font: string, colour: string) {
-    this.text = text;
-    this.font = font;
-    this.colour = colour;
-    this.hasOutline = false;
+  constructor(
+    text: string,
+    font: string,
+    colour: string,
+    outlineColour: string,
+    outlineWidth: number
+  ) {
+    this._text = text;
+    this._font = font;
+    this._colour = colour;
+    this._outlineColour = outlineColour;
+    this._outlineWidth = outlineWidth;
   }
 
   /**
-   * Render the fading text frame by frame on each function call.
+   * Render text on the canvas with the specified position, angle, and opacity.
    *
    * @param context The 2D canvas context.
    * @param x The x position coordinate of the fading text.
@@ -53,33 +61,18 @@ export default class Text {
     context.globalAlpha = opacity;
 
     // Set canvas font
-    context.font = this.font;
+    context.font = this._font;
 
     // Draw the text outline if can draw outline flag is true
-    if (this.hasOutline) {
-      context.strokeStyle = this.outlineColour!;
-      context.lineWidth = this.outlineWidth!;
-      context.strokeText(this.text, x, y);
-    }
+    context.strokeStyle = this._outlineColour;
+    context.lineWidth = this._outlineWidth;
+    context.strokeText(this._text, x, y);
 
     // Draw the actual text
-    context.fillStyle = this.colour;
-    context.fillText(this.text, x, y);
+    context.fillStyle = this._colour;
+    context.fillText(this._text, x, y);
 
     // Restore the canvas state prior to rendering
     context.restore();
-  }
-
-  /**
-   * Enable rendering of the text's outline and set the colour and width
-   * of the text's outline.
-   *
-   * @param colour The colour of the text's outline.
-   * @param width The width of the text's outline.
-   */
-  setOutline(colour: string, width: number) {
-    this.outlineColour = colour;
-    this.outlineWidth = width;
-    this.hasOutline = true;
   }
 }

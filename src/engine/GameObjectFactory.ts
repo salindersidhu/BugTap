@@ -1,14 +1,14 @@
 import GameObject from "./GameObject";
 
 /**
- * Represents a factory class for creating instances of GameObject subclasses.
+ * Factory class for creating instances of a concrete GameObject class.
  *
- * @template T The type of GameObject subclass to instantiate.
+ * @template T The type of GameObject class to instantiate.
  * @author Salinder Sidhu
  */
 export default class GameObjectFactory<T extends GameObject> {
-  private canvas: HTMLCanvasElement;
-  private context: CanvasRenderingContext2D;
+  private _canvas: HTMLCanvasElement;
+  private _context: CanvasRenderingContext2D;
 
   private gameObjectFactory: (
     canvas: HTMLCanvasElement,
@@ -16,6 +16,14 @@ export default class GameObjectFactory<T extends GameObject> {
     ...args: any[]
   ) => T;
 
+  /**
+   * Constructs a new GameObjectFactory instance.
+   *
+   * @param canvas The HTML canvas element.
+   * @param context The 2D rendering context of the canvas.
+   * @param gameObjectFactory A function that creates instances of a concrete
+   * GameObject class.
+   */
   constructor(
     canvas: HTMLCanvasElement,
     context: CanvasRenderingContext2D,
@@ -25,18 +33,18 @@ export default class GameObjectFactory<T extends GameObject> {
       ...args: any[]
     ) => T
   ) {
-    this.canvas = canvas;
-    this.context = context;
+    this._canvas = canvas;
+    this._context = context;
     this.gameObjectFactory = gameObjectFactory;
   }
 
   /**
-   * Factory method to create a new instance of the specified GameObject
-   * subclass.
-   * @returns {T} A new instance of the specified GameObject subclass with the
-   * canvas and context objects passed to it.
+   * Create a new instance of a concrete GameObject class.
+   *
+   * @returns {T} A new instance of a concrete GameObject class with canvas and
+   * context passed to it.
    */
   createGameObject(...args: any[]): T {
-    return this.gameObjectFactory(this.canvas, this.context, ...args);
+    return this.gameObjectFactory(this._canvas, this._context, ...args);
   }
 }
