@@ -62,10 +62,26 @@ export default class Game {
   /**
    * Return all GameObject instances added to the game.
    *
-   * @returns All GameObject instances added to the game.
+   * @returns A collection of all GameObject instances added to the game.
    */
   protected getGameObjects(): GameObject[] {
     return this._gameObjects;
+  }
+
+  /**
+   * Return all GameObject instances, of a specific type, added to the game.
+   *
+   * @template T The type of GameObjects to fetch.
+   * @param type The constructor representing the type of GameObjectsto fetch.
+   * @returns A collection of all GameObject instances, of the specified type,
+   * added to the game.
+   */
+  protected getGameObjectsOfType<T extends GameObject>(type: {
+    new (...args: any[]): T;
+  }): T[] {
+    return this._gameObjects.filter(
+      (gameObject) => gameObject instanceof type
+    ) as T[];
   }
 
   /**

@@ -109,33 +109,24 @@ export default class BugTap extends Game {
       return;
     }
 
-    for (const gameObject of this.getGameObjects()) {
-      if (!(gameObject instanceof Bug)) {
+    for (const bug of this.getGameObjectsOfType(Bug)) {
+      if (!bug.boundingBox.isOverlappingPoint(event.offsetX, event.offsetY)) {
         continue;
       }
 
-      if (
-        !(gameObject as Bug).boundingBox.isOverlappingPoint(
-          event.offsetX,
-          event.offsetY
-        )
-      ) {
+      if (!bug.isAlive()) {
         continue;
       }
 
-      if (!gameObject.isAlive()) {
-        continue;
-      }
-
-      const points = gameObject.getPoints();
+      const points = bug.getPoints();
       this._score += points;
 
       const point = new Point(
         this.canvas,
         this.context,
         points,
-        gameObject.boundingBox.x,
-        gameObject.boundingBox.y
+        bug.boundingBox.x,
+        bug.boundingBox.y
       );
       this.addGameObject(point);
 
@@ -143,7 +134,7 @@ export default class BugTap extends Game {
       score!.innerHTML = `Score: ${this._score}`;
 
       setToStore("score", this._score.toString());
-      gameObject.setDead();
+      bug.setDead();
     }
   };
 
