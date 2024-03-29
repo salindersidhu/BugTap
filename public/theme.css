@@ -28,3 +28,11 @@ a:hover {
 .mastfoot {
     color: rgba(255,255,255,.5);
 }
+
+.yellow {
+    color: #FFCC22;
+}
+
+.red {
+    color: red;   
+}

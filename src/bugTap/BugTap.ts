@@ -2,6 +2,7 @@ import { Game, clearStore, getRandomNumber, setToStore } from "../engine";
 
 import Bug from "./Bug";
 import Cursor from "./Cursor";
+import Countdown from "./Countdown";
 import Food from "./Food";
 import Level from "./Level";
 import Point from "./Point";
@@ -9,17 +10,17 @@ import Point from "./Point";
 import BugManager from "./BugManager";
 import FoodManager from "./FoodManager";
 
+const AMOUNT_OF_FOOD: number = 10;
+const COUNTDOWN_SECONDS: number = 3;
+const MAX_BUGS_TO_SPAWN: number = 3;
+const MAX_SPAWN_INTERVAL: number = 1500;
+const MIN_BUGS_TO_SPAWN: number = 1;
+const MIN_SPAWN_INTERVAL: number = 800;
+
 /**
  * @author Salinder Sidhu
  */
 export default class BugTap extends Game {
-  private readonly AMOUNT_OF_FOOD: number = 10;
-
-  private readonly MIN_BUGS_TO_SPAWN: number = 1;
-  private readonly MAX_BUGS_TO_SPAWN: number = 3;
-  private readonly MIN_SPAWN_INTERVAL: number = 800;
-  private readonly MAX_SPAWN_INTERVAL: number = 1500;
-
   private bugManager: BugManager;
   private foodManager: FoodManager;
 
@@ -36,7 +37,12 @@ export default class BugTap extends Game {
 
     const level = new Level(this.canvas, this.context);
     const cursor = new Cursor(this.canvas, this.context);
-    this.addGameObjects([level, cursor]);
+    const countdown = new Countdown(
+      this.canvas,
+      this.context,
+      COUNTDOWN_SECONDS
+    );
+    this.addGameObjects([level, countdown, cursor]);
 
     this._initEventHandlers();
 
@@ -47,7 +53,7 @@ export default class BugTap extends Game {
    * Create food spread randomly near the center of the table.
    */
   private _initFood() {
-    this._food = this.foodManager.generate(this.AMOUNT_OF_FOOD);
+    this._food = this.foodManager.generate(AMOUNT_OF_FOOD);
     this.bugManager.receiveFood(this._food);
 
     this.addGameObjects(this._food);
@@ -76,15 +82,18 @@ export default class BugTap extends Game {
    * Handle event when the start button is clicked.
    */
   private _startButtonOnClick = () => {
-    this.start();
-    this._initFood();
-    this._spawnBugsRandomly();
-    this._startTimeElapsed();
-
     const welcomeSection = document.getElementById("welcome-section");
     const gameSection = document.getElementById("game-section");
     welcomeSection?.classList.add("hidden");
     gameSection?.classList.remove("hidden");
+
+    this.start();
+    this._initFood();
+
+    setTimeout(() => {
+      this._spawnBugsRandomly();
+      this._startTimeElapsed();
+    }, COUNTDOWN_SECONDS * 1000);
   };
 
   /**
@@ -145,8 +154,8 @@ export default class BugTap extends Game {
     const spawnBugRandomly = () => {
       if (this.isRunning() && this._food.length > 0) {
         const numBugsToSpawn = getRandomNumber(
-          this.MIN_BUGS_TO_SPAWN,
-          this.MAX_BUGS_TO_SPAWN
+          MIN_BUGS_TO_SPAWN,
+          MAX_BUGS_TO_SPAWN
         );
         Array(numBugsToSpawn)
           .fill(null)
@@ -155,8 +164,8 @@ export default class BugTap extends Game {
           });
       }
       const spawnInterval = getRandomNumber(
-        this.MIN_SPAWN_INTERVAL,
-        this.MAX_SPAWN_INTERVAL
+        MIN_SPAWN_INTERVAL,
+        MAX_SPAWN_INTERVAL
       );
       setTimeout(spawnBugRandomly, spawnInterval);
     };

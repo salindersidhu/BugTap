@@ -2,7 +2,7 @@ import { Howl } from "howler";
 
 import { GameObject, Text } from "../engine";
 
-const SOUND_POINT: string = "./assets/sound/point.ogg";
+const POINT_SOUND: string = "./assets/sound/point.ogg";
 
 /**
  * Represents a point object displayed in the game.
@@ -40,16 +40,11 @@ export default class Point extends GameObject {
 
     this._x = x;
     this._y = y;
-    this._text = new Text(
-      `+ ${points}`,
-      "bold 30px Sans-serif",
-      "#B8E600",
-      "black",
-      6
-    );
+    this._text = new Text(`+${points}`, "bold 30px Sans-serif", "#B8E600");
+    this._text.setOutline("black", 5);
 
     this._soundPoint = new Howl({
-      src: [SOUND_POINT],
+      src: [POINT_SOUND],
       html5: true,
     });
 
@@ -57,7 +52,7 @@ export default class Point extends GameObject {
   }
 
   /**
-   * Updates the position and opacity of the point object.
+   * Update the position and opacity of the point object.
    *
    * @param fps The current frames per second.
    */
@@ -70,7 +65,7 @@ export default class Point extends GameObject {
   }
 
   /**
-   * Renders the point object on the canvas.
+   * Render the point object on the canvas.
    */
   render() {
     this._text.render(this.context, this._x, this._y, 0, this._opacity);

@@ -83,7 +83,7 @@ export default class Bug extends GameObject {
   }
 
   /**
-   * Updates the bug's movement and behaviour.
+   * Update the bug's movement and behaviour.
    *
    * @param fps The frames per second.
    */
@@ -101,7 +101,7 @@ export default class Bug extends GameObject {
   }
 
   /**
-   * Renders the bug on the canvas.
+   * Render the bug on the canvas.
    */
   render() {
     const { x, y } = this.boundingBox;
@@ -172,7 +172,7 @@ export default class Bug extends GameObject {
   }
 
   /**
-   * Updates the bug's movement based on food availability. If there's no food,
+   * Update the bug's movement based on food availability. If there's no food,
    * the bug flee back to its spawn point.
    */
   private _handleMovement() {
@@ -186,7 +186,7 @@ export default class Bug extends GameObject {
   }
 
   /**
-   * Updates the bug's interaction with food. If the bug overlaps with any
+   * Update the bug's interaction with food. If the bug overlaps with any
    * food, it eats the food.
    */
   private _handleEatingFood() {
@@ -228,7 +228,7 @@ export default class Bug extends GameObject {
   }
 
   /**
-   * Computes the squared distance between the bug and a food object.
+   * Compute the squared distance between the bug and a food object.
    *
    * @param food The Food object.
    * @returns The squared distance between the bug and the food object.
@@ -254,7 +254,7 @@ export default class Bug extends GameObject {
   }
 
   /**
-   * Moves the bug towards a specified point.
+   * Move the bug towards a specified point.
    *
    * @param x The X coordinate of the target point.
    * @param y The Y coordinate of the target point.

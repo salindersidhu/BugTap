@@ -43,7 +43,7 @@ export default class Cursor extends GameObject {
   }
 
   /**
-   * Deletes the cursor instance and unbinds event listeners.
+   * Delete the cursor instance and unbinds event listeners.
    */
   delete() {
     super.delete();
@@ -51,14 +51,14 @@ export default class Cursor extends GameObject {
   }
 
   /**
-   * Updates the cursor's state (not implemented).
+   * Update the cursor's state (not implemented).
    *
    * @param fps The current frames per second.
    */
   update(_: number) {}
 
   /**
-   * Renders the cursor on the canvas.
+   * Render the cursor on the canvas.
    */
   render() {
     this.context.beginPath();

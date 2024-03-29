@@ -1,6 +1,11 @@
 import { GameObjectFactory, getRandomItem, getRandomNumber } from "../engine";
+
 import Bug from "./Bug";
 import Food from "./Food";
+
+const RED_BUG: string = "./assets/graphics/bug_red.png";
+const ORANGE_BUG: string = "./assets/graphics/bug_orange.png";
+const GREY_BUG: string = "./assets/graphics/bug_grey.png";
 
 /**
  * Interface representing data structure for bug properties.
@@ -11,19 +16,15 @@ interface BugData {
   spriteSrc: string;
 }
 
-const redBugSprite = "./assets/graphics/bug_red.png";
-const orangeBugSprite = "./assets/graphics/bug_orange.png";
-const greyBugSprite = "./assets/graphics/bug_grey.png";
-
 const numBugFrames = 2;
 
 const bugHeight = 50;
 const bugWidth = 45;
 
 const bugData: BugData[] = [
-  { points: 1, speed: 3, spriteSrc: redBugSprite },
-  { points: 3, speed: 5, spriteSrc: orangeBugSprite },
-  { points: 5, speed: 8, spriteSrc: greyBugSprite },
+  { points: 1, speed: 3, spriteSrc: RED_BUG },
+  { points: 3, speed: 5, spriteSrc: ORANGE_BUG },
+  { points: 5, speed: 8, spriteSrc: GREY_BUG },
 ];
 
 /**
@@ -96,7 +97,7 @@ export default class BugManager {
   }
 
   /**
-   * Receives an array of Food for bug interaction.
+   * Receive an array of Food for bug interaction.
    *
    * @param food An array of Food to be assigned to the BugManager.
    */
@@ -105,7 +106,7 @@ export default class BugManager {
   }
 
   /**
-   * Spawns a new bug GameObject.
+   * Spawn a new bug GameObject.
    *
    * @param canvas - The HTMLCanvasElement for rendering.
    * @returns The newly spawned Bug GameObject.

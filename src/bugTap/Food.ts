@@ -62,7 +62,7 @@ export default class Food extends GameObject {
   }
 
   /**
-   * Updates the state of the food item.
+   * Update the state of the food item.
    *
    * @param fps The frames per second.
    */
@@ -71,7 +71,7 @@ export default class Food extends GameObject {
   }
 
   /**
-   * Renders the food item on the canvas.
+   * Render the food item on the canvas.
    */
   render() {
     const { x, y } = this.boundingBox;
@@ -79,7 +79,7 @@ export default class Food extends GameObject {
   }
 
   /**
-   * Marks the food item as eaten and play the sound effect for eating food.
+   * Mark the food item as eaten and play the sound effect for eating food.
    */
   eaten() {
     this._soundEatFood.play();
@@ -87,8 +87,8 @@ export default class Food extends GameObject {
   }
 
   /**
-   * Updates the state of the food item when it has been eaten. Gradually
-   * reduces the opacity of the food item until it fades out completely.
+   * Update the state of the food item when it has been eaten. Gradually
+   * reduce the opacity of the food item until it fades out completely.
    *
    * @param fps The frames per second.
    */
