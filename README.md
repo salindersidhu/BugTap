@@ -4,7 +4,7 @@
 
 ## Overview
 
-A single player game featuring a table with six food items placed around the center. Bugs will spawn randomly from the top and bottom of the table, heading straight towards the nearest food. Upon reaching food, bugs will immediately eat it before proceeding to the next available one. The goal of this game is to tap or click the bugs before they eat all of the food within 60 seconds. The game ends upon the expiration of the timer or the bugs eaten all of the food on the table. Built using source technologies.
+A single player game featuring a table with food placed around the center. Bugs will spawn continuously from all corners of the table, heading straight towards the nearest food. Players must tap or click on the bugs to squish them before they eat all of the food. The game continues with bugs spawning until no food remains. The goal is to survive for as long as possible, squishing as many bugs as you can. Bugtap was built using source technologies.
 
 <p float="left">
     <img src="https://seeklogo.com/images/T/typescript-logo-B29A3F462D-seeklogo.com.png" height="150" width="150">
@@ -58,13 +58,10 @@ npm run dev
 
 ## Acknowledgements
 
-- **Original Assignment**:
-  - University of Toronto: CSC309 Programming on the Web, Summer 2015
 - **Graphics**:
   - Bug sprite from [E-String](http://e-string.com/articles/create-simple-game-using-sprite-kit/)
   - Food sprites from [Free Vector](http://all-free-download.com/free-vector/download/vivid_food_icon_design_vector_535039.html)
   - Media button images from [Vector.me](http://vector.me/browse/695406/icon_set_player)
-  - Favicon generated from [Font Awesome Favicon Generator](http://paulferrett.com/fontawesome-favicon/)
   - Tablecloth texture created by **Patrick Hoesly** from [Flickr](http://www.everystockphoto.com/photo.php?imageId=5778707) under [Create Commons Attribution License](http://creativecommons.org/licenses/by/4.0/)
 - **Sound Effects**:
   - Coin (Retro video game SFX) created by **cabled_mess** from [Freesound](https://freesound.org/people/cabled_mess/sounds/350874/) under [Create Commons 0 License](https://creativecommons.org/publicdomain/zero/1.0/)

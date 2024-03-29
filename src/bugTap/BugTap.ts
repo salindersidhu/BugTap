@@ -1,12 +1,13 @@
 import { Game, clearStore, getRandomNumber, setToStore } from "../engine";
 
-import Food from "./Food";
 import Bug from "./Bug";
+import Cursor from "./Cursor";
+import Food from "./Food";
+import Level from "./Level";
+import Point from "./Point";
 
 import BugManager from "./BugManager";
-import CursorManager from "./CursorManager";
 import FoodManager from "./FoodManager";
-import Point from "./Point";
 
 /**
  * @author Salinder Sidhu
@@ -19,7 +20,6 @@ export default class BugTap extends Game {
   private readonly MIN_SPAWN_INTERVAL: number = 800;
   private readonly MAX_SPAWN_INTERVAL: number = 1500;
 
-  private cursorManager: CursorManager;
   private bugManager: BugManager;
   private foodManager: FoodManager;
 
@@ -32,11 +32,11 @@ export default class BugTap extends Game {
     super(canvasId);
 
     this.bugManager = BugManager.getInstance(this.canvas, this.context);
-    this.cursorManager = CursorManager.getInstance(this.canvas, this.context);
     this.foodManager = FoodManager.getInstance(this.canvas, this.context);
 
-    const cursor = this.cursorManager.create();
-    this.addGameObject(cursor);
+    const level = new Level(this.canvas, this.context);
+    const cursor = new Cursor(this.canvas, this.context);
+    this.addGameObjects([level, cursor]);
 
     this._initEventHandlers();
 
