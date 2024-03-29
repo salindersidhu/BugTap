@@ -1,4 +1,4 @@
-import { Game, clearStore, getRandomNumber, setToStore } from "../engine";
+import { Game, clearStore, formatSeconds, getRandomNumber } from "../engine";
 
 import Bug from "./Bug";
 import Cursor from "./Cursor";
@@ -93,6 +93,7 @@ export default class BugTap extends Game {
     setTimeout(() => {
       this._spawnBugsRandomly();
       this._startTimeElapsed();
+      this._handleGameOver();
     }, COUNTDOWN_SECONDS * 1000);
   };
 
@@ -139,10 +140,9 @@ export default class BugTap extends Game {
       );
       this.addGameObject(point);
 
-      const score = document.getElementById("score");
-      score!.innerHTML = `Score: ${this._score}`;
+      const score = document.getElementById("game-score");
+      score!.innerHTML = this._score.toString();
 
-      setToStore("score", this._score.toString());
       bug.setDead();
     }
   };
@@ -177,15 +177,7 @@ export default class BugTap extends Game {
    * Start the time elapsed counter.
    */
   private _startTimeElapsed() {
-    const time = document.getElementById("time");
-
-    function formatSeconds(seconds: number) {
-      const minutes = Math.floor(seconds / 60);
-      const remainingSeconds = seconds % 60;
-      const paddedSeconds =
-        remainingSeconds < 10 ? `0${remainingSeconds}` : remainingSeconds;
-      return `${minutes}:${paddedSeconds}`;
-    }
+    const time = document.getElementById("game-time");
 
     const startTimeElapsed = () => {
       if (this._food.length < 1) {
@@ -194,13 +186,42 @@ export default class BugTap extends Game {
 
       if (!this.isPaused()) {
         this._time++;
-        time!.innerHTML = `Time: ${formatSeconds(this._time)}`;
-        setToStore("time", this._time.toString());
+        time!.innerHTML = formatSeconds(this._time);
       }
       setTimeout(startTimeElapsed, 1000);
     };
 
     startTimeElapsed();
+  }
+
+  /**
+   * Handle when the game is over. Game over occurs when there is no food on the
+   * table and all the bugs have fled.
+   */
+  private _handleGameOver() {
+    const time = document.getElementById("game-over-time");
+    const score = document.getElementById("game-over-score");
+
+    const gameSection = document.getElementById("game-section");
+    const gameOverSection = document.getElementById("score-section");
+
+    const handleGameOver = () => {
+      const numBugs = this.getGameObjectsOfType(Bug).length;
+
+      if (this.isRunning() && this._food.length < 1 && numBugs < 1) {
+        gameSection?.classList.add("hidden");
+        gameOverSection?.classList.remove("hidden");
+
+        time!.innerHTML = formatSeconds(this._time);
+        score!.innerHTML = this._score.toString();
+
+        this.stop();
+        return;
+      }
+      setTimeout(handleGameOver, 1000);
+    };
+
+    handleGameOver();
   }
 
   /**

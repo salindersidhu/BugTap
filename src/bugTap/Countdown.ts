@@ -1,9 +1,12 @@
+import { Howl } from "howler";
+
 import { GameObject, Text } from "../engine";
 
 const FONT_SIZE: number = 48;
 const SCALE_SPEED: number = 30;
 const TEXT_HEIGHT_RATIO: number = 3;
 const TEXT_WIDTH_RATIO: number = 4;
+const SOUND_PING: string = "./assets/sound/ping.wav";
 
 /**
  * Displays a countdown on the game. The countdown decreases over time, and the
@@ -20,6 +23,8 @@ export default class Countdown extends GameObject {
   private _countdown: number;
   private _opacity: number = 1;
   private _scale: number = 1;
+
+  private _soundPing: Howl;
 
   /**
    * Create an instance of Countdown.
@@ -43,6 +48,11 @@ export default class Countdown extends GameObject {
       "bold 48px Sans-serif",
       "black"
     );
+
+    this._soundPing = new Howl({
+      src: [SOUND_PING],
+      html5: true,
+    });
   }
 
   /**
@@ -51,6 +61,10 @@ export default class Countdown extends GameObject {
    * @param fps The current frames per second.
    */
   update(fps: number) {
+    if (this._opacity === 1) {
+      this._soundPing.play();
+    }
+
     // Update opacity and scale
     this._opacity -= 1 / fps;
     this._scale += SCALE_SPEED / fps;
@@ -60,11 +74,12 @@ export default class Countdown extends GameObject {
     );
 
     if (this._opacity < 0) {
-      // Reset text opacity and scale
+      // Decrement the countdown
       this._countdown -= 1;
+      // Reset text opacity and scale
       this._opacity = 1;
       this._scale = 1;
-      // Decrement the countdown
+
       this._text = new Text(
         this._countdown.toString(),
         `bold ${FONT_SIZE}px Sans-serif`,

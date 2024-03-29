@@ -145,6 +145,13 @@ export default class Game {
   }
 
   /**
+   * Stop the game.
+   */
+  protected stop() {
+    this._state = State.STOPPED;
+  }
+
+  /**
    * Main game loop that continuously updates the frames per second, updates
    * game objects, and renders the game.
    */

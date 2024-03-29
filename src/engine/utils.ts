@@ -55,3 +55,18 @@ export function removeFromStore(key: string) {
 export function clearStore() {
   localStorage.clear();
 }
+
+/**
+ * Format the given number of seconds into a string representation of minutes
+ * and seconds (MM:SS).
+ *
+ * @param seconds The number of seconds to format.
+ * @returns A string representing the formatted time in minutes and seconds (MM:SS).
+ */
+export function formatSeconds(seconds: number): string {
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = seconds % 60;
+  const paddedSeconds =
+    remainingSeconds < 10 ? `0${remainingSeconds}` : remainingSeconds;
+  return `${minutes}:${paddedSeconds}`;
+}
