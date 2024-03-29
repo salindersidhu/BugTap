@@ -9,6 +9,7 @@ A single player game featuring a table with food placed around the center. Bugs 
 <p float="left">
     <img src="https://seeklogo.com/images/T/typescript-logo-B29A3F462D-seeklogo.com.png" height="150" width="150">
     <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/Unofficial_JavaScript_logo_2.svg/1024px-Unofficial_JavaScript_logo_2.svg.png" height="150" width="150">
+    <img src="https://d1muf25xaso8hp.cloudfront.net/https%3A%2F%2Fmeta-q.cdn.bubble.io%2Ff1511101808452x248499521985650050%2Fhowlericon.png?w=&h=&auto=compress&dpr=1&fit=max" height="150" width="150">
 </p>
 
 ## Prerequisite Software
@@ -26,13 +27,15 @@ A single player game featuring a table with food placed around the center. Bugs 
 npm install
 ```
 
-## Running
+## Development Build
 
-1. Run the development server:
+1. Run the following command:
 
 ```bash
-npm run dev
+npm run build
 ```
+
+2. The project is built to the `dist` folder.
 
 ## Project Structure
 
@@ -41,7 +44,7 @@ npm run dev
     │    ├── engine                 # Game engine
     │    │    ├── index.ts
     │    │    └── ...
-    │    ├── game                   # Game source
+    │    ├── bugTap                 # Main game source
     │    │    ├── index.ts
     │    │    └── ...
     │    ├── index.ts
@@ -50,6 +53,8 @@ npm run dev
     │    └── ...
     ├── public
     │    ├── favicon.ico            # Favicon
+    │    ├── theme.css              # Theme styles
+    │    ├── game.css               # Game styles
     │    ├── template.html
     │    └── ...
     ├── tsconfig.json               # TypeScript config
