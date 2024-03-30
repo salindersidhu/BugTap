@@ -17,7 +17,7 @@ A single player game featuring a table with food placed around the center. Bugs 
 ![Screen Capture](https://github.com/salindersidhu/BugTap/assets/12175684/f65ace42-2b3f-40e4-802e-47e9f8a6bf21)
 
 - BugTap game embedded on the webpage
-- Pause and Resume with a button or SPACE bar
+- Pause and resume with the button or spacebar
 - Game over screen with time and score
 - Sound effects
 
