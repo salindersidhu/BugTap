@@ -27,8 +27,6 @@ export default class BugTap extends Game {
   private _time: number = 0;
   private _score: number = 0;
 
-  private _food: Food[] = [];
-
   private _bugSpawnTimeout: NodeJS.Timeout | null = null;
   private _timeElapsedTimeout: NodeJS.Timeout | null = null;
 
@@ -109,7 +107,9 @@ export default class BugTap extends Game {
    * Handle event when the game canvas is clicked.
    */
   private _canvasOnClick = (event: MouseEvent) => {
-    if (!this.isRunning() || this._food.length < 1) {
+    const numFood = this.getGameObjectsOfType(Food).length;
+
+    if (!this.isRunning() || numFood < 1) {
       return;
     }
 
@@ -174,7 +174,9 @@ export default class BugTap extends Game {
    */
   private _handleBugSpawn() {
     const bugSpawn = () => {
-      if (this.isRunning() && this._food.length > 0) {
+      const numFood = this.getGameObjectsOfType(Food).length;
+
+      if (this.isRunning() && numFood > 0) {
         const numBugsToSpawn = getRandomNumber(
           MIN_BUGS_TO_SPAWN,
           MAX_BUGS_TO_SPAWN
@@ -202,9 +204,10 @@ export default class BugTap extends Game {
    */
   private _handleTimeElapsed() {
     const time = document.getElementById("game-time");
+    const numFood = this.getGameObjectsOfType(Food).length;
 
     const timeElapsed = () => {
-      if (this._food.length < 1) {
+      if (numFood < 1) {
         return;
       }
 
@@ -232,8 +235,9 @@ export default class BugTap extends Game {
 
     const gameOver = () => {
       const numBugs = this.getGameObjectsOfType(Bug).length;
+      const numFood = this.getGameObjectsOfType(Food).length;
 
-      if (this.isRunning() && this._food.length < 1 && numBugs < 1) {
+      if (this.isRunning() && numFood < 1 && numBugs < 1) {
         gameSection?.classList.add("hidden");
         gameOverSection?.classList.remove("hidden");
 
@@ -263,10 +267,9 @@ export default class BugTap extends Game {
    * Create food spread randomly near the center of the table.
    */
   private _initFood() {
-    this._food = this.foodManager.generate(AMOUNT_OF_FOOD);
-    this.bugManager.receiveFood(this._food);
-
-    this.addGameObjects(this._food);
+    const food = this.foodManager.generate(AMOUNT_OF_FOOD);
+    this.bugManager.receiveFood(food);
+    this.addGameObjects(food);
   }
 
   /**
