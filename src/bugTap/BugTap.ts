@@ -1,4 +1,4 @@
-import { Game, clearStore, formatSeconds, getRandomNumber } from "../engine";
+import { Game, formatSeconds, getRandomNumber } from "../engine";
 
 import Bug from "./Bug";
 import Cursor from "./Cursor";
@@ -29,6 +29,9 @@ export default class BugTap extends Game {
 
   private _food: Food[] = [];
 
+  private _bugSpawnTimeout: NodeJS.Timeout | null = null;
+  private _timeElapsedTimeout: NodeJS.Timeout | null = null;
+
   constructor(canvasId: string) {
     super(canvasId);
 
@@ -37,26 +40,9 @@ export default class BugTap extends Game {
 
     const level = new Level(this.canvas, this.context);
     const cursor = new Cursor(this.canvas, this.context);
-    const countdown = new Countdown(
-      this.canvas,
-      this.context,
-      COUNTDOWN_SECONDS
-    );
-    this.addGameObjects([level, countdown, cursor]);
+    this.addGameObjects([level, cursor]);
 
     this._initEventHandlers();
-
-    clearStore();
-  }
-
-  /**
-   * Create food spread randomly near the center of the table.
-   */
-  private _initFood() {
-    this._food = this.foodManager.generate(AMOUNT_OF_FOOD);
-    this.bugManager.receiveFood(this._food);
-
-    this.addGameObjects(this._food);
   }
 
   /**
@@ -75,8 +61,23 @@ export default class BugTap extends Game {
     const startButton = document.getElementById("start-button");
     startButton?.addEventListener("click", this._startButtonOnClick);
 
-    this.canvas.addEventListener("mousedown", this._canvasOnMouseClick);
+    const restartButton = document.getElementById("restart-button");
+    restartButton?.addEventListener("click", this._restartGameOnClick);
+
+    this.canvas.addEventListener("mousedown", this._canvasOnClick);
   }
+
+  /**
+   * Handle event when restart game button is clicked.
+   */
+  private _restartGameOnClick = () => {
+    const gameOverSection = document.getElementById("score-section");
+    const gameSection = document.getElementById("game-section");
+    gameOverSection?.classList.add("hidden");
+    gameSection?.classList.remove("hidden");
+
+    this._restartGame();
+  };
 
   /**
    * Handle event when the start button is clicked.
@@ -87,14 +88,7 @@ export default class BugTap extends Game {
     welcomeSection?.classList.add("hidden");
     gameSection?.classList.remove("hidden");
 
-    this.start();
-    this._initFood();
-
-    setTimeout(() => {
-      this._spawnBugsRandomly();
-      this._startTimeElapsed();
-      this._handleGameOver();
-    }, COUNTDOWN_SECONDS * 1000);
+    this._restartGame();
   };
 
   /**
@@ -114,7 +108,7 @@ export default class BugTap extends Game {
   /**
    * Handle event when the game canvas is clicked.
    */
-  private _canvasOnMouseClick = (event: MouseEvent) => {
+  private _canvasOnClick = (event: MouseEvent) => {
     if (!this.isRunning() || this._food.length < 1) {
       return;
     }
@@ -148,10 +142,38 @@ export default class BugTap extends Game {
   };
 
   /**
-   * Spawn bugs continuously at random times.
+   * Reset the game.
    */
-  private _spawnBugsRandomly() {
-    const spawnBugRandomly = () => {
+  private _restartGame() {
+    // Create a countdown
+    const countdown = new Countdown(
+      this.canvas,
+      this.context,
+      COUNTDOWN_SECONDS
+    );
+    this.addGameObject(countdown);
+
+    // Start the game and initalize food
+    this.start();
+    this._initFood();
+
+    // Reset the time elapsed and score
+    this._setTime(0);
+    this._setScore(0);
+
+    // Start game handlers after the countdown
+    setTimeout(() => {
+      this._handleBugSpawn();
+      this._handleTimeElapsed();
+      this._handleGameOver();
+    }, COUNTDOWN_SECONDS * 1000);
+  }
+
+  /**
+   * Spawn bugs at random times.
+   */
+  private _handleBugSpawn() {
+    const bugSpawn = () => {
       if (this.isRunning() && this._food.length > 0) {
         const numBugsToSpawn = getRandomNumber(
           MIN_BUGS_TO_SPAWN,
@@ -160,26 +182,28 @@ export default class BugTap extends Game {
         Array(numBugsToSpawn)
           .fill(null)
           .forEach(() => {
-            this._spawnBug();
+            const bug = this.bugManager.spawn(this.canvas);
+            this.addGameObject(bug);
           });
       }
+
       const spawnInterval = getRandomNumber(
         MIN_SPAWN_INTERVAL,
         MAX_SPAWN_INTERVAL
       );
-      setTimeout(spawnBugRandomly, spawnInterval);
+      this._bugSpawnTimeout = setTimeout(bugSpawn, spawnInterval);
     };
 
-    spawnBugRandomly();
+    bugSpawn();
   }
 
   /**
-   * Start the time elapsed counter.
+   * Handle the time elapsed counter.
    */
-  private _startTimeElapsed() {
+  private _handleTimeElapsed() {
     const time = document.getElementById("game-time");
 
-    const startTimeElapsed = () => {
+    const timeElapsed = () => {
       if (this._food.length < 1) {
         return;
       }
@@ -188,10 +212,11 @@ export default class BugTap extends Game {
         this._time++;
         time!.innerHTML = formatSeconds(this._time);
       }
-      setTimeout(startTimeElapsed, 1000);
+
+      this._timeElapsedTimeout = setTimeout(timeElapsed, 1000);
     };
 
-    startTimeElapsed();
+    timeElapsed();
   }
 
   /**
@@ -205,7 +230,7 @@ export default class BugTap extends Game {
     const gameSection = document.getElementById("game-section");
     const gameOverSection = document.getElementById("score-section");
 
-    const handleGameOver = () => {
+    const gameOver = () => {
       const numBugs = this.getGameObjectsOfType(Bug).length;
 
       if (this.isRunning() && this._food.length < 1 && numBugs < 1) {
@@ -216,19 +241,56 @@ export default class BugTap extends Game {
         score!.innerHTML = this._score.toString();
 
         this.stop();
+
+        if (this._bugSpawnTimeout !== null) {
+          clearTimeout(this._bugSpawnTimeout);
+          this._bugSpawnTimeout = null;
+        }
+        if (this._timeElapsedTimeout !== null) {
+          clearTimeout(this._timeElapsedTimeout);
+          this._timeElapsedTimeout = null;
+        }
+
         return;
       }
-      setTimeout(handleGameOver, 1000);
+      setTimeout(gameOver, 1000);
     };
 
-    handleGameOver();
+    gameOver();
   }
 
   /**
-   * Spawn a bug and add it to the game.
+   * Create food spread randomly near the center of the table.
    */
-  private _spawnBug() {
-    const bug = this.bugManager.spawn(this.canvas);
-    this.addGameObject(bug);
+  private _initFood() {
+    this._food = this.foodManager.generate(AMOUNT_OF_FOOD);
+    this.bugManager.receiveFood(this._food);
+
+    this.addGameObjects(this._food);
+  }
+
+  /**
+   * Set the game time to the specified value and update the displayed game time.
+   *
+   * @param time The new game time value.
+   */
+  private _setTime(time: number) {
+    this._time = time;
+
+    const gameTime = document.getElementById("game-time");
+    gameTime!.innerHTML = formatSeconds(this._time);
+  }
+
+  /**
+   * Set the game score to the specified points and update the displayed game
+   * score.
+   *
+   * @param points The points to set as the new game score.
+   */
+  private _setScore(points: number) {
+    this._score = points;
+
+    const gameScore = document.getElementById("game-score");
+    gameScore!.innerHTML = this._score.toString();
   }
 }
