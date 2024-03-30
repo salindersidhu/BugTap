@@ -1,4 +1,4 @@
-# Bug Tap
+# BugTap
 
 [![Contributors](https://img.shields.io/github/contributors/salindersidhu/BugTap?style=for-the-badge)](https://github.com/salindersidhu/BugTap/graphs/contributors) [![Visitors](https://api.visitorbadge.io/api/visitors?path=https%3A%2F%2Fgithub.com%2Fsalindersidhu%2FBugTap&countColor=%23263759)](https://visitorbadge.io/status?path=https%3A%2F%2Fgithub.com%2Fsalindersidhu%2FBugTap) [![License: Apache](https://img.shields.io/badge/license-APACHE-brightgreen.svg?style=for-the-badge)](/LICENSE.md)
 
@@ -11,6 +11,15 @@ A single player game featuring a table with food placed around the center. Bugs 
     <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/Unofficial_JavaScript_logo_2.svg/1024px-Unofficial_JavaScript_logo_2.svg.png" height="150" width="150">
     <img src="https://d1muf25xaso8hp.cloudfront.net/https%3A%2F%2Fmeta-q.cdn.bubble.io%2Ff1511101808452x248499521985650050%2Fhowlericon.png?w=&h=&auto=compress&dpr=1&fit=max" height="150" width="150">
 </p>
+
+## Features
+
+![Screen Capture](https://github.com/salindersidhu/BugTap/assets/12175684/f65ace42-2b3f-40e4-802e-47e9f8a6bf21)
+
+- BugTap game embedded on the webpage
+- Pause and Resume with a button or SPACE bar
+- Game over screen with time and score
+- Sound effects
 
 ## Prerequisite Software
 
@@ -36,6 +45,10 @@ npm run build
 ```
 
 2. The project is built to the `dist` folder.
+
+## Contributing
+
+Please see our [Contributing Guide](/CONTRIBUTING.md) for more info.
 
 ## Project Structure
 
