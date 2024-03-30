@@ -3,14 +3,13 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "build": "webpack --config webpack.prod.config.js",
-    "dev": "webpack server --config webpack.dev.config.js --hot",
-    "clean": "rm -rf dist",
+    "build": "webpack --mode=production",
+    "start": "webpack server --hot",
+    "clean": "rm -rf build",
     "postinstall": "patch-package"
   },
   "dependencies": {
-    "howler": "^2.2.4",
-    "remove": "^0.1.5"
+    "howler": "^2.2.4"
   },
   "devDependencies": {
     "@types/howler": "^2.2.11",
