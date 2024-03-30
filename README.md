@@ -41,10 +41,22 @@ npm install
 1. Run the following command:
 
 ```bash
+npm run dev
+```
+
+2. Navigate to `localhost:8000` in your browser.
+
+3. The webpack dev server has support for hot module reload.
+
+## Production Build
+
+1. Run the following command:
+
+```bash
 npm run build
 ```
 
-2. The project is built to the `dist` folder.
+2. The production ready build is located in the `dist` folder.
 
 ## Contributing
 
@@ -71,7 +83,8 @@ Please see our [Contributing Guide](/CONTRIBUTING.md) for more info.
     │    ├── template.html
     │    └── ...
     ├── tsconfig.json               # TypeScript config
-    ├── webpack.config.js           # Webpack config
+    ├── webpack.dev.config.js       # Development webpack config
+    ├── webpack.prod.config.js      # Production webpack config
     └── ...
 
 ## Acknowledgements
