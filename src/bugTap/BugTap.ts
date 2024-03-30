@@ -124,6 +124,7 @@ export default class BugTap extends Game {
 
       const points = bug.getPoints();
       this._score += points;
+      this._setScore(this._score);
 
       const point = new Point(
         this.canvas,
@@ -133,9 +134,6 @@ export default class BugTap extends Game {
         bug.boundingBox.y
       );
       this.addGameObject(point);
-
-      const score = document.getElementById("game-score");
-      score!.innerHTML = this._score.toString();
 
       bug.setDead();
     }
@@ -161,12 +159,20 @@ export default class BugTap extends Game {
     this._setTime(0);
     this._setScore(0);
 
-    // Start game handlers after the countdown
-    setTimeout(() => {
-      this._handleBugSpawn();
-      this._handleTimeElapsed();
-      this._handleGameOver();
-    }, COUNTDOWN_SECONDS * 1000);
+    const checkCountdown = () => {
+      const numCountdown = this.getGameObjectsOfType(Countdown).length;
+      if (numCountdown < 1) {
+        // Start game handlers after the countdown
+        this._handleBugSpawn();
+        this._handleTimeElapsed();
+        this._handleGameOver();
+
+        return;
+      }
+      setTimeout(checkCountdown, 100);
+    };
+
+    checkCountdown();
   }
 
   /**
@@ -203,7 +209,6 @@ export default class BugTap extends Game {
    * Handle the time elapsed counter.
    */
   private _handleTimeElapsed() {
-    const time = document.getElementById("game-time");
     const numFood = this.getGameObjectsOfType(Food).length;
 
     const timeElapsed = () => {
@@ -213,7 +218,7 @@ export default class BugTap extends Game {
 
       if (!this.isPaused()) {
         this._time++;
-        time!.innerHTML = formatSeconds(this._time);
+        this._setTime(this._time);
       }
 
       this._timeElapsedTimeout = setTimeout(timeElapsed, 1000);
