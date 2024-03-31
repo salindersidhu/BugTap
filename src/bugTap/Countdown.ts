@@ -45,7 +45,9 @@ export default class Countdown extends Entity {
 
     this._text = new Text(
       this._countdown.toString(),
-      "bold 48px Sans-serif",
+      "Sans-serif",
+      `${FONT_SIZE}px`,
+      "bold",
       "black"
     );
 
@@ -82,7 +84,9 @@ export default class Countdown extends Entity {
 
       this._text = new Text(
         this._countdown.toString(),
-        `bold ${FONT_SIZE}px Sans-serif`,
+        "Sans-serif",
+        `${FONT_SIZE}px`,
+        "bold",
         "black"
       );
     }

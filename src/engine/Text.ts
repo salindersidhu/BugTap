@@ -6,7 +6,11 @@
  */
 export default class Text {
   private _text: string;
-  private _font: string;
+
+  private _fontFamily: string;
+  private _fontSize: string;
+  private _fontWeight: number | string;
+
   private _colour: string;
   private _hasOutline: boolean = false;
   private _outlineColour: string = "";
@@ -16,12 +20,22 @@ export default class Text {
    * Create an instance of Text.
    *
    * @param text The text string to be displayed.
-   * @param font The font and font styles of the text.
+   * @param fontFamily The font family name.
+   * @param fontSize The size of the font.
+   * @param fontWeight The weight (or boldness) of the font.
    * @param colour The fill colour of the text.
    */
-  constructor(text: string, font: string, colour: string) {
+  constructor(
+    text: string,
+    fontFamily: string,
+    fontSize: string,
+    fontWeight: number | string,
+    colour: string
+  ) {
     this._text = text;
-    this._font = font;
+    this._fontFamily = fontFamily;
+    this._fontSize = fontSize;
+    this._fontWeight = fontWeight;
     this._colour = colour;
   }
 
@@ -71,7 +85,7 @@ export default class Text {
     context.globalAlpha = opacity;
 
     // Set canvas font
-    context.font = this._font;
+    context.font = `${this._fontWeight} ${this._fontSize} ${this._fontFamily}`;
 
     // Draw the text outline if can draw outline flag is true
     if (this._hasOutline) {
@@ -80,7 +94,7 @@ export default class Text {
       context.strokeText(this._text, x, y);
     }
 
-    // Draw the actual text
+    // Draw the text
     context.fillStyle = this._colour;
     context.fillText(this._text, x, y);
 

@@ -40,7 +40,13 @@ export default class Point extends Entity {
 
     this._x = x;
     this._y = y;
-    this._text = new Text(`+${points}`, "bold 30px Sans-serif", "#B8E600");
+    this._text = new Text(
+      `+${points}`,
+      "Sans-serif",
+      "30px",
+      "bold",
+      "#B8E600"
+    );
     this._text.setOutline("black", 5);
 
     this._soundPoint = new Howl({
