@@ -1,6 +1,6 @@
 import { Howl } from "howler";
 
-import { GameObject, Text } from "../engine";
+import { Entity, Text } from "../engine";
 
 const FONT_SIZE: number = 48;
 const SCALE_SPEED: number = 30;
@@ -15,7 +15,7 @@ const SOUND_PING: string = "./assets/sound/ping.wav";
  *
  * @author Salinder Sidhu
  */
-export default class Countdown extends GameObject {
+export default class Countdown extends Entity {
   private _text: Text;
 
   private _x: number;

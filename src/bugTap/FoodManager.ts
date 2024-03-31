@@ -1,4 +1,4 @@
-import { BoundingBox, GameObjectFactory, getRandomNumber } from "../engine";
+import { BoundingBox, EntityFactory, getRandomNumber } from "../engine";
 
 import Food from "./Food";
 
@@ -17,7 +17,7 @@ const foodWidth = 56;
  */
 export default class FoodManager {
   private static instance: FoodManager;
-  private foodFactory: GameObjectFactory<Food>;
+  private foodFactory: EntityFactory<Food>;
 
   /**
    * Creates an instance of FoodManager.
@@ -29,7 +29,7 @@ export default class FoodManager {
     canvas: HTMLCanvasElement,
     context: CanvasRenderingContext2D
   ) {
-    this.foodFactory = new GameObjectFactory<Food>(
+    this.foodFactory = new EntityFactory<Food>(
       canvas,
       context,
       (
@@ -107,7 +107,7 @@ export default class FoodManager {
       const frameIndex = availableFrames.splice(randomIndex, 1);
 
       // Create Food
-      const newFood = this.foodFactory.createGameObject(
+      const newFood = this.foodFactory.createEntity(
         x,
         y,
         foodWidth,

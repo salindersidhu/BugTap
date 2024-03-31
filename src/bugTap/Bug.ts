@@ -1,4 +1,4 @@
-import { BoundingBox, GameObject, Sprite } from "../engine";
+import { BoundingBox, Entity, Sprite } from "../engine";
 
 import Food from "./Food";
 
@@ -14,7 +14,7 @@ enum State {
 /**
  * @author Salinder Sidhu
  */
-export default class Bug extends GameObject {
+export default class Bug extends Entity {
   private _sprite: Sprite;
   private _angle: number = 0;
   private _speed: number;

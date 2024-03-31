@@ -1,4 +1,4 @@
-import { GameObjectFactory, getRandomItem, getRandomNumber } from "../engine";
+import { EntityFactory, getRandomItem, getRandomNumber } from "../engine";
 
 import Bug from "./Bug";
 import Food from "./Food";
@@ -28,13 +28,13 @@ const bugData: BugData[] = [
 ];
 
 /**
- * The BugManager class manages the spawning of bug GameObjects.
+ * The BugManager class manages the spawning of bug Entities.
  *
  * @author Salinder Sidhu
  */
 export default class BugManager {
   private static instance: BugManager;
-  private bugFactory: GameObjectFactory<Bug>;
+  private bugFactory: EntityFactory<Bug>;
   private _food: Food[] = [];
 
   /**
@@ -47,7 +47,7 @@ export default class BugManager {
     canvas: HTMLCanvasElement,
     context: CanvasRenderingContext2D
   ) {
-    this.bugFactory = new GameObjectFactory<Bug>(
+    this.bugFactory = new EntityFactory<Bug>(
       canvas,
       context,
       (
@@ -106,10 +106,10 @@ export default class BugManager {
   }
 
   /**
-   * Spawn a new bug GameObject.
+   * Spawn a new Bug.
    *
    * @param canvas - The HTMLCanvasElement for rendering.
-   * @returns The newly spawned Bug GameObject.
+   * @returns The newly spawned Bug.
    */
   public spawn(canvas: HTMLCanvasElement): Bug {
     const selectedBugData = getRandomItem(bugData)!;
@@ -146,7 +146,7 @@ export default class BugManager {
     // Select coordinates based on the chosen side
     const [x, y] = sideCoordinates[side];
 
-    return this.bugFactory.createGameObject(
+    return this.bugFactory.createEntity(
       x,
       y,
       bugHeight,

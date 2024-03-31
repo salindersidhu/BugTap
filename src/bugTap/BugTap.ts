@@ -38,7 +38,7 @@ export default class BugTap extends Game {
 
     const level = new Level(this.canvas, this.context);
     const cursor = new Cursor(this.canvas, this.context);
-    this.addGameObjects([level, cursor]);
+    this.addEntities([level, cursor]);
 
     this._initEventHandlers();
   }
@@ -107,13 +107,13 @@ export default class BugTap extends Game {
    * Handle event when the game canvas is clicked.
    */
   private _canvasOnClick = (event: MouseEvent) => {
-    const numFood = this.getGameObjectsOfType(Food).length;
+    const numFood = this.getEntitiesOfType(Food).length;
 
     if (!this.isRunning() || numFood < 1) {
       return;
     }
 
-    for (const bug of this.getGameObjectsOfType(Bug)) {
+    for (const bug of this.getEntitiesOfType(Bug)) {
       if (!bug.boundingBox.isOverlappingPoint(event.offsetX, event.offsetY)) {
         continue;
       }
@@ -133,7 +133,7 @@ export default class BugTap extends Game {
         bug.boundingBox.x,
         bug.boundingBox.y
       );
-      this.addGameObject(point);
+      this.addEntity(point);
 
       bug.setDead();
     }
@@ -149,18 +149,18 @@ export default class BugTap extends Game {
       this.context,
       COUNTDOWN_SECONDS
     );
-    this.addGameObject(countdown);
+    this.addEntity(countdown);
 
     // Start the game and initalize food
-    this.start();
     this._initFood();
+    this.start();
 
     // Reset the time elapsed and score
     this._setTime(0);
     this._setScore(0);
 
     const checkCountdown = () => {
-      const numCountdown = this.getGameObjectsOfType(Countdown).length;
+      const numCountdown = this.getEntitiesOfType(Countdown).length;
       if (numCountdown < 1) {
         // Start game handlers after the countdown
         this._handleBugSpawn();
@@ -180,7 +180,7 @@ export default class BugTap extends Game {
    */
   private _handleBugSpawn() {
     const bugSpawn = () => {
-      const numFood = this.getGameObjectsOfType(Food).length;
+      const numFood = this.getEntitiesOfType(Food).length;
 
       if (this.isRunning() && numFood > 0) {
         const numBugsToSpawn = getRandomNumber(
@@ -191,7 +191,7 @@ export default class BugTap extends Game {
           .fill(null)
           .forEach(() => {
             const bug = this.bugManager.spawn(this.canvas);
-            this.addGameObject(bug);
+            this.addEntity(bug);
           });
       }
 
@@ -209,7 +209,7 @@ export default class BugTap extends Game {
    * Handle the time elapsed counter.
    */
   private _handleTimeElapsed() {
-    const numFood = this.getGameObjectsOfType(Food).length;
+    const numFood = this.getEntitiesOfType(Food).length;
 
     const timeElapsed = () => {
       if (numFood < 1) {
@@ -239,8 +239,8 @@ export default class BugTap extends Game {
     const gameOverSection = document.getElementById("score-section");
 
     const gameOver = () => {
-      const numBugs = this.getGameObjectsOfType(Bug).length;
-      const numFood = this.getGameObjectsOfType(Food).length;
+      const numBugs = this.getEntitiesOfType(Bug).length;
+      const numFood = this.getEntitiesOfType(Food).length;
 
       if (this.isRunning() && numFood < 1 && numBugs < 1) {
         gameSection?.classList.add("hidden");
@@ -274,7 +274,7 @@ export default class BugTap extends Game {
   private _initFood() {
     const food = this.foodManager.generate(AMOUNT_OF_FOOD);
     this.bugManager.receiveFood(food);
-    this.addGameObjects(food);
+    this.addEntities(food);
   }
 
   /**

@@ -1,7 +1,7 @@
 import BoundingBox from "./BoundingBox";
+import Entity from "./Entity";
+import EntityFactory from "./EntityFactory";
 import Game from "./Game";
-import GameObject from "./GameObject";
-import GameObjectFactory from "./GameObjectFactory";
 import Sprite from "./Sprite";
 import Text from "./Text";
 
@@ -17,9 +17,9 @@ import {
 
 export {
   BoundingBox,
+  Entity,
+  EntityFactory,
   Game,
-  GameObject,
-  GameObjectFactory,
   Sprite,
   Text,
   clearStore,

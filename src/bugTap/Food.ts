@@ -1,6 +1,6 @@
 import { Howl } from "howler";
 
-import { BoundingBox, GameObject, Sprite } from "../engine";
+import { BoundingBox, Entity, Sprite } from "../engine";
 
 const SOUND_EAT_FOOD: string = "./assets/sound/eat.ogg";
 
@@ -17,7 +17,7 @@ enum State {
  *
  * @author Salinder Sidhu
  */
-export default class Food extends GameObject {
+export default class Food extends Entity {
   private _sprite: Sprite;
 
   private _state: State = State.ACTIVE;

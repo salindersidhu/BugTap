@@ -1,11 +1,11 @@
-import { GameObject } from "../engine";
+import { Entity } from "../engine";
 
 /**
  * Represents a cursor that tracks mouse movements.
  *
  * @author Salinder Sidhu
  */
-export default class Cursor extends GameObject {
+export default class Cursor extends Entity {
   x: number;
   y: number;
   radius: number;

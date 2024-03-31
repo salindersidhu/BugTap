@@ -1,6 +1,6 @@
 import { Howl } from "howler";
 
-import { GameObject, Text } from "../engine";
+import { Entity, Text } from "../engine";
 
 const POINT_SOUND: string = "./assets/sound/point.ogg";
 
@@ -9,7 +9,7 @@ const POINT_SOUND: string = "./assets/sound/point.ogg";
  *
  * @author Salinder Sidhu
  */
-export default class Point extends GameObject {
+export default class Point extends Entity {
   private _text: Text;
 
   private _x: number;
