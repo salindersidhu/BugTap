@@ -8,7 +8,7 @@ import Food from "./Food";
 enum State {
   ALIVE,
   DEAD,
-  FLEE,
+  FLEEING,
 }
 
 /**
@@ -152,7 +152,7 @@ export default class Bug extends Entity {
    * @param fps The frames per second.
    */
   private _handleFleeing(fps: number) {
-    if (this._state !== State.FLEE) {
+    if (this._state !== State.FLEEING) {
       return;
     }
 
@@ -177,7 +177,7 @@ export default class Bug extends Entity {
    */
   private _handleMovement() {
     if (this._food.length < 1) {
-      this._state = State.FLEE;
+      this._state = State.FLEEING;
       this._fadeSpeed = 1.3;
       this._moveToPoint(this._spawnX, this._spawnY);
       return;

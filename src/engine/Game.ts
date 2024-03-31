@@ -17,7 +17,9 @@ enum State {
 export default class Game {
   protected canvas: HTMLCanvasElement;
   protected context: CanvasRenderingContext2D;
+
   protected fps: number = 0;
+  protected debug: boolean = false;
 
   private _entities: Entity[] = [];
   private _state: State = State.STOPPED;
@@ -80,6 +82,13 @@ export default class Game {
     new (...args: any[]): T;
   }): T[] {
     return this._entities.filter((entity) => entity instanceof type) as T[];
+  }
+
+  /**
+   * Removes all Entity instances from the game.
+   */
+  clearAllEntities() {
+    this._entities = [];
   }
 
   /**
@@ -193,6 +202,19 @@ export default class Game {
     this._entities
       .sort(this._sortEntitiesByDrawPriority)
       .forEach((entity) => entity.render());
+
+    // If debug mode is enabled, display debug information
+    if (this.debug) {
+      this.context.save();
+
+      this.context.fillStyle = "black";
+      this.context.font = "bold 18px Arial";
+      this.context.fillText(`Debug: True`, 10, 20);
+      this.context.fillText(`FPS: ${this.fps}`, 10, 40);
+      this.context.fillText(`Entities: ${this._entities.length}`, 10, 60);
+
+      this.context.restore();
+    }
   }
 
   /**

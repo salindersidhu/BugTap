@@ -36,10 +36,6 @@ export default class BugTap extends Game {
     this.bugManager = BugManager.getInstance(this.canvas, this.context);
     this.foodManager = FoodManager.getInstance(this.canvas, this.context);
 
-    const level = new Level(this.canvas, this.context);
-    const cursor = new Cursor(this.canvas, this.context);
-    this.addEntities([level, cursor]);
-
     this._initEventHandlers();
   }
 
@@ -74,6 +70,7 @@ export default class BugTap extends Game {
     gameOverSection?.classList.add("hidden");
     gameSection?.classList.remove("hidden");
 
+    this.clearAllEntities();
     this._restartGame();
   };
 
@@ -143,13 +140,15 @@ export default class BugTap extends Game {
    * Reset the game.
    */
   private _restartGame() {
-    // Create a countdown
+    // Create level, cursor and countdown
+    const level = new Level(this.canvas, this.context);
+    const cursor = new Cursor(this.canvas, this.context);
     const countdown = new Countdown(
       this.canvas,
       this.context,
       COUNTDOWN_SECONDS
     );
-    this.addEntity(countdown);
+    this.addEntities([level, cursor, countdown]);
 
     // Start the game and initalize food
     this._initFood();
