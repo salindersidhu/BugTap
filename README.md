@@ -76,8 +76,7 @@ Please see our [Contributing Guide](/CONTRIBUTING.md) for more info.
     │    └── ...
     ├── public
     │    ├── favicon.ico            # Favicon
-    │    ├── theme.css              # Theme styles
-    │    ├── game.css               # Game styles
+    │    ├── styles.css             # Styles
     │    ├── template.html
     │    └── ...
     ├── tsconfig.json               # TypeScript config
