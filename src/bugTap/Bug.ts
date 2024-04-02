@@ -1,9 +1,9 @@
-import { BoundingBox, Entity, Sprite } from "../engine";
+import { BoundingBox, Entity, Sprite, filterObjectsByType } from "../engine";
 
 import Food from "./Food";
 
 /**
- * Representing the state of a bug.
+ * Representing the state of a Bug.
  */
 enum State {
   ALIVE,
@@ -12,6 +12,9 @@ enum State {
 }
 
 /**
+ * The Bug entity in the BugTap game. Bugs move around the canvas and can be
+ * tapped by the player to earn points. They move towards and eat nearby food.
+ *
  * @author Salinder Sidhu
  */
 export default class Bug extends Entity {
@@ -21,8 +24,6 @@ export default class Bug extends Entity {
   private _state: State = State.ALIVE;
   private _opacity: number = 1;
   private _fadeSpeed: number = 0.7;
-
-  private _food: Food[] = [];
 
   private _spawnX: number = 0;
   private _spawnY: number = 0;
@@ -42,9 +43,9 @@ export default class Bug extends Entity {
    * @param width The width of the bug.
    * @param spriteSrc The URL of the sprite image for rendering.
    * @param speed The speed of the bug.
-   * @param food An array of Food objects for interaction.
+   * @param points
    * @param numFrames The number of frames in the animated sprite.
-   * @param initFrame The initial frame index of the animated sprite (default is 0).
+   * @param initFrame The initial frame of the animated sprite (default is 0).
    */
   constructor(
     canvas: HTMLCanvasElement,
@@ -56,7 +57,6 @@ export default class Bug extends Entity {
     spriteSrc: string,
     speed: number,
     points: number,
-    food: Food[],
     numFrames: number,
     initFrame: number = 0
   ) {
@@ -72,8 +72,6 @@ export default class Bug extends Entity {
     );
     this._speed = speed;
 
-    this._food = food;
-
     this._spawnX = x;
     this._spawnY = y;
 
@@ -86,17 +84,23 @@ export default class Bug extends Entity {
    * Update the bug's movement and behaviour.
    *
    * @param fps The frames per second.
+   * @param entities
    */
-  update(fps: number) {
+  update(fps: number, entities: Entity[]) {
     this._handleDeath(fps);
+
+    // Filter out eaten food
+    const food = filterObjectsByType(entities, Food).filter(
+      (food) => !food.isEaten()
+    );
 
     if (this._state === State.DEAD) {
       return;
     }
 
     this._sprite.update(fps);
-    this._handleMovement();
-    this._handleEatingFood();
+    this._handleMovement(food);
+    this._handleEatingFood(food);
     this._handleFleeing(fps);
   }
 
@@ -174,31 +178,29 @@ export default class Bug extends Entity {
   /**
    * Update the bug's movement based on food availability. If there's no food,
    * the bug flee back to its spawn point.
+   *
+   * @param food An array of Food objects.
    */
-  private _handleMovement() {
-    if (this._food.length < 1) {
+  private _handleMovement(food: Food[]) {
+    if (food.length < 1) {
       this._state = State.FLEEING;
       this._fadeSpeed = 1.3;
       this._moveToPoint(this._spawnX, this._spawnY);
       return;
     }
-    this._moveToFood(this._food);
+    this._moveToFood(food);
   }
 
   /**
    * Update the bug's interaction with food. If the bug overlaps with any
    * food, it eats the food.
+   *
+   * @param food An array of Food objects.
    */
-  private _handleEatingFood() {
-    for (const _food of this._food) {
+  private _handleEatingFood(food: Food[]) {
+    for (const _food of food) {
       if (_food.boundingBox.isOverlapping(this.boundingBox)) {
         _food.eaten();
-
-        // Remove the eaten food from the array
-        const index = this._food.indexOf(_food);
-        if (index >= 0) {
-          this._food.splice(index, 1);
-        }
       }
     }
   }

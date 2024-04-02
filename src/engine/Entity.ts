@@ -10,9 +10,18 @@ export default abstract class Entity {
   protected context: CanvasRenderingContext2D;
 
   private _isPausable: boolean;
-  private _canDelete: boolean;
   private _drawPriority: number;
 
+  private _delete: boolean = false;
+
+  /**
+   * Create a new Entity instance.
+   *
+   * @param canvas The HTML canvas element for rendering.
+   * @param context The 2D rendering context of the canvas.
+   * @param drawPriority The priority for rendering the entity (default is 0).
+   * @param isPausable Indicates if the entity is pausable (default is true).
+   */
   constructor(
     canvas: HTMLCanvasElement,
     context: CanvasRenderingContext2D,
@@ -21,8 +30,8 @@ export default abstract class Entity {
   ) {
     this.canvas = canvas;
     this.context = context;
+
     this._isPausable = isPausable;
-    this._canDelete = false;
     this._drawPriority = drawPriority;
   }
 
@@ -31,8 +40,9 @@ export default abstract class Entity {
    *
    * @abstract
    * @param fps The current frames per second.
+   * @param entities
    */
-  abstract update(fps: number): void;
+  abstract update(fps: number, entities: Entity[]): void;
 
   /**
    * Abstract function that renders the Entity.
@@ -45,16 +55,16 @@ export default abstract class Entity {
    * Flag the Entity to be deleted.
    */
   delete() {
-    this._canDelete = true;
+    this._delete = true;
   }
 
   /**
-   * Indicate if the Entity can be deleted.
+   * Indicate if the Entity is deleted.
    *
-   * @returns True if the Entity can be deleted, otherwise false.
+   * @returns True if the Entity is deleted, otherwise false.
    */
-  canDelete() {
-    return this._canDelete;
+  isDeleted() {
+    return this._delete;
   }
 
   /**

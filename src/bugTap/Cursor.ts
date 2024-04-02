@@ -9,7 +9,7 @@ import { Entity } from "../engine";
 export default class Cursor extends Entity {
   private _x: number = 0;
   private _y: number = 0;
-  private _radius: number;
+  private _radius: number = 15;
 
   /**
    * Creates a new Cursor instance.
@@ -20,43 +20,34 @@ export default class Cursor extends Entity {
   constructor(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D) {
     super(canvas, context, 1, false);
 
-    this._radius = 15;
     this._bindMouseMoveListeners();
 
     // Hide the default cursor
     this.canvas.style.cursor = "none";
   }
 
-  private _handleMouseMove = (event: MouseEvent) => {
+  /**
+   * Binds mouse move event listeners to the canvas.
+   */
+  private _bindMouseMoveListeners() {
+    this.canvas.addEventListener("mouseenter", this._updateCursorPosition);
+    this.canvas.addEventListener("mousemove", this._updateCursorPosition);
+  }
+
+  /**
+   * Updates the cursor position based on the mouse event.
+   *
+   * @param event The mouse event.
+   */
+  private _updateCursorPosition = (event: MouseEvent) => {
     this._x = event.offsetX;
     this._y = event.offsetY;
   };
 
-  private _bindMouseMoveListeners() {
-    this.canvas.addEventListener("mouseenter", this._handleMouseMove);
-    this.canvas.addEventListener("mousemove", this._handleMouseMove);
-  }
-
-  private _unbindMouseMoveListeners() {
-    this.canvas.removeEventListener("mouseenter", this._handleMouseMove);
-    this.canvas.removeEventListener("mousemove", this._handleMouseMove);
-  }
-
-  /**
-   * Delete the cursor instance and unbind the mouse event listeners.
-   */
-  delete() {
-    this._unbindMouseMoveListeners();
-
-    super.delete();
-  }
-
   /**
    * Update the cursor's state (not implemented).
-   *
-   * @param fps The current frames per second.
    */
-  update(_: number) {}
+  update() {}
 
   /**
    * Render the cursor on the canvas.

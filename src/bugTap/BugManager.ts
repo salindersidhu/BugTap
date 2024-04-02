@@ -1,27 +1,25 @@
 import { EntityFactory, getRandomItem, getRandomNumber } from "../engine";
 
 import Bug from "./Bug";
-import Food from "./Food";
 
 const RED_BUG: string = "./assets/graphics/bug_red.png";
 const ORANGE_BUG: string = "./assets/graphics/bug_orange.png";
 const GREY_BUG: string = "./assets/graphics/bug_grey.png";
 
 /**
- * Interface representing data structure for bug properties.
+ * Interface representing the data structure for a Bug's properties.
  */
-interface BugData {
+interface BugProps {
   points: number;
   speed: number;
   spriteSrc: string;
 }
 
-const numBugFrames = 2;
+const BUG_HEIGHT: number = 50;
+const BUG_WIDTH: number = 45;
+const NUMBER_OF_BUG_FRAMES: number = 2;
 
-const bugHeight = 50;
-const bugWidth = 45;
-
-const bugData: BugData[] = [
+const bugProps: BugProps[] = [
   { points: 1, speed: 3, spriteSrc: RED_BUG },
   { points: 3, speed: 5, spriteSrc: ORANGE_BUG },
   { points: 5, speed: 8, spriteSrc: GREY_BUG },
@@ -33,12 +31,11 @@ const bugData: BugData[] = [
  * @author Salinder Sidhu
  */
 export default class BugManager {
-  private static instance: BugManager;
-  private bugFactory: EntityFactory<Bug>;
-  private _food: Food[] = [];
+  private static _instance: BugManager;
+  private _bugFactory: EntityFactory<Bug>;
 
   /**
-   * Creates an instance of BugManager.
+   * Create an instance of BugManager.
    *
    * @param canvas The HTMLCanvasElement for rendering.
    * @param context The CanvasRenderingContext2D for drawing.
@@ -47,7 +44,7 @@ export default class BugManager {
     canvas: HTMLCanvasElement,
     context: CanvasRenderingContext2D
   ) {
-    this.bugFactory = new EntityFactory<Bug>(
+    this._bugFactory = new EntityFactory<Bug>(
       canvas,
       context,
       (
@@ -72,7 +69,6 @@ export default class BugManager {
           spriteSrc,
           speed,
           points,
-          this._food,
           numFrames
         );
       }
@@ -90,46 +86,37 @@ export default class BugManager {
     canvas: HTMLCanvasElement,
     context: CanvasRenderingContext2D
   ): BugManager {
-    if (!BugManager.instance) {
-      BugManager.instance = new BugManager(canvas, context);
+    if (!BugManager._instance) {
+      BugManager._instance = new BugManager(canvas, context);
     }
-    return BugManager.instance;
+    return BugManager._instance;
   }
 
   /**
-   * Receive an array of Food for bug interaction.
-   *
-   * @param food An array of Food to be assigned to the BugManager.
-   */
-  public receiveFood(food: Food[]) {
-    this._food = food;
-  }
-
-  /**
-   * Spawn a new Bug.
+   * Spawn a Bug.
    *
    * @param canvas - The HTMLCanvasElement for rendering.
    * @returns The newly spawned Bug.
    */
   public spawn(canvas: HTMLCanvasElement): Bug {
-    const selectedBugData = getRandomItem(bugData)!;
+    const bugProp = getRandomItem(bugProps)!;
 
     // Define arrays to store possible coordinates for each side
     const topSideCoordinates = [
-      getRandomNumber(0, canvas.width - bugWidth),
-      -bugHeight,
+      getRandomNumber(0, canvas.width - BUG_WIDTH),
+      -BUG_HEIGHT,
     ];
     const rightSideCoordinates = [
       canvas.width,
-      getRandomNumber(0, canvas.height - bugHeight),
+      getRandomNumber(0, canvas.height - BUG_HEIGHT),
     ];
     const bottomSideCoordinates = [
-      getRandomNumber(0, canvas.width - bugWidth),
+      getRandomNumber(0, canvas.width - BUG_WIDTH),
       canvas.height,
     ];
     const leftSideCoordinates = [
-      -bugWidth,
-      getRandomNumber(0, canvas.height - bugHeight),
+      -BUG_WIDTH,
+      getRandomNumber(0, canvas.height - BUG_HEIGHT),
     ];
 
     // Define an array to store possible side coordinate pairs
@@ -140,21 +127,18 @@ export default class BugManager {
       leftSideCoordinates,
     ];
 
-    // Choose a random side
-    const side = getRandomNumber(0, 3); // 0: top, 1: right, 2: bottom, 3: left
+    const [x, y] = sideCoordinates[getRandomNumber(0, 3)];
+    const { spriteSrc, speed, points } = bugProp;
 
-    // Select coordinates based on the chosen side
-    const [x, y] = sideCoordinates[side];
-
-    return this.bugFactory.createEntity(
+    return this._bugFactory.createEntity(
       x,
       y,
-      bugHeight,
-      bugWidth,
-      selectedBugData.spriteSrc,
-      selectedBugData.speed,
-      selectedBugData.points,
-      numBugFrames
+      BUG_HEIGHT,
+      BUG_WIDTH,
+      spriteSrc,
+      speed,
+      points,
+      NUMBER_OF_BUG_FRAMES
     );
   }
 }

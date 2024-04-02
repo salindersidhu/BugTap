@@ -70,3 +70,23 @@ export function formatSeconds(seconds: number): string {
     remainingSeconds < 10 ? `0${remainingSeconds}` : remainingSeconds;
   return `${minutes}:${paddedSeconds}`;
 }
+
+/**
+ * Returns objects of a specific type from an array.
+ *
+ * @template T The type of objects to fetch.
+ * @param array The array of objects to filter.
+ * @param type The constructor representing the type of objects.
+ * @returns An array of objects of the specified type.
+ */
+export function filterObjectsByType<T>(
+  array: any[] | undefined,
+  type: new (...args: any[]) => T
+): T[] {
+  // Check if array is defined and is an array
+  if (!Array.isArray(array)) {
+    return [];
+  }
+
+  return array.filter((item) => item instanceof type) as T[];
+}

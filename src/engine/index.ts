@@ -7,6 +7,7 @@ import Text from "./Text";
 
 import {
   clearStore,
+  filterObjectsByType,
   formatSeconds,
   getFromStore,
   getRandomItem,
@@ -23,6 +24,7 @@ export {
   Sprite,
   Text,
   clearStore,
+  filterObjectsByType,
   formatSeconds,
   getFromStore,
   getRandomItem,

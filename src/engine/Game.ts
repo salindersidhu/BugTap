@@ -15,14 +15,15 @@ enum State {
  * @author Salinder Sidhu
  */
 export default class Game {
-  protected canvas: HTMLCanvasElement;
-  protected context: CanvasRenderingContext2D;
-
-  protected fps: number = 0;
   protected debug: boolean = false;
 
-  private _entities: Entity[] = [];
+  protected canvas: HTMLCanvasElement;
+  protected context: CanvasRenderingContext2D;
+  protected entities: Entity[] = [];
+
+  private _fps: number = 0;
   private _state: State = State.STOPPED;
+
   private _lastFrameTime = performance.now();
   private _frameCount = 0;
 
@@ -49,7 +50,7 @@ export default class Game {
    * @param entity The Entity instance to add to the game.
    */
   protected addEntity(entity: Entity) {
-    this._entities.push(entity);
+    this.entities.push(entity);
   }
 
   /**
@@ -58,37 +59,14 @@ export default class Game {
    * @param entities An array of Entity instances to add to the game.
    */
   protected addEntities(entities: Entity[]) {
-    this._entities.push(...entities);
-  }
-
-  /**
-   * Return all Entity instances added to the game.
-   *
-   * @returns A collection of all Entity instances added to the game.
-   */
-  protected getEntities(): Entity[] {
-    return this._entities;
-  }
-
-  /**
-   * Return all Entity instances, of a specific type, added to the game.
-   *
-   * @template T The type of Entity instances to fetch.
-   * @param type The constructor representing the type of Entity instances.
-   * @returns A collection of all Entity instances, of the specified type,
-   * added to the game.
-   */
-  protected getEntitiesOfType<T extends Entity>(type: {
-    new (...args: any[]): T;
-  }): T[] {
-    return this._entities.filter((entity) => entity instanceof type) as T[];
+    this.entities.push(...entities);
   }
 
   /**
    * Removes all Entity instances from the game.
    */
-  clearAllEntities() {
-    this._entities = [];
+  protected clearAllEntities() {
+    this.entities = [];
   }
 
   /**
@@ -164,22 +142,23 @@ export default class Game {
    */
   private _loop = () => {
     this._updateFps();
-    this._update(this.fps);
+    this._update(this._fps, this.entities);
     this._render();
 
     requestAnimationFrame(this._loop);
   };
 
   /**
-   * Update all Entity insstances based on the current state of the game and
+   * Update all Entity instances based on the current state of the game and
    * the frames per second. If the game is stopped or if a pausable Entity is
    * paused, it will not be updated. Each Entity's update method is called,
    * and if it can be deleted, it will be removed from the game.
    *
    * @param fps The current frames per second.
+   * @param entities An array of Entity instances to update.
    */
-  private _update(fps: number) {
-    this._entities.forEach((entity) => {
+  private _update(fps: number, entities: Entity[]) {
+    this.entities.forEach((entity) => {
       if (
         this._state === State.STOPPED ||
         (entity.isPausable() && this._state === State.PAUSED)
@@ -187,8 +166,8 @@ export default class Game {
         return;
       }
 
-      entity.update(fps);
-      if (entity.canDelete()) {
+      entity.update(fps, entities);
+      if (entity.isDeleted()) {
         this._deleteEntity(entity);
       }
     });
@@ -199,7 +178,7 @@ export default class Game {
    */
   private _render() {
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    this._entities
+    this.entities
       .sort(this._sortEntitiesByDrawPriority)
       .forEach((entity) => entity.render());
 
@@ -210,8 +189,8 @@ export default class Game {
       this.context.fillStyle = "black";
       this.context.font = "bold 18px Arial";
       this.context.fillText(`Debug: True`, 10, 20);
-      this.context.fillText(`FPS: ${this.fps}`, 10, 40);
-      this.context.fillText(`Entities: ${this._entities.length}`, 10, 60);
+      this.context.fillText(`FPS: ${this._fps}`, 10, 40);
+      this.context.fillText(`Entities: ${this.entities.length}`, 10, 60);
 
       this.context.restore();
     }
@@ -227,7 +206,7 @@ export default class Game {
 
     this._frameCount++;
 
-    this.fps = Math.round((this._frameCount * 1000) / deltaTime);
+    this._fps = Math.round((this._frameCount * 1000) / deltaTime);
     this._frameCount = 0;
     this._lastFrameTime = currentTime;
   }
@@ -238,7 +217,7 @@ export default class Game {
    * @param targetEntity The Entity to delete.
    */
   private _deleteEntity(targetEntity: Entity) {
-    this._entities = this._entities.filter((entity) => entity !== targetEntity);
+    this.entities = this.entities.filter((entity) => entity !== targetEntity);
   }
 
   /**

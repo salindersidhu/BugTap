@@ -32,10 +32,8 @@ export default class Level extends Entity {
 
   /**
    * Update the Level's state (not implemented).
-   *
-   * @param fps The current frames per second.
    */
-  update(_: number) {}
+  update() {}
 
   /**
    * Render the background for the Level.

@@ -16,9 +16,9 @@ export default class Point extends Entity {
 
   private _x: number;
   private _y: number;
-  private _moveSpeed: number;
-  private _fadeSpeed: number;
-  private _opacity: number;
+  private _moveSpeed: number = 60;
+  private _fadeSpeed: number = 1;
+  private _opacity: number = 1;
 
   private _soundPoint: Howl;
 
@@ -30,30 +30,18 @@ export default class Point extends Entity {
    * @param points The number of points to display.
    * @param x The x-coordinate of the point.
    * @param y The y-coordinate of the point.
-   * @param moveSpeed The speed at which the point moves vertically in pixels
-   * per second (default is 60).
-   * @param fadeSpeed The speed at which the point fades out in opacity per
-   * second (default is 1).
-   * @param opacity The initial opacity of the point (default is 1).
    */
   constructor(
     canvas: HTMLCanvasElement,
     context: CanvasRenderingContext2D,
     points: number,
     x: number,
-    y: number,
-    moveSpeed: number = 60,
-    fadeSpeed: number = 1,
-    opacity: number = 1
+    y: number
   ) {
     super(canvas, context);
 
     this._x = x;
     this._y = y;
-
-    this._moveSpeed = moveSpeed;
-    this._fadeSpeed = fadeSpeed;
-    this._opacity = opacity;
 
     this._text = new Text(
       `+${points}`,
@@ -73,12 +61,13 @@ export default class Point extends Entity {
   }
 
   /**
-   * Update the position and opacity of the point object.
+   * Update the state of the point.
    *
    * @param fps The current frames per second.
    */
   update(fps: number) {
     this._y -= this._moveSpeed / fps;
+
     this._opacity -= 1 / (fps * this._fadeSpeed);
     if (this._opacity < 0) {
       this.delete();
