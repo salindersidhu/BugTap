@@ -29,9 +29,6 @@ const MIN_SPAWN_INTERVAL: number = 800;
  * @author Salinder Sidhu
  */
 export default class BugTap extends Game {
-  private bugManager: BugManager;
-  private foodManager: FoodManager;
-
   private _time: number = 0;
   private _score: number = 0;
 
@@ -46,9 +43,6 @@ export default class BugTap extends Game {
    */
   constructor(canvasId: string) {
     super(canvasId);
-
-    this.bugManager = BugManager.getInstance(this.canvas, this.context);
-    this.foodManager = FoodManager.getInstance(this.canvas, this.context);
 
     this._initEventHandlers();
   }
@@ -159,7 +153,8 @@ export default class BugTap extends Game {
     this.clearAllEntities();
 
     // Create food, Level, Cursor and Countdown
-    const food = this.foodManager.generate(AMOUNT_OF_FOOD);
+    const foodManager = FoodManager.getInstance(this.canvas, this.context);
+    const food = foodManager.generate(AMOUNT_OF_FOOD);
     const level = new Level(this.canvas, this.context);
     const cursor = new Cursor(this.canvas, this.context);
     const countdown = new Countdown(this.canvas, this.context, COUNTDOWN);
@@ -201,6 +196,8 @@ export default class BugTap extends Game {
    * Spawn bugs at random times.
    */
   private _handleSpawningBugs() {
+    const bugManager = BugManager.getInstance(this.canvas, this.context);
+
     const spawnBugs = () => {
       const numFood = filterObjectsByType(this.entities, Food).length;
 
@@ -212,7 +209,7 @@ export default class BugTap extends Game {
         Array(numBugsToSpawn)
           .fill(null)
           .forEach(() => {
-            const bug = this.bugManager.spawn(this.canvas);
+            const bug = bugManager.spawn(this.canvas);
             this.addEntity(bug);
           });
       }
