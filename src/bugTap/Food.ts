@@ -1,6 +1,6 @@
 import { Howl } from "howler";
 
-import { BoundingBox, GameObject, Sprite } from "../engine";
+import { BoundingBox, Entity, Sprite } from "../engine";
 
 const SOUND_EAT_FOOD: string = "./assets/sound/eat.ogg";
 
@@ -13,20 +13,21 @@ enum State {
 }
 
 /**
- * Represents a food item in the game.
+ * Represents a Food in the BugTap game. When Food is eaten, it will gradually
+ * fade out.
  *
  * @author Salinder Sidhu
  */
-export default class Food extends GameObject {
+export default class Food extends Entity {
   private _sprite: Sprite;
 
   private _state: State = State.ACTIVE;
   private _opacity: number = 1;
   private _fadeSpeed: number = 0.7;
 
-  boundingBox: BoundingBox;
-
   private _soundEatFood: Howl;
+
+  boundingBox: BoundingBox;
 
   /**
    * Creates a new Food instance.
@@ -38,7 +39,7 @@ export default class Food extends GameObject {
    * @param height The height of the food item.
    * @param width The width of the food item.
    * @param spriteSrc The URL of the sprite image for rendering.
-   * @param initFrame The initial frame index of the sprite animation.
+   * @param initFrame The initial frame of the animated sprite.
    */
   constructor(
     canvas: HTMLCanvasElement,
@@ -67,7 +68,14 @@ export default class Food extends GameObject {
    * @param fps The frames per second.
    */
   update(fps: number) {
-    this._updateEaten(fps);
+    if (this._state === State.ACTIVE) {
+      return;
+    }
+
+    this._opacity -= 1 / (fps * this._fadeSpeed);
+    if (this._opacity < 0) {
+      this.delete();
+    }
   }
 
   /**
@@ -82,22 +90,20 @@ export default class Food extends GameObject {
    * Mark the food item as eaten and play the sound effect for eating food.
    */
   eaten() {
+    if (this._state === State.EATEN) {
+      return;
+    }
+
     this._soundEatFood.play();
     this._state = State.EATEN;
   }
 
   /**
-   * Update the state of the food item when it has been eaten. Gradually
-   * reduce the opacity of the food item until it fades out completely.
+   * Indicate if the Food has been eaten.
    *
-   * @param fps The frames per second.
+   * @returns True if the Food has been eaten, otherwise false.
    */
-  private _updateEaten(fps: number) {
-    if (this._state === State.EATEN) {
-      this._opacity -= 1 / (fps * this._fadeSpeed);
-      if (this._opacity < 0) {
-        this.delete();
-      }
-    }
+  isEaten() {
+    return this._state === State.EATEN;
   }
 }

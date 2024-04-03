@@ -1,4 +1,9 @@
-import { Game, formatSeconds, getRandomNumber } from "../engine";
+import {
+  Game,
+  filterObjectsByType,
+  formatSeconds,
+  getRandomNumber,
+} from "../engine";
 
 import Bug from "./Bug";
 import Cursor from "./Cursor";
@@ -11,34 +16,33 @@ import BugManager from "./BugManager";
 import FoodManager from "./FoodManager";
 
 const AMOUNT_OF_FOOD: number = 10;
-const COUNTDOWN_SECONDS: number = 3;
+const COUNTDOWN: number = 3;
 const MAX_BUGS_TO_SPAWN: number = 3;
 const MAX_SPAWN_INTERVAL: number = 1500;
 const MIN_BUGS_TO_SPAWN: number = 1;
 const MIN_SPAWN_INTERVAL: number = 800;
 
 /**
+ * Represents the BugTap game, a simple clicker game where the player taps on
+ * bugs to earn points before they eat all of the food.
+ *
  * @author Salinder Sidhu
  */
 export default class BugTap extends Game {
-  private bugManager: BugManager;
-  private foodManager: FoodManager;
-
   private _time: number = 0;
   private _score: number = 0;
 
   private _bugSpawnTimeout: NodeJS.Timeout | null = null;
   private _timeElapsedTimeout: NodeJS.Timeout | null = null;
 
+  /**
+   * Create a new BugTap Game instance.
+   *
+   * @param canvasId The id of the HTML canvas element used for rendering the
+   * game.
+   */
   constructor(canvasId: string) {
     super(canvasId);
-
-    this.bugManager = BugManager.getInstance(this.canvas, this.context);
-    this.foodManager = FoodManager.getInstance(this.canvas, this.context);
-
-    const level = new Level(this.canvas, this.context);
-    const cursor = new Cursor(this.canvas, this.context);
-    this.addGameObjects([level, cursor]);
 
     this._initEventHandlers();
   }
@@ -48,27 +52,29 @@ export default class BugTap extends Game {
    */
   private _initEventHandlers() {
     document.addEventListener("keydown", (event: KeyboardEvent) => {
-      if (event.code === "Space") {
-        this._pauseButtonOnClick();
+      if (event.code !== "Space") {
+        return;
       }
+
+      this._pauseButton__OnClick();
     });
 
     const button = document.getElementById("pause-resume-button");
-    button?.addEventListener("click", this._pauseButtonOnClick);
+    button?.addEventListener("click", this._pauseButton__OnClick);
 
     const startButton = document.getElementById("start-button");
-    startButton?.addEventListener("click", this._startButtonOnClick);
+    startButton?.addEventListener("click", this._startButton__OnClick);
 
     const restartButton = document.getElementById("restart-button");
-    restartButton?.addEventListener("click", this._restartGameOnClick);
+    restartButton?.addEventListener("click", this._restartGame__OnClick);
 
-    this.canvas.addEventListener("mousedown", this._canvasOnClick);
+    this.canvas.addEventListener("mousedown", this._canvas__OnClick);
   }
 
   /**
    * Handle event when restart game button is clicked.
    */
-  private _restartGameOnClick = () => {
+  private _restartGame__OnClick = () => {
     const gameOverSection = document.getElementById("score-section");
     const gameSection = document.getElementById("game-section");
     gameOverSection?.classList.add("hidden");
@@ -80,7 +86,7 @@ export default class BugTap extends Game {
   /**
    * Handle event when the start button is clicked.
    */
-  private _startButtonOnClick = () => {
+  private _startButton__OnClick = () => {
     const welcomeSection = document.getElementById("welcome-section");
     const gameSection = document.getElementById("game-section");
     welcomeSection?.classList.add("hidden");
@@ -92,7 +98,7 @@ export default class BugTap extends Game {
   /**
    * Handle event when the pause button is clicked.
    */
-  private _pauseButtonOnClick = () => {
+  private _pauseButton__OnClick = () => {
     this.isPaused() ? this.resume() : this.pause();
 
     const button = document.getElementById("pause-resume-button");
@@ -105,26 +111,27 @@ export default class BugTap extends Game {
 
   /**
    * Handle event when the game canvas is clicked.
+   *
+   * @param event The MouseEvent representing the click event on the game
+   * canvas.
    */
-  private _canvasOnClick = (event: MouseEvent) => {
-    const numFood = this.getGameObjectsOfType(Food).length;
-
+  private _canvas__OnClick = (event: MouseEvent) => {
+    const numFood = filterObjectsByType(this.entities, Food).length;
     if (!this.isRunning() || numFood < 1) {
       return;
     }
 
-    for (const bug of this.getGameObjectsOfType(Bug)) {
-      if (!bug.boundingBox.isOverlappingPoint(event.offsetX, event.offsetY)) {
-        continue;
-      }
-
-      if (!bug.isAlive()) {
+    const bugs = filterObjectsByType(this.entities, Bug);
+    for (const bug of bugs) {
+      if (
+        !bug.boundingBox.isOverlappingPoint(event.offsetX, event.offsetY) ||
+        !bug.isAlive()
+      ) {
         continue;
       }
 
       const points = bug.getPoints();
-      this._score += points;
-      this._setScore(this._score);
+      this._setScore(this._score + points);
 
       const point = new Point(
         this.canvas,
@@ -133,7 +140,7 @@ export default class BugTap extends Game {
         bug.boundingBox.x,
         bug.boundingBox.y
       );
-      this.addGameObject(point);
+      this.addEntity(point);
 
       bug.setDead();
     }
@@ -143,44 +150,56 @@ export default class BugTap extends Game {
    * Reset the game.
    */
   private _restartGame() {
-    // Create a countdown
-    const countdown = new Countdown(
-      this.canvas,
-      this.context,
-      COUNTDOWN_SECONDS
-    );
-    this.addGameObject(countdown);
+    this.clearAllEntities();
 
-    // Start the game and initalize food
+    // Create food, Level, Cursor and Countdown
+    const foodManager = FoodManager.getInstance(this.canvas, this.context);
+    const food = foodManager.generate(AMOUNT_OF_FOOD);
+    const level = new Level(this.canvas, this.context);
+    const cursor = new Cursor(this.canvas, this.context);
+    const countdown = new Countdown(this.canvas, this.context, COUNTDOWN);
+    this.addEntities([level, cursor, countdown, ...food]);
+
     this.start();
-    this._initFood();
 
     // Reset the time elapsed and score
     this._setTime(0);
     this._setScore(0);
 
-    const checkCountdown = () => {
-      const numCountdown = this.getGameObjectsOfType(Countdown).length;
-      if (numCountdown < 1) {
-        // Start game handlers after the countdown
-        this._handleBugSpawn();
-        this._handleTimeElapsed();
-        this._handleGameOver();
+    // Start game handlers when the countdown is completed
+    this._checkCountdown();
+  }
 
-        return;
-      }
-      setTimeout(checkCountdown, 100);
-    };
+  /**
+   * Check if the countdown has completed, then start the game handlers.
+   */
+  private _checkCountdown = () => {
+    const numCountdown = filterObjectsByType(this.entities, Countdown).length;
+    if (numCountdown < 1) {
+      this._initGameHandlers();
+      return;
+    }
+    setTimeout(this._checkCountdown, 100);
+  };
 
-    checkCountdown();
+  /**
+   * Initialize the game handlers including bug spawning, time elapsed tracking
+   * and game over detection.
+   */
+  private _initGameHandlers() {
+    this._handleSpawningBugs();
+    this._handleTimeElapsed();
+    this._handleGameOver();
   }
 
   /**
    * Spawn bugs at random times.
    */
-  private _handleBugSpawn() {
-    const bugSpawn = () => {
-      const numFood = this.getGameObjectsOfType(Food).length;
+  private _handleSpawningBugs() {
+    const bugManager = BugManager.getInstance(this.canvas, this.context);
+
+    const spawnBugs = () => {
+      const numFood = filterObjectsByType(this.entities, Food).length;
 
       if (this.isRunning() && numFood > 0) {
         const numBugsToSpawn = getRandomNumber(
@@ -190,8 +209,8 @@ export default class BugTap extends Game {
         Array(numBugsToSpawn)
           .fill(null)
           .forEach(() => {
-            const bug = this.bugManager.spawn(this.canvas);
-            this.addGameObject(bug);
+            const bug = bugManager.spawn(this.canvas);
+            this.addEntity(bug);
           });
       }
 
@@ -199,26 +218,24 @@ export default class BugTap extends Game {
         MIN_SPAWN_INTERVAL,
         MAX_SPAWN_INTERVAL
       );
-      this._bugSpawnTimeout = setTimeout(bugSpawn, spawnInterval);
+      this._bugSpawnTimeout = setTimeout(spawnBugs, spawnInterval);
     };
 
-    bugSpawn();
+    spawnBugs();
   }
 
   /**
    * Handle the time elapsed counter.
    */
   private _handleTimeElapsed() {
-    const numFood = this.getGameObjectsOfType(Food).length;
-
     const timeElapsed = () => {
+      const numFood = filterObjectsByType(this.entities, Food).length;
       if (numFood < 1) {
         return;
       }
 
       if (!this.isPaused()) {
-        this._time++;
-        this._setTime(this._time);
+        this._setTime(this._time + 1);
       }
 
       this._timeElapsedTimeout = setTimeout(timeElapsed, 1000);
@@ -228,57 +245,56 @@ export default class BugTap extends Game {
   }
 
   /**
-   * Handle when the game is over. Game over occurs when there is no food on the
-   * table and all the bugs have fled.
+   * Handle when the game is over. Game over occurs when there is no food on
+   * the table and all the bugs have fled.
    */
   private _handleGameOver() {
+    // Recursive function to check and handle game over
+    const checkAndHandleGameOver = () => {
+      const numBugs = filterObjectsByType(this.entities, Bug).length;
+      const numFood = filterObjectsByType(this.entities, Food).length;
+
+      if (this.isRunning() && numFood < 1 && numBugs < 1) {
+        this._gameOverActions();
+        return;
+      }
+      setTimeout(checkAndHandleGameOver, 1000);
+    };
+
+    // Start checking for game over
+    checkAndHandleGameOver();
+  }
+
+  /**
+   * Define the actions to be taken when the game is over.
+   */
+  private _gameOverActions = () => {
     const time = document.getElementById("game-over-time");
     const score = document.getElementById("game-over-score");
-
     const gameSection = document.getElementById("game-section");
     const gameOverSection = document.getElementById("score-section");
 
-    const gameOver = () => {
-      const numBugs = this.getGameObjectsOfType(Bug).length;
-      const numFood = this.getGameObjectsOfType(Food).length;
+    gameSection?.classList.add("hidden");
+    gameOverSection?.classList.remove("hidden");
 
-      if (this.isRunning() && numFood < 1 && numBugs < 1) {
-        gameSection?.classList.add("hidden");
-        gameOverSection?.classList.remove("hidden");
+    time!.innerHTML = formatSeconds(this._time);
+    score!.innerHTML = this._score.toString();
 
-        time!.innerHTML = formatSeconds(this._time);
-        score!.innerHTML = this._score.toString();
+    this.stop();
 
-        this.stop();
-
-        if (this._bugSpawnTimeout !== null) {
-          clearTimeout(this._bugSpawnTimeout);
-          this._bugSpawnTimeout = null;
-        }
-        if (this._timeElapsedTimeout !== null) {
-          clearTimeout(this._timeElapsedTimeout);
-          this._timeElapsedTimeout = null;
-        }
-
-        return;
-      }
-      setTimeout(gameOver, 1000);
-    };
-
-    gameOver();
-  }
+    if (this._bugSpawnTimeout !== null) {
+      clearTimeout(this._bugSpawnTimeout);
+      this._bugSpawnTimeout = null;
+    }
+    if (this._timeElapsedTimeout !== null) {
+      clearTimeout(this._timeElapsedTimeout);
+      this._timeElapsedTimeout = null;
+    }
+  };
 
   /**
-   * Create food spread randomly near the center of the table.
-   */
-  private _initFood() {
-    const food = this.foodManager.generate(AMOUNT_OF_FOOD);
-    this.bugManager.receiveFood(food);
-    this.addGameObjects(food);
-  }
-
-  /**
-   * Set the game time to the specified value and update the displayed game time.
+   * Set the game time to the specified value and update the displayed game
+   * time.
    *
    * @param time The new game time value.
    */

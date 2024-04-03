@@ -1,13 +1,12 @@
-import { BoundingBox, GameObjectFactory, getRandomNumber } from "../engine";
+import { BoundingBox, EntityFactory, getRandomNumber } from "../engine";
 
 import Food from "./Food";
 
 const foodSprite = "./assets/graphics/food.png";
 
-const numFoodFrames = 16;
-
-const foodHeight = 56;
-const foodWidth = 56;
+const FOOD_HEIGHT: number = 56;
+const FOOD_WIDTH: number = 56;
+const NUMBER_OF_FOOD_FRAMES: number = 16;
 
 /**
  * The FoodManager class handles the creation and management of food objects
@@ -16,8 +15,8 @@ const foodWidth = 56;
  * @author Salinder Sidhu
  */
 export default class FoodManager {
-  private static instance: FoodManager;
-  private foodFactory: GameObjectFactory<Food>;
+  private static _instance: FoodManager;
+  private _foodFactory: EntityFactory<Food>;
 
   /**
    * Creates an instance of FoodManager.
@@ -29,7 +28,7 @@ export default class FoodManager {
     canvas: HTMLCanvasElement,
     context: CanvasRenderingContext2D
   ) {
-    this.foodFactory = new GameObjectFactory<Food>(
+    this._foodFactory = new EntityFactory<Food>(
       canvas,
       context,
       (
@@ -67,10 +66,10 @@ export default class FoodManager {
     canvas: HTMLCanvasElement,
     context: CanvasRenderingContext2D
   ): FoodManager {
-    if (!FoodManager.instance) {
-      FoodManager.instance = new FoodManager(canvas, context);
+    if (!FoodManager._instance) {
+      FoodManager._instance = new FoodManager(canvas, context);
     }
-    return FoodManager.instance;
+    return FoodManager._instance;
   }
 
   /**
@@ -81,7 +80,10 @@ export default class FoodManager {
   public generate(amount: number): Food[] {
     const food: Food[] = [];
 
-    let availableFrames = Array.from({ length: numFoodFrames }, (_, i) => i);
+    let availableFrames = Array.from(
+      { length: NUMBER_OF_FOOD_FRAMES },
+      (_, i) => i
+    );
 
     while (food.length < amount) {
       // Generate random coordinates for a food's bounding box
@@ -89,7 +91,7 @@ export default class FoodManager {
       const y = getRandomNumber(100, 444);
 
       // Skip food creation if new food will intersect with any existing food
-      const newBoundingBox = new BoundingBox(x, y, foodWidth, foodHeight);
+      const newBoundingBox = new BoundingBox(x, y, FOOD_WIDTH, FOOD_HEIGHT);
       const isOverlapping = food.some((existingFood) =>
         newBoundingBox.isIntersecting(existingFood.boundingBox)
       );
@@ -99,7 +101,10 @@ export default class FoodManager {
 
       // If all frames have been used, refresh the availableFrames list
       if (availableFrames.length === 0) {
-        availableFrames = Array.from({ length: numFoodFrames }, (_, i) => i);
+        availableFrames = Array.from(
+          { length: NUMBER_OF_FOOD_FRAMES },
+          (_, i) => i
+        );
       }
 
       // Pick a random frame index from available frames list
@@ -107,11 +112,11 @@ export default class FoodManager {
       const frameIndex = availableFrames.splice(randomIndex, 1);
 
       // Create Food
-      const newFood = this.foodFactory.createGameObject(
+      const newFood = this._foodFactory.createEntity(
         x,
         y,
-        foodWidth,
-        foodHeight,
+        FOOD_WIDTH,
+        FOOD_HEIGHT,
         foodSprite,
         frameIndex
       );

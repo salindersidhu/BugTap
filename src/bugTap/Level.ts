@@ -1,4 +1,4 @@
-import { GameObject } from "../engine";
+import { Entity } from "../engine";
 
 const TABLE: string = "./assets/graphics/table.png";
 
@@ -8,7 +8,7 @@ const TABLE: string = "./assets/graphics/table.png";
  *
  * @author Salinder Sidhu
  */
-export default class Level extends GameObject {
+export default class Level extends Entity {
   private _image: HTMLImageElement;
   private _pattern: CanvasPattern | null = null;
   private _isImageLoaded: boolean = false;
@@ -32,10 +32,8 @@ export default class Level extends GameObject {
 
   /**
    * Update the Level's state (not implemented).
-   *
-   * @param fps The current frames per second.
    */
-  update(_: number) {}
+  update() {}
 
   /**
    * Render the background for the Level.

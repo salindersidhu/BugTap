@@ -1,4 +1,4 @@
-import GameObject from "./GameObject";
+import Entity from "./Entity";
 
 /**
  * Enum representing the possible states of the game.
@@ -15,12 +15,15 @@ enum State {
  * @author Salinder Sidhu
  */
 export default class Game {
+  protected debug: boolean = false;
+
   protected canvas: HTMLCanvasElement;
   protected context: CanvasRenderingContext2D;
-  protected fps: number = 0;
+  protected entities: Entity[] = [];
 
-  private _gameObjects: GameObject[] = [];
+  private _fps: number = 0;
   private _state: State = State.STOPPED;
+
   private _lastFrameTime = performance.now();
   private _frameCount = 0;
 
@@ -42,46 +45,28 @@ export default class Game {
   }
 
   /**
-   * Add a GameObject to the game.
+   * Add an Entity to the game.
    *
-   * @param gameObject The GameObject instance to add to the game.
+   * @param entity The Entity instance to add to the game.
    */
-  protected addGameObject(gameObject: GameObject) {
-    this._gameObjects.push(gameObject);
+  protected addEntity(entity: Entity) {
+    this.entities.push(entity);
   }
 
   /**
-   * Add a collection of GameObjects to the game.
+   * Add a collection of Entity instances to the game.
    *
-   * @param gameObjects An array of GameObject instances to add to the game.
+   * @param entities An array of Entity instances to add to the game.
    */
-  protected addGameObjects(gameObjects: GameObject[]) {
-    this._gameObjects.push(...gameObjects);
+  protected addEntities(entities: Entity[]) {
+    this.entities.push(...entities);
   }
 
   /**
-   * Return all GameObject instances added to the game.
-   *
-   * @returns A collection of all GameObject instances added to the game.
+   * Removes all Entity instances from the game.
    */
-  protected getGameObjects(): GameObject[] {
-    return this._gameObjects;
-  }
-
-  /**
-   * Return all GameObject instances, of a specific type, added to the game.
-   *
-   * @template T The type of GameObjects to fetch.
-   * @param type The constructor representing the type of GameObjectsto fetch.
-   * @returns A collection of all GameObject instances, of the specified type,
-   * added to the game.
-   */
-  protected getGameObjectsOfType<T extends GameObject>(type: {
-    new (...args: any[]): T;
-  }): T[] {
-    return this._gameObjects.filter(
-      (gameObject) => gameObject instanceof type
-    ) as T[];
+  protected clearAllEntities() {
+    this.entities = [];
   }
 
   /**
@@ -157,44 +142,58 @@ export default class Game {
    */
   private _loop = () => {
     this._updateFps();
-    this._update(this.fps);
+    this._update(this._fps, this.entities);
     this._render();
 
     requestAnimationFrame(this._loop);
   };
 
   /**
-   * Update all GameObjects based on the current state of the game and the
-   * frames per second. If the game is stopped or if a pausable GameObject is
-   * paused, it will not be updated. Each GameObject's update method is called,
+   * Update all Entity instances based on the current state of the game and
+   * the frames per second. If the game is stopped or if a pausable Entity is
+   * paused, it will not be updated. Each Entity's update method is called,
    * and if it can be deleted, it will be removed from the game.
    *
    * @param fps The current frames per second.
+   * @param entities An array of Entity instances to update.
    */
-  private _update(fps: number) {
-    this._gameObjects.forEach((gameObject) => {
+  private _update(fps: number, entities: Entity[]) {
+    this.entities.forEach((entity) => {
       if (
         this._state === State.STOPPED ||
-        (gameObject.isPausable() && this._state === State.PAUSED)
+        (entity.isPausable() && this._state === State.PAUSED)
       ) {
         return;
       }
 
-      gameObject.update(fps);
-      if (gameObject.canDelete()) {
-        this._deleteGameObject(gameObject);
+      entity.update(fps, entities);
+      if (entity.isDeleted()) {
+        this._deleteEntity(entity);
       }
     });
   }
 
   /**
-   * Render all GameObjects in sorted order based on their draw priority.
+   * Render all Entity instances in sorted order based on their draw priority.
    */
   private _render() {
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    this._gameObjects
-      .sort(this._sortGameObjectsByDrawPriority)
-      .forEach((gameObject) => gameObject.render());
+    this.entities
+      .sort(this._sortEntitiesByDrawPriority)
+      .forEach((entity) => entity.render());
+
+    // If debug mode is enabled, display debug information
+    if (this.debug) {
+      this.context.save();
+
+      this.context.fillStyle = "black";
+      this.context.font = "bold 18px Arial";
+      this.context.fillText(`Debug: True`, 10, 20);
+      this.context.fillText(`FPS: ${this._fps}`, 10, 40);
+      this.context.fillText(`Entities: ${this.entities.length}`, 10, 60);
+
+      this.context.restore();
+    }
   }
 
   /**
@@ -207,36 +206,31 @@ export default class Game {
 
     this._frameCount++;
 
-    this.fps = Math.round((this._frameCount * 1000) / deltaTime);
+    this._fps = Math.round((this._frameCount * 1000) / deltaTime);
     this._frameCount = 0;
     this._lastFrameTime = currentTime;
   }
 
   /**
-   * Delete a GameObject from the game.
+   * Delete an Entity from the game.
    *
-   * @param gameObject The GameObject instance to delete.
+   * @param targetEntity The Entity to delete.
    */
-  private _deleteGameObject(gameObjectToDelete: GameObject) {
-    this._gameObjects = this._gameObjects.filter(
-      (gameObject) => gameObject !== gameObjectToDelete
-    );
+  private _deleteEntity(targetEntity: Entity) {
+    this.entities = this.entities.filter((entity) => entity !== targetEntity);
   }
 
   /**
    * Comparator function used to sort game objects by their draw priority.
    * Lower draw priority values will be rendered first.
    *
-   * @param gameObjectA The first GameObject to compare.
-   * @param gameObjectB The second GameObject to compare.
-   * @returns A negative value if gameObjectA has lower draw priority, a
-   * positive value if gameObjectB has lower draw priority, or zero if both
-   * have equal draw priority.
+   * @param entityA The first Entity to compare.
+   * @param entityB The second Entity to compare.
+   * @returns A negative value if EntityA has lower draw priority, a positive
+   * value if EntityB has lower draw priority, or zero if both have equal draw
+   * priority.
    */
-  private _sortGameObjectsByDrawPriority(
-    gameObjectA: GameObject,
-    gameObjectB: GameObject
-  ) {
-    return gameObjectA.drawPriority() - gameObjectB.drawPriority();
+  private _sortEntitiesByDrawPriority(entityA: Entity, entityB: Entity) {
+    return entityA.drawPriority() - entityB.drawPriority();
   }
 }

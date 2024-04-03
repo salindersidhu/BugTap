@@ -7,19 +7,17 @@
 A single player game featuring a table with food placed around the center. Bugs will spawn continuously from all corners of the table, heading straight towards the nearest food. Players must tap or click on the bugs to squish them before they eat all of the food. The game continues with bugs spawning until no food remains. The goal is to survive for as long as possible, squishing as many bugs as you can. BugTap was built using source technologies.
 
 <p float="left">
+    <img src="https://images.squarespace-cdn.com/content/v1/5cc22d6593a63233d214110c/1597710652025-QEY2UL92MLE1E2BX4WSJ/Vercel+%28Zeit%29.jpg" height="150" width="150">
     <img src="https://seeklogo.com/images/T/typescript-logo-B29A3F462D-seeklogo.com.png" height="150" width="150">
     <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/Unofficial_JavaScript_logo_2.svg/1024px-Unofficial_JavaScript_logo_2.svg.png" height="150" width="150">
-    <img src="https://d1muf25xaso8hp.cloudfront.net/https%3A%2F%2Fmeta-q.cdn.bubble.io%2Ff1511101808452x248499521985650050%2Fhowlericon.png?w=&h=&auto=compress&dpr=1&fit=max" height="150" width="150">
+    <img src="https://products.fileformat.com/audio/javascript/howler-js/header-image.png" height="150" width="150">
 </p>
 
-## Features
+## Demo
 
 ![Screen Capture](https://github.com/salindersidhu/BugTap/assets/12175684/f65ace42-2b3f-40e4-802e-47e9f8a6bf21)
 
-- BugTap game embedded on the webpage
-- Pause and resume with the button or spacebar
-- Game over screen with time and score
-- Sound effects
+A playable demo is avaliable at https://bug-tap.vercel.app/
 
 ## Prerequisite Software
 
@@ -36,7 +34,7 @@ A single player game featuring a table with food placed around the center. Bugs 
 npm i
 ```
 
-## Development Build
+## Running
 
 1. Run the following command:
 
@@ -44,7 +42,7 @@ npm i
 npm start
 ```
 
-2. Navigate to `http://localhost:8080/` in your browser.
+2. Navigate to http://localhost:8080/ in your browser.
 
 3. The webpack dev server has support for hot reload.
 
@@ -78,8 +76,7 @@ Please see our [Contributing Guide](/CONTRIBUTING.md) for more info.
     │    └── ...
     ├── public
     │    ├── favicon.ico            # Favicon
-    │    ├── theme.css              # Theme styles
-    │    ├── game.css               # Game styles
+    │    ├── styles.css             # Styles
     │    ├── template.html
     │    └── ...
     ├── tsconfig.json               # TypeScript config
