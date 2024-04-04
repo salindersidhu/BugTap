@@ -84,7 +84,7 @@ export default class Bug extends Entity {
    * Update the bug's movement and behaviour.
    *
    * @param fps The frames per second.
-   * @param entities
+   * @param entities An array of Entity instances.
    */
   update(fps: number, entities: Entity[]) {
     this._handleDeath(fps);

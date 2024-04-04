@@ -86,6 +86,9 @@ export default class Text {
     // Set canvas font
     context.font = `${this._fontWeight} ${this._fontSize} ${this._fontFamily}`;
 
+    // Enable anti-aliasing
+    context.imageSmoothingEnabled = true;
+
     // Translate and rotate canvas to draw the text at an angle
     context.translate(x, y);
     context.rotate(angle);
