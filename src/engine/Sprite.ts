@@ -80,6 +80,9 @@ export default class Sprite {
     // Save current state of the canvas prior to rendering
     context.save();
 
+    // Enable anti-aliasing
+    context.imageSmoothingEnabled = true;
+
     // Configure the canvas opacity
     context.globalAlpha = opacity;
 

@@ -40,7 +40,7 @@ export default abstract class Entity {
    *
    * @abstract
    * @param fps The current frames per second.
-   * @param entities
+   * @param entities An array of Entity instances.
    */
   abstract update(fps: number, entities: Entity[]): void;
 
