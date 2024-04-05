@@ -91,6 +91,7 @@ Please see our [Contributing Guide](/CONTRIBUTING.md) for more info.
   - Media button images from [Vector.me](http://vector.me/browse/695406/icon_set_player)
   - Tablecloth texture created by **Patrick Hoesly** from [Flickr](http://www.everystockphoto.com/photo.php?imageId=5778707) under [Create Commons Attribution 4.0 License](http://creativecommons.org/licenses/by/4.0/)
 - **Sound Effects**:
-  - Coin_C_08 created by **cabled_mess** from [Freesound](https://freesound.org/people/cabled_mess/sounds/350874/) under [Create Commons 0 License](https://creativecommons.org/publicdomain/zero/1.0/)
+  - Score 2 created by **CJspellsfish** from [Freesound](https://freesound.org/people/CJspellsfish/sounds/676402/) under [Create Commons 0 License](https://creativecommons.org/publicdomain/zero/1.0/)
+  - Achievement Happy Beeps Jingle created by **CogFireStudios** from [Freesound](https://freesound.org/people/CogFireStudios/sounds/619838/) under [Create Commons 0 License](https://creativecommons.org/publicdomain/zero/1.0/)
+  - Button UI App created by **CogFireStudios** from [Freesound](https://freesound.org/people/CogFireStudios/sounds/619835/) under [Create Commons 0 License](https://creativecommons.org/publicdomain/zero/1.0/)
   - Chewing, Breadstick, Single, D.wav created by **InspectorJ** from [Freesound](https://freesound.org/people/InspectorJ/sounds/429591/) under [Create Commons Attribution 4.0 License](https://creativecommons.org/licenses/by/4.0/)
-  - Ping-coin created by **ProjectsU012** from [Freesound](https://freesound.org/people/ProjectsU012/sounds/334277/) under [Create Commons Attribution 4.0 License](https://creativecommons.org/licenses/by/4.0/)

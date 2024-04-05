@@ -2,11 +2,13 @@ import { Howl } from "howler";
 
 import { Entity, Text } from "../engine";
 
-const FONT_SIZE: number = 48;
-const SCALE_SPEED: number = 30;
-const TEXT_HEIGHT_RATIO: number = 3;
-const TEXT_WIDTH_RATIO: number = 4;
+const COLOR = "black";
+const FONT_SIZE: number = 24;
+const SCALE_SPEED: number = 60;
+const START_COLOR: string = "#6FBF19";
+const START_TEXT: string = "GO";
 const SOUND_PING: string = "./assets/sound/ping.wav";
+const SOUND_START: string = "./assets/sound/start.wav";
 
 /**
  * Displays a countdown on the game. The countdown decreases over time, and the
@@ -16,15 +18,14 @@ const SOUND_PING: string = "./assets/sound/ping.wav";
  * @author Salinder Sidhu
  */
 export default class Countdown extends Entity {
-  private _text: Text;
+  private _text: Text | undefined;
 
-  private _x: number;
-  private _y: number;
   private _countdown: number;
   private _opacity: number = 1;
   private _scale: number = 1;
 
   private _soundPing: Howl;
+  private _soundStart: Howl;
 
   /**
    * Create an instance of Countdown.
@@ -39,20 +40,15 @@ export default class Countdown extends Entity {
   ) {
     super(canvas, context, 1);
 
-    this._x = this.canvas.width / 2;
-    this._y = this.canvas.height / 2;
     this._countdown = countdown;
-
-    this._text = new Text(
-      this._countdown.toString(),
-      "Sans-serif",
-      `${FONT_SIZE}px`,
-      "bold",
-      "black"
-    );
+    this._updateCountdownText();
 
     this._soundPing = new Howl({
       src: [SOUND_PING],
+      html5: true,
+    });
+    this._soundStart = new Howl({
+      src: [SOUND_START],
       html5: true,
     });
   }
@@ -64,7 +60,7 @@ export default class Countdown extends Entity {
    */
   update(fps: number) {
     if (this._opacity === 1) {
-      this._soundPing.play();
+      this._countdown > 0 ? this._soundPing.play() : this._soundStart.play();
     }
 
     // Update opacity and scale
@@ -72,41 +68,54 @@ export default class Countdown extends Entity {
     this._scale += SCALE_SPEED / fps;
     this._scale = Math.min(
       this._scale,
-      Math.max(this.canvas.height / FONT_SIZE)
+      Math.max(Math.round(this.canvas.height / FONT_SIZE))
     );
 
     if (this._opacity < 0) {
-      // Decrement the countdown
+      // Decrement the countdown, reset opacity and scale
       this._countdown -= 1;
-      // Reset text opacity and scale
       this._opacity = 1;
       this._scale = 1;
 
-      this._text = new Text(
-        this._countdown.toString(),
-        "Sans-serif",
-        `${FONT_SIZE}px`,
-        "bold",
-        "black"
-      );
+      this._updateCountdownText();
     }
 
-    if (this._countdown < 1) {
+    if (this._countdown < 0) {
       this.delete();
     }
+  }
+
+  /**
+   * Update the countdown text.
+   */
+  private _updateCountdownText() {
+    this._text = new Text(
+      this._countdown < 1 ? START_TEXT : this._countdown.toString(),
+      "Sans-serif",
+      `${FONT_SIZE}px`,
+      "bold",
+      this._countdown < 1 ? START_COLOR : COLOR
+    );
   }
 
   /**
    * Render the countdown text.
    */
   render() {
-    this._text.render(
+    this.context.save();
+
+    this.context.textBaseline = "middle";
+    this.context.textAlign = "center";
+
+    this._text?.render(
       this.context,
-      this._x - (FONT_SIZE / TEXT_WIDTH_RATIO) * this._scale,
-      this._y + (FONT_SIZE / TEXT_HEIGHT_RATIO) * this._scale,
+      this.canvas.width / 2,
+      this.canvas.height / 2 + this._scale,
       0,
       Math.max(this._opacity, 0),
       this._scale
     );
+
+    this.context.restore();
   }
 }

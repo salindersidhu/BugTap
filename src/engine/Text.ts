@@ -52,6 +52,15 @@ export default class Text {
   }
 
   /**
+   * Return the text string associated with the canvas Text.
+   *
+   * @returns The text string.
+   */
+  getText() {
+    return this._text;
+  }
+
+  /**
    * Render text on the canvas with the specified position, angle, and opacity.
    *
    * @param context The 2D canvas context.
@@ -71,6 +80,12 @@ export default class Text {
     // Save current state of the canvas
     context.save();
 
+    // Configure the canvas opacity
+    context.globalAlpha = opacity;
+
+    // Set canvas font
+    context.font = `${this._fontWeight} ${this._fontSize} ${this._fontFamily}`;
+
     // Translate and rotate canvas to draw the text at an angle
     context.translate(x, y);
     context.rotate(angle);
@@ -80,12 +95,6 @@ export default class Text {
     context.translate(x, y);
     context.scale(scale, scale);
     context.translate(-x, -y);
-
-    // Configure the canvas opacity
-    context.globalAlpha = opacity;
-
-    // Set canvas font
-    context.font = `${this._fontWeight} ${this._fontSize} ${this._fontFamily}`;
 
     // Draw the text outline if can draw outline flag is true
     if (this._hasOutline) {

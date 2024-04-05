@@ -2,7 +2,7 @@ import { Howl } from "howler";
 
 import { BoundingBox, Entity, Sprite } from "../engine";
 
-const SOUND_EAT_FOOD: string = "./assets/sound/eat.ogg";
+const SOUND_EAT_FOOD: string = "./assets/sound/eat.wav";
 
 /**
  * Representing the state of food.
