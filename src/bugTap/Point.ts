@@ -2,7 +2,7 @@ import { Howl } from "howler";
 
 import { Entity, Text } from "../engine";
 
-const POINT_SOUND: string = "./assets/sound/point.ogg";
+const POINT_SOUND: string = "./assets/sound/point.mp3";
 
 /**
  * Represents a score displayed in the game. The score is displayed on the
