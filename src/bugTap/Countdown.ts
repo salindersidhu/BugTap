@@ -3,8 +3,8 @@ import { Howl } from "howler";
 import { Entity, Text } from "../engine";
 
 const COLOR = "black";
-const FONT_SIZE: number = 48;
-const SCALE_SPEED: number = 30;
+const FONT_SIZE: number = 24;
+const SCALE_SPEED: number = 60;
 const START_COLOR: string = "#6FBF19";
 const START_TEXT: string = "GO";
 const SOUND_PING: string = "./assets/sound/ping.wav";
@@ -68,7 +68,7 @@ export default class Countdown extends Entity {
     this._scale += SCALE_SPEED / fps;
     this._scale = Math.min(
       this._scale,
-      Math.max(this.canvas.height / FONT_SIZE)
+      Math.max(Math.round(this.canvas.height / FONT_SIZE))
     );
 
     if (this._opacity < 0) {
@@ -110,7 +110,7 @@ export default class Countdown extends Entity {
     this._text?.render(
       this.context,
       this.canvas.width / 2,
-      this.canvas.height / 2,
+      this.canvas.height / 2 + this._scale,
       0,
       Math.max(this._opacity, 0),
       this._scale
