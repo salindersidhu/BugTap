@@ -21,7 +21,7 @@ const BUG_WIDTH: number = 45;
 const NUMBER_OF_BUG_FRAMES: number = 2;
 
 const bugProps: BugProps[] = [
-  { points: 1, moveSpeed: 50, frameSpeed: 3, spriteSrc: RED_BUG },
+  { points: 1, moveSpeed: 65, frameSpeed: 3, spriteSrc: RED_BUG },
   { points: 3, moveSpeed: 120, frameSpeed: 5, spriteSrc: ORANGE_BUG },
   { points: 5, moveSpeed: 160, frameSpeed: 8, spriteSrc: GREY_BUG },
 ];
