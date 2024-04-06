@@ -15,7 +15,7 @@ A single player game featuring a table with food placed around the center. Bugs 
 
 ## Demo
 
-![Screen Capture](https://github.com/salindersidhu/BugTap/assets/12175684/f65ace42-2b3f-40e4-802e-47e9f8a6bf21)
+![Screen Capture](https://github.com/salindersidhu/BugTap/assets/12175684/c3ff72c9-7039-4914-ba8d-9eefab4006cd)
 
 Play BugTap at https://bug-tap.vercel.app/
 
