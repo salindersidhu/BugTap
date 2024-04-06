@@ -15,9 +15,9 @@ A single player game featuring a table with food placed around the center. Bugs 
 
 ## Demo
 
-![Screen Capture](https://github.com/salindersidhu/BugTap/assets/12175684/f65ace42-2b3f-40e4-802e-47e9f8a6bf21)
+![Screen Capture](https://github.com/salindersidhu/BugTap/assets/12175684/c3ff72c9-7039-4914-ba8d-9eefab4006cd)
 
-A playable demo is avaliable at https://bug-tap.vercel.app/
+Play BugTap at https://bug-tap.vercel.app/
 
 ## Prerequisite Software
 
@@ -42,9 +42,7 @@ npm i
 npm start
 ```
 
-2. Navigate to http://localhost:8080/ in your browser.
-
-3. The webpack dev server has support for hot reload.
+Webpack dev server will automatically open a new tab in your browser and navigate you to http://localhost:8080/.
 
 ## Production Build
 
@@ -54,7 +52,7 @@ npm start
 npm run build
 ```
 
-2. The production ready build is located in the `build` folder.
+The production ready build is located in the `build` folder.
 
 ## Contributing
 
@@ -64,23 +62,25 @@ Please see our [Contributing Guide](/CONTRIBUTING.md) for more info.
 
     .
     ├── src
-    │    ├── engine                 # Game engine
+    │    ├── engine
     │    │    ├── index.ts
     │    │    └── ...
-    │    ├── bugTap                 # Main game source
+    │    ├── bugTap
     │    │    ├── index.ts
     │    │    └── ...
     │    ├── index.ts
     │    └── ...
-    ├── assets                      # Game assets
+    ├── assets                      # Graphics and sounds
     │    └── ...
     ├── public
-    │    ├── favicon.ico            # Favicon
-    │    ├── styles.css             # Styles
+    │    ├── favicon.ico
+    │    ├── preview.png            # SEO preview image
+    │    ├── ribbon.png             # Github fork me ribbon
+    │    ├── styles.css
     │    ├── template.html
     │    └── ...
-    ├── tsconfig.json               # TypeScript config
-    ├── webpack.config.js           # Webpack config
+    ├── tsconfig.json
+    ├── webpack.config.js
     └── ...
 
 ## Acknowledgements

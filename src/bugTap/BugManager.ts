@@ -11,7 +11,8 @@ const GREY_BUG: string = "./assets/graphics/bug_grey.png";
  */
 interface BugProps {
   points: number;
-  speed: number;
+  moveSpeed: number;
+  frameSpeed: number;
   spriteSrc: string;
 }
 
@@ -20,9 +21,9 @@ const BUG_WIDTH: number = 45;
 const NUMBER_OF_BUG_FRAMES: number = 2;
 
 const bugProps: BugProps[] = [
-  { points: 1, speed: 3, spriteSrc: RED_BUG },
-  { points: 3, speed: 5, spriteSrc: ORANGE_BUG },
-  { points: 5, speed: 8, spriteSrc: GREY_BUG },
+  { points: 1, moveSpeed: 65, frameSpeed: 3, spriteSrc: RED_BUG },
+  { points: 3, moveSpeed: 120, frameSpeed: 5, spriteSrc: ORANGE_BUG },
+  { points: 5, moveSpeed: 160, frameSpeed: 8, spriteSrc: GREY_BUG },
 ];
 
 /**
@@ -55,7 +56,8 @@ export default class BugManager {
         height: number,
         width: number,
         spriteSrc: string,
-        speed: number,
+        moveSpeed: number,
+        frameSpeed: number,
         points: number,
         numFrames: number
       ) => {
@@ -67,7 +69,8 @@ export default class BugManager {
           height,
           width,
           spriteSrc,
-          speed,
+          moveSpeed,
+          frameSpeed,
           points,
           numFrames
         );
@@ -128,7 +131,7 @@ export default class BugManager {
     ];
 
     const [x, y] = sideCoordinates[getRandomNumber(0, 3)];
-    const { spriteSrc, speed, points } = bugProp;
+    const { spriteSrc, moveSpeed, frameSpeed, points } = bugProp;
 
     return this._bugFactory.createEntity(
       x,
@@ -136,7 +139,8 @@ export default class BugManager {
       BUG_HEIGHT,
       BUG_WIDTH,
       spriteSrc,
-      speed,
+      moveSpeed,
+      frameSpeed,
       points,
       NUMBER_OF_BUG_FRAMES
     );

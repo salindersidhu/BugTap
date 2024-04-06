@@ -55,7 +55,7 @@
                     Welcome <i class="fas fa-hand-sparkles"></i>
                 </h1>
                 <p class="lead">
-                    Squish as many bugs as you can before they eat all of the food, good luck! <i class="fas fa-face-smile yellow"></i>
+                    Squish as many bugs as you can before they eat all of the food, good luck! <i class="fas fa-face-smile"></i>
                 </p>
                 <p>
                     <a id="start-button" class="btn btn-lg btn-secondary">
@@ -68,18 +68,26 @@
             <span id="game-section" class="hidden">
                 <!-- Information bar -->
                 <section class="info-bar">
-                    <!-- Time remaining, in seconds -->
-                    <p class="h5">
-                        <span id="game-time">0:00</span>
-                        <i class="fas fa-clock"></i>
-                    </p>
-                    <!-- Pause and resume image button -->
-                    <input id="pause-resume-button" class="button" type="image" src="assets/graphics/pause.png" />
-                    <!-- The current score -->
-                    <p class="h5">
-                        <span id="game-score">0</span>
-                        <i class="fas fa-trophy yellow"></i>
-                    </p>
+                    <section>
+                        <!-- Time remaining, in seconds -->
+                        <p class="h5">
+                            <span id="game-time">0:00</span>
+                            <i class="fas fa-clock"></i>
+                        </p>
+                    </section>
+                    <section>
+                        <!-- Pause and resume image button -->
+                        <button id="pause-resume-button" type="button" class="btn btn-light btn-circle btn-xl">
+                            <i class="fas fa-pause"></i>
+                        </button>
+                    </section>
+                    <section>
+                        <!-- The current score -->
+                        <p class="h5">
+                            <span id="game-score">0</span>
+                            <i class="fas fa-trophy yellow"></i>
+                        </p>
+                    </section>
                 </section>
                 <!-- Game Canvas -->
                 <canvas id="game-canvas" class="game-canvas" width="946" height="602">

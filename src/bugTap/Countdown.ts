@@ -110,7 +110,7 @@ export default class Countdown extends Entity {
     this._text?.render(
       this.context,
       this.canvas.width / 2,
-      this.canvas.height / 2 + this._scale,
+      this.canvas.height / 2 + this._scale * 2,
       0,
       Math.max(this._opacity, 0),
       this._scale
