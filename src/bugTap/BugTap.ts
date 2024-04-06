@@ -101,11 +101,14 @@ export default class BugTap extends Game {
   private _pauseButton__OnClick = () => {
     this.isPaused() ? this.resume() : this.pause();
 
-    const button = document.getElementById("pause-resume-button");
+    const buttonIcon = document
+      .getElementById("pause-resume-button")
+      ?.getElementsByTagName("i")[0];
+
     if (this.isPaused()) {
-      button?.setAttribute("src", "assets/graphics/play.png");
+      buttonIcon?.classList.replace("fa-pause", "fa-play");
     } else if (this.isRunning()) {
-      button?.setAttribute("src", "assets/graphics/pause.png");
+      buttonIcon?.classList.replace("fa-play", "fa-pause");
     }
   };
 
