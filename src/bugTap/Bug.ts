@@ -20,7 +20,7 @@ enum State {
 export default class Bug extends Entity {
   private _sprite: Sprite;
   private _angle: number = 0;
-  private _speed: number;
+  private _moveSpeed: number;
   private _state: State = State.ALIVE;
   private _opacity: number = 1;
   private _fadeSpeed: number = 0.7;
@@ -42,7 +42,8 @@ export default class Bug extends Entity {
    * @param height The height of the bug.
    * @param width The width of the bug.
    * @param spriteSrc The URL of the sprite image for rendering.
-   * @param speed The speed of the bug.
+   * @param moveSpeed The speed of the bug.
+   * @param frameSpeed
    * @param points
    * @param numFrames The number of frames in the animated sprite.
    * @param initFrame The initial frame of the animated sprite (default is 0).
@@ -55,7 +56,8 @@ export default class Bug extends Entity {
     height: number,
     width: number,
     spriteSrc: string,
-    speed: number,
+    moveSpeed: number,
+    frameSpeed: number,
     points: number,
     numFrames: number,
     initFrame: number = 0
@@ -66,11 +68,11 @@ export default class Bug extends Entity {
       spriteSrc,
       height,
       width,
-      speed,
+      frameSpeed,
       numFrames,
       initFrame
     );
-    this._speed = speed;
+    this._moveSpeed = moveSpeed;
 
     this._spawnX = x;
     this._spawnY = y;
@@ -99,7 +101,7 @@ export default class Bug extends Entity {
     }
 
     this._sprite.update(fps);
-    this._handleMovement(food);
+    this._handleMovement(fps, food);
     this._handleEatingFood(food);
     this._handleFleeing(fps);
   }
@@ -179,16 +181,17 @@ export default class Bug extends Entity {
    * Update the bug's movement based on food availability. If there's no food,
    * the bug flee back to its spawn point.
    *
+   * @param fps The frames per second.
    * @param food An array of Food objects.
    */
-  private _handleMovement(food: Food[]) {
+  private _handleMovement(fps: number, food: Food[]) {
     if (food.length < 1) {
       this._state = State.FLEEING;
       this._fadeSpeed = 1.3;
-      this._moveToPoint(this._spawnX, this._spawnY);
+      this._moveToPoint(fps, this._spawnX, this._spawnY);
       return;
     }
-    this._moveToFood(food);
+    this._moveToFood(fps, food);
   }
 
   /**
@@ -208,9 +211,10 @@ export default class Bug extends Entity {
   /**
    * Move the bug towards the nearest food.
    *
+   * @param fps The frames per second.
    * @param food An array of Food objects.
    */
-  private _moveToFood(food: Food[]) {
+  private _moveToFood(fps: number, food: Food[]) {
     // Compute the center coordinates of the nearest food
     let nearestFood = food[0];
     let minDistanceSquared = this._distanceSquared(nearestFood);
@@ -226,7 +230,7 @@ export default class Bug extends Entity {
     const foodCenterY = y + height / 2;
 
     // Move towards the center of the nearest food
-    this._moveToPoint(foodCenterX, foodCenterY);
+    this._moveToPoint(fps, foodCenterX, foodCenterY);
   }
 
   /**
@@ -258,10 +262,11 @@ export default class Bug extends Entity {
   /**
    * Move the bug towards a specified point.
    *
+   * @param fps The frames per second.
    * @param x The X coordinate of the target point.
    * @param y The Y coordinate of the target point.
    */
-  private _moveToPoint(x: number, y: number) {
+  private _moveToPoint(fps: number, x: number, y: number) {
     // Compute the distance to the point
     const { x: bugX, y: bugY, width, height } = this.boundingBox;
     const dx = x - bugX - width / 2;
@@ -276,7 +281,7 @@ export default class Bug extends Entity {
       const ndx = dx / hypotenuse;
       const ndy = dy / hypotenuse;
 
-      const nSpeed = 0.3 * this._speed;
+      const nSpeed = this._moveSpeed * (1 / fps);
 
       this.boundingBox.x += ndx * nSpeed;
       this.boundingBox.y += ndy * nSpeed;
