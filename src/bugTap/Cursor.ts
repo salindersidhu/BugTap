@@ -28,18 +28,11 @@ export default class Cursor extends Entity {
   constructor(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D) {
     super(canvas, context, 1, false);
 
-    this._bindMouseMoveListeners();
+    this.canvas.addEventListener("mouseenter", this._updateCursorPosition);
+    this.canvas.addEventListener("mousemove", this._updateCursorPosition);
 
     // Hide the default cursor
     this.canvas.style.cursor = "none";
-  }
-
-  /**
-   * Binds mouse move event listeners to the canvas.
-   */
-  private _bindMouseMoveListeners() {
-    this.canvas.addEventListener("mouseenter", this._updateCursorPosition);
-    this.canvas.addEventListener("mousemove", this._updateCursorPosition);
   }
 
   /**
