@@ -32,6 +32,8 @@ export default class BugTap extends Game {
   private _time: number = 0;
   private _score: number = 0;
 
+  private _isGameOver: boolean = false;
+
   private _bugSpawnTimeout: NodeJS.Timeout | null = null;
   private _timeElapsedTimeout: NodeJS.Timeout | null = null;
 
@@ -68,6 +70,12 @@ export default class BugTap extends Game {
     const restartButton = document.getElementById("restart-button");
     restartButton?.addEventListener("click", this._restartGame__OnClick);
 
+    const gameButton = document.getElementById("game-link");
+    gameButton?.addEventListener("click", this._gameButton__onClick);
+
+    const highScoreButton = document.getElementById("high-score-link");
+    highScoreButton?.addEventListener("click", this._highScoreButton_onClick);
+
     this.canvas.addEventListener("mousedown", this._canvas__OnClick);
   }
 
@@ -75,7 +83,7 @@ export default class BugTap extends Game {
    * Handle event when restart game button is clicked.
    */
   private _restartGame__OnClick = () => {
-    const gameOverSection = document.getElementById("score-section");
+    const gameOverSection = document.getElementById("game-over-section");
     const gameSection = document.getElementById("game-section");
     gameOverSection?.classList.add("hidden");
     gameSection?.classList.remove("hidden");
@@ -147,6 +155,58 @@ export default class BugTap extends Game {
 
       bug.setDead();
     }
+  };
+
+  /**
+   * Update the state of game and high score buttons based on whether the game
+   * view is active.
+   *
+   * @param isGameActive Indicates whether the game view is currently active.
+   */
+  private _updateButtonStates(isGameActive: boolean) {
+    const gameButton = document.getElementById("game-link");
+    const highScoreButton = document.getElementById("high-score-link");
+
+    gameButton?.classList.toggle("active", isGameActive);
+    highScoreButton?.classList.toggle("active", !isGameActive);
+  }
+
+  /**
+   * Handle the click event on the game button.
+   */
+  private _gameButton__onClick = () => {
+    if (!this.isStopped()) {
+      return;
+    }
+
+    this._updateButtonStates(true);
+
+    const welcomeSection = document.getElementById("welcome-section");
+    const gameOverSection = document.getElementById("game-over-section");
+    const highScoreSection = document.getElementById("high-score-section");
+
+    gameOverSection?.classList.toggle("hidden", !this._isGameOver);
+    welcomeSection?.classList.toggle("hidden", this._isGameOver);
+    highScoreSection?.classList.add("hidden");
+  };
+
+  /**
+   * Handle the click event on the high score button.
+   */
+  private _highScoreButton_onClick = () => {
+    if (!this.isStopped()) {
+      return;
+    }
+
+    this._updateButtonStates(false);
+
+    const welcomeSection = document.getElementById("welcome-section");
+    const gameOverSection = document.getElementById("game-over-section");
+    const highScoreSection = document.getElementById("high-score-section");
+
+    welcomeSection?.classList.add("hidden");
+    gameOverSection?.classList.add("hidden");
+    highScoreSection?.classList.remove("hidden");
   };
 
   /**
@@ -252,12 +312,12 @@ export default class BugTap extends Game {
    * the table and all the bugs have fled.
    */
   private _handleGameOver() {
-    // Recursive function to check and handle game over
     const checkAndHandleGameOver = () => {
       const numBugs = filterObjectsByType(this.entities, Bug).length;
       const numFood = filterObjectsByType(this.entities, Food).length;
 
       if (this.isRunning() && numFood < 1 && numBugs < 1) {
+        this._isGameOver = true;
         this._gameOverActions();
         return;
       }
@@ -275,7 +335,7 @@ export default class BugTap extends Game {
     const time = document.getElementById("game-over-time");
     const score = document.getElementById("game-over-score");
     const gameSection = document.getElementById("game-section");
-    const gameOverSection = document.getElementById("score-section");
+    const gameOverSection = document.getElementById("game-over-section");
 
     gameSection?.classList.add("hidden");
     gameOverSection?.classList.remove("hidden");

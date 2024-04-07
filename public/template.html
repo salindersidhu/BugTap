@@ -47,6 +47,14 @@
         <a class="fork-me-ribbon" href="https://github.com/salindersidhu/BugTap">
             <img src="./ribbon.png" alt="Fork me on GitHub">
         </a>
+        <!-- Navigation Header -->
+        <header class="masthead">
+            <!-- Navigation menu -->
+            <nav class="nav nav-masthead justify-content-center">
+                <a id="game-link" class="nav-link active" href="#">Game</a>
+                <a id="high-score-link" class="nav-link" href="#">High Score</a>
+            </nav>
+        </header>
         <!-- Page content -->
         <main role="main" class="mt-auto mb-auto">
             <!-- Welcome section -->
@@ -95,8 +103,8 @@
                     <p>Please update to a modern browser such as <a href="www.google.com/chrome/">Google Chrome</a> to play.</p>
                 </canvas>
             </span>
-            <!-- Score section -->
-            <section id="score-section" class="hidden">
+            <!-- Game Over section -->
+            <section id="game-over-section" class="hidden">
                 <h1 class="mb-3">
                     Game Over
                     <i class="fas fa-face-tired"></i>
@@ -115,6 +123,29 @@
                     <a id="restart-button" class="btn btn-lg btn-secondary" type="button">
                         <i class="fas fa-sync fa-1x"></i>
                         Restart Game
+                    </a>
+                </p>
+            </section>
+            <!-- High Score section -->
+            <section id="high-score-section" class="hidden">
+                <h1 class="mb-3">
+                    Your High Score
+                    <i class="fas fa-face-laugh-beam fa-1x"></i>
+                </h1>
+                <h4>
+                    Best Time:
+                    <span id="best-time">0:00</span>
+                    <i class="fas fa-clock"></i>
+                </h4>
+                <h4>
+                    Berst Score:
+                    <span id="best-score">0</span>
+                    <i class="fas fa-trophy yellow"></i>
+                </h1>
+                <p class="mt-4">
+                    <a id="clear-button" class="btn btn-lg btn-danger" type="button">
+                        <i class="fas fa-trash fa-1x"></i>
+                        Clear Score
                     </a>
                 </p>
             </section>
