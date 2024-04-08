@@ -2,7 +2,10 @@ import {
   Game,
   filterObjectsByType,
   formatSeconds,
+  getStore,
   getRandomNumber,
+  setStore,
+  clearStore,
 } from "../engine";
 
 import Bug from "./Bug";
@@ -74,7 +77,13 @@ export default class BugTap extends Game {
     gameButton?.addEventListener("click", this._gameButton__onClick);
 
     const highScoreButton = document.getElementById("high-score-link");
-    highScoreButton?.addEventListener("click", this._highScoreButton_onClick);
+    highScoreButton?.addEventListener("click", this._highScoreButton__onClick);
+
+    const clearScoreButton = document.getElementById("clear-score-button");
+    clearScoreButton?.addEventListener(
+      "click",
+      this._clearScoreButton__onClick
+    );
 
     this.canvas.addEventListener("mousedown", this._canvas__OnClick);
   }
@@ -193,7 +202,7 @@ export default class BugTap extends Game {
   /**
    * Handle the click event on the high score button.
    */
-  private _highScoreButton_onClick = () => {
+  private _highScoreButton__onClick = () => {
     if (!this.isStopped()) {
       return;
     }
@@ -207,7 +216,28 @@ export default class BugTap extends Game {
     welcomeSection?.classList.add("hidden");
     gameOverSection?.classList.add("hidden");
     highScoreSection?.classList.remove("hidden");
+
+    this._updateHighScore();
   };
+
+  /**
+   * Handle the click event on the clear score button.
+   */
+  private _clearScoreButton__onClick = () => {
+    clearStore();
+    this._updateHighScore();
+  };
+
+  /**
+   * Update the high score and time from the store.
+   */
+  private _updateHighScore() {
+    const bestScore = document.getElementById("best-score");
+    const bestTime = document.getElementById("best-time");
+
+    bestScore!.innerHTML = getStore<string>("score") ?? "0";
+    bestTime!.innerHTML = formatSeconds(getStore<number>("time") ?? 0);
+  }
 
   /**
    * Reset the game.
@@ -329,9 +359,18 @@ export default class BugTap extends Game {
   }
 
   /**
-   * Define the actions to be taken when the game is over.
+   * The actions to be taken when the game is over. Stop the game, set high
+   * score, and delete Timeouts.
    */
   private _gameOverActions = () => {
+    this.stop();
+
+    const existingScore = getStore<number>("score") ?? 0;
+    if (this._score > existingScore) {
+      setStore("score", this._score);
+      setStore("time", this._time);
+    }
+
     const time = document.getElementById("game-over-time");
     const score = document.getElementById("game-over-score");
     const gameSection = document.getElementById("game-section");
@@ -342,8 +381,6 @@ export default class BugTap extends Game {
 
     time!.innerHTML = formatSeconds(this._time);
     score!.innerHTML = this._score.toString();
-
-    this.stop();
 
     if (this._bugSpawnTimeout !== null) {
       clearTimeout(this._bugSpawnTimeout);

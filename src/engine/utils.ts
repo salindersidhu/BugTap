@@ -26,27 +26,30 @@ export function getRandomItem<T>(itemArray: T[]): T {
  * @param key The key to store the value under.
  * @param value The value to be stored.
  */
-export function setToStore(key: string, value: string) {
-  localStorage.setItem(key, value);
+export function setStore(key: string, value: any) {
+  localStorage.setItem(key, value.toString());
 }
 
 /**
- * Fetch a value from the store with the specified key.
+ * Fetch a value from the store with the specified key and converts it to the
+ * specified type.
  *
  * @param key The key of the value to retrieve.
- * @returns The value stored under the key, or null if the key does not exist.
+ * @returns The value stored under the key, converted to the specified type.
  */
-export function getFromStore(key: string): string | null {
-  return localStorage.getItem(key);
-}
+export function getStore<T>(key: string): T | null {
+  const storedItem = localStorage.getItem(key);
 
-/**
- * Remove a value from the store with the specified key.
- *
- * @param key The key of the value to remove.
- */
-export function removeFromStore(key: string) {
-  localStorage.removeItem(key);
+  if (storedItem === null) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(storedItem) as T;
+  } catch (error) {
+    console.error(`Error parsing stored item with key "${key}":`, error);
+    return null;
+  }
 }
 
 /**
