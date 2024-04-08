@@ -6,6 +6,7 @@ const foodSprite = "./assets/graphics/food.png";
 
 const FOOD_HEIGHT: number = 56;
 const FOOD_WIDTH: number = 56;
+const MAX_FOOD_ATTEMPTS = 500;
 const NUMBER_OF_FOOD_FRAMES: number = 16;
 
 /**
@@ -80,12 +81,15 @@ export default class FoodManager {
   public generate(amount: number): Food[] {
     const food: Food[] = [];
 
+    let attempts = 0;
     let availableFrames = Array.from(
       { length: NUMBER_OF_FOOD_FRAMES },
       (_, i) => i
     );
 
     while (food.length < amount) {
+      attempts++;
+
       // Generate random coordinates for a food's bounding box
       const x = getRandomNumber(150, 744);
       const y = getRandomNumber(100, 444);
@@ -97,6 +101,11 @@ export default class FoodManager {
       );
       if (isOverlapping) {
         continue;
+      }
+
+      // Exceeded maximum number of attempts
+      if (attempts > MAX_FOOD_ATTEMPTS) {
+        break;
       }
 
       // If all frames have been used, refresh the availableFrames list

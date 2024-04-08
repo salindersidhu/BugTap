@@ -9,11 +9,10 @@ import {
   clearStore,
   filterObjectsByType,
   formatSeconds,
-  getFromStore,
+  getStore,
   getRandomItem,
   getRandomNumber,
-  removeFromStore,
-  setToStore,
+  setStore,
 } from "./utils";
 
 export {
@@ -26,9 +25,8 @@ export {
   clearStore,
   filterObjectsByType,
   formatSeconds,
-  getFromStore,
+  getStore,
   getRandomItem,
   getRandomNumber,
-  removeFromStore,
-  setToStore,
+  setStore,
 };
