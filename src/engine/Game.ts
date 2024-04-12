@@ -149,6 +149,21 @@ export default class Game {
   };
 
   /**
+   * Update the frames per second of the game based on the time elapsed since
+   * the last frame.
+   */
+  private _updateFps() {
+    const currentTime = performance.now();
+    const deltaTime = currentTime - this._lastFrameTime;
+
+    this._frameCount++;
+
+    this._fps = Math.round((this._frameCount * 1000) / deltaTime);
+    this._frameCount = 0;
+    this._lastFrameTime = currentTime;
+  }
+
+  /**
    * Update all Entity instances based on the current state of the game and
    * the frames per second. If the game is stopped or if a pausable Entity is
    * paused, it will not be updated. Each Entity's update method is called,
@@ -194,21 +209,6 @@ export default class Game {
 
       this.context.restore();
     }
-  }
-
-  /**
-   * Update the frames per second of the game based on the time elapsed since
-   * the last frame.
-   */
-  private _updateFps() {
-    const currentTime = performance.now();
-    const deltaTime = currentTime - this._lastFrameTime;
-
-    this._frameCount++;
-
-    this._fps = Math.round((this._frameCount * 1000) / deltaTime);
-    this._frameCount = 0;
-    this._lastFrameTime = currentTime;
   }
 
   /**

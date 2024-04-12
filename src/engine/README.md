@@ -59,9 +59,10 @@ classDiagram
         + drawPriority(): number
         + isPausable(): boolean
     }
-    Entity --> Sprite : Contains
-    Entity --> BoundingBox : Contains
-    Entity --> Text : Contains
+
+    Entity --> "1" Sprite : Contains
+    Entity --> "1" BoundingBox : Contains
+    Entity --> "1" Text : Contains
 
     class EntityFactory {
         - _canvas: HTMLCanvasElement
@@ -99,5 +100,27 @@ classDiagram
       -_deleteEntity(targetEntity: Entity): void
       -_sortEntitiesByDrawPriority(entityA: Entity, entityB: Entity): number
     }
-    Game --> Entity : Contains
+
+    Game --> "*" Entity : Contains
+```
+
+## The Game Loop Flow
+
+This Flow chart illustrates the main loop of the game engine, outlining the sequence of operations executed during each iteration of the loop. This includes updating the game state, handling user input, rendering graphics, and managing the frame rate.
+
+```mermaid
+flowchart TD
+    A[Start Loop]
+    subgraph s1[Update FPS]
+    end
+    subgraph s2[Update]
+    end
+    subgraph s3[Render]
+    end
+    B[End Loop]
+
+    A --> s1
+    s1 --> s2
+    s2 --> s3
+    s3 --> B
 ```
