@@ -110,3 +110,15 @@ a:hover {
     border-radius: 3.75rem;
     text-align: center;
 }
+
+.buy-me-a-coffee-button {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    margin: 1rem;
+
+    img {
+        height: 60px;
+        width: 217px
+    }
+}
