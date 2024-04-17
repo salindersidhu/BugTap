@@ -56,7 +56,7 @@ The production ready build is located in the `build` folder.
 
 ## Contributing
 
-Please see our [Contributing Guide](/CONTRIBUTING.md) for more info.
+Please see our [Contributing Guide](/CONTRIBUTING.md) for more details.
 
 ## Project Structure
 
@@ -82,6 +82,10 @@ Please see our [Contributing Guide](/CONTRIBUTING.md) for more info.
     ├── tsconfig.json
     ├── webpack.config.js
     └── ...
+
+## Docs
+
+Please see our [Engine README](/src/engine/README.md) for more details on the game engine.
 
 ## Acknowledgements
 
