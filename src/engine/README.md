@@ -104,27 +104,6 @@ classDiagram
     Game --> "*" Entity : Contains
 ```
 
-## The Game Loop Flow
-
-This Flow chart illustrates the main loop of the game engine, outlining the sequence of operations executed during each iteration of the loop. This includes updating the game state, handling user input, rendering graphics, and managing the frame rate.
-
-```mermaid
-flowchart TD
-    A[Start Loop]
-    subgraph s1[Update FPS]
-    end
-    subgraph s2[Update]
-    end
-    subgraph s3[Render]
-    end
-    B[End Loop]
-
-    A --> s1
-    s1 --> s2
-    s2 --> s3
-    s3 --> B
-```
-
 ## Utilities
 
 The game engine provides useful functions such as generating random numbers, working with local storage, formatting time, and filtering objects. These utility functions are imported directly from the game engine, offering a convenient way to access and utilize them.
