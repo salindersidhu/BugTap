@@ -91,14 +91,14 @@ export default class Bug extends Entity {
   update(fps: number, entities: Entity[]) {
     this._handleDeath(fps);
 
+    if (this._state === State.DEAD) {
+      return;
+    }
+
     // Filter out eaten food
     const food = filterObjectsByType(entities, Food).filter(
       (food) => !food.isEaten()
     );
-
-    if (this._state === State.DEAD) {
-      return;
-    }
 
     this._sprite.update(fps);
     this._handleMovement(fps, food);
