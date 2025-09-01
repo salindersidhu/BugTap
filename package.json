@@ -24,5 +24,10 @@
   },
   "engines": {
     "node": ">=18"
+  },
+  "overrides": {
+    "patch-package": {
+      "tmp": "^0.2.4"
+    }
   }
 }
