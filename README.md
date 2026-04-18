@@ -6,12 +6,7 @@
 
 A single player game featuring a table with food placed around the center. Bugs will spawn continuously from all corners of the table, heading straight towards the nearest food. Players must tap or click on the bugs to squish them before they eat all of the food. The game continues with bugs spawning until no food remains. The goal is to survive for as long as possible, squishing as many bugs as you can. BugTap was built using source technologies.
 
-<p float="left">
-    <img src="https://images.squarespace-cdn.com/content/v1/5cc22d6593a63233d214110c/1597710652025-QEY2UL92MLE1E2BX4WSJ/Vercel+%28Zeit%29.jpg" height="150" width="150">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/f/f5/Typescript.svg" height="150" width="150">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/Unofficial_JavaScript_logo_2.svg/1024px-Unofficial_JavaScript_logo_2.svg.png" height="150" width="150">
-    <img src="https://products.fileformat.com/audio/javascript/howler-js/header-image.png" height="150" width="150">
-</p>
+<img src="https://images.squarespace-cdn.com/content/v1/5cc22d6593a63233d214110c/1597710652025-QEY2UL92MLE1E2BX4WSJ/Vercel+%28Zeit%29.jpg" width="150" /> <img src="https://upload.wikimedia.org/wikipedia/commons/f/f5/Typescript.svg" width="150" /> <img src="https://camo.githubusercontent.com/86918d276006681ebba60a6dba69d4c090751d7c2487ffe3608fa126cbb5b8f2/68747470733a2f2f63646e2e7261776769742e636f6d2f7a656b652f6a6176617363726970742d79656c6c6f772f6d61737465722f6c6f676f2e737667" width="150" /> <img src="https://products.fileformat.com/audio/javascript/howler-js/header-image.png" width="150" />
 
 ## Demo
 
